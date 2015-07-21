@@ -10,7 +10,7 @@ class Zui {
 	var inputX:Float; // Input position
 	var inputY:Float;
 	var inputDX:Float; // Delta
-	var inputDY:Float; // Delta
+	var inputDY:Float;
 	var inputReleased:Bool; // Buttons
 
 	var g:kha.graphics2.Graphics;
@@ -54,10 +54,7 @@ class Zui {
 		_w = w;
 		_h = h;
 
-		if (inputReleased &&
-        	inputX >= _x && inputX < (_x + _w) &&
-        	inputY >= _y && inputY < (_y + ELEMENT_H)) {
-
+		if (getPressed()) {
 			windowExpanded[id] = !windowExpanded[id];
 		}
 
@@ -77,10 +74,7 @@ class Zui {
 	}
 
 	public function node(text:String, id:Int):Bool {
-		if (inputReleased &&
-        	inputX >= _x && inputX < (_x + _w) &&
-        	inputY >= _y && inputY < (_y + ELEMENT_H)) {
-
+		if (getPressed()) {
 			nodeExpanded[id] = !nodeExpanded[id];
 		}
 
@@ -111,9 +105,7 @@ class Zui {
 	}
 
 	public function button(text:String):Bool {
-		var pressed = inputReleased &&
-        	inputX >= _x && inputX < (_x + _w) &&
-        	inputY >= _y && inputY < (_y + ELEMENT_H);
+		var pressed = getPressed();
 
 		g.color = 0xff777777;
 		g.fillRect(_x, _y, _w, ELEMENT_H);
@@ -127,12 +119,24 @@ class Zui {
 		return pressed;
 	}
 
-	public function check(text:String):Bool {
+	public function check(text:String, id:Int):Bool {
+		g.color = 0xffffffff;
+		g.font = font;
+		g.drawString(text, _x, _y);
 
+		_y += ELEMENT_H;
+
+		return false;
 	}
 
-	public function radio(text:String):Bool {
+	public function radio(text:String, id:Int):Bool {
+		g.color = 0xffffffff;
+		g.font = font;
+		g.drawString(text, _x, _y);
 
+		_y += ELEMENT_H;
+
+		return false;
 	}
 
 	function drawArrow(expanded:Bool) {
@@ -147,5 +151,11 @@ class Zui {
 						   _x, _y + ARROW_W,
 						   _x + ARROW_W, _y + ARROW_W / 2);
 		}
+	}
+
+	function getPressed():Bool {
+		return inputReleased &&
+        	inputX >= _x && inputX < (_x + _w) &&
+        	inputY >= _y && inputY < (_y + ELEMENT_H);
 	}
 }
