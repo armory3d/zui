@@ -14,6 +14,10 @@ class Zui {
 	var inputDY:Float;
 	var inputReleased:Bool; // Buttons
 
+	var isKeyDown = false; // Keys
+	var key:kha.Key;
+	var char:String;
+
 	var g:kha.graphics2.Graphics;
 	var font:kha.Font;
 
@@ -22,24 +26,24 @@ class Zui {
 	var _w:Int; // Window size
 	var _h:Int;
 
+	var cursorX = 0; // Text input
+	var cursorY = 0;
+	var cursorPixelX = 0.0;
+
 	var windowExpanded:Array<Bool> = []; // Element states
 	var nodeExpanded:Array<Bool> = [];
 	var checkSelected:Array<Bool> = [];
-	var radioSelected:Array<Array<Bool>> = [];
+	var radioSelected:Array<Int> = [];
+	var textSelected:Int = -1;
 
 	public function new(font:kha.Font) {
 		this.font = font;
 
-		// Preset amount of elements for now
+		// Fixed amount of elements for now
 		for (i in 0...10) windowExpanded.push(true);
 		for (i in 0...100) nodeExpanded.push(true);
 		for (i in 0...100) checkSelected.push(false);
-		for (i in 0...10) {
-			var ar:Array<Bool> = [];
-			ar.push(true);
-			for (j in 0...10) ar.push(false);
-			radioSelected.push(ar);
-		}
+		for (i in 0...10) radioSelected.push(0); 
 	}
 
 	public function begin(g:kha.graphics2.Graphics) {
@@ -50,12 +54,23 @@ class Zui {
 		_h = 0;
 	}
 
+	public function end() {
+		// Only one char at once for now
+		isKeyDown = false;
+	}
+
 	public function setInput(inputX:Float, inputY:Float, inputReleased:Bool) {
 		this.inputDX = inputX - this.inputX;
 		this.inputDY = inputY - this.inputY;
 		this.inputX = inputX;
 		this.inputY = inputY;
 		this.inputReleased = inputReleased;
+	}
+
+	public function setKeyInput(isKeyDown:Bool, key:kha.Key, char:String) {
+		this.isKeyDown = isKeyDown;
+		this.key = key;
+		this.char = char;
 	}
 
 	public function window(x:Int, y:Int, w:Int, h:Int, text:String, id:Int):Bool {
@@ -109,8 +124,63 @@ class Zui {
 		_y += ELEMENT_H;
 	}
 
-	public function inputText(text:String):String {
-		return "";
+	public function inputText(text:String, id:Int):String {
+		if (textSelected != id && getPressed()) { // Passive
+			textSelected = id;
+			cursorX = 0;
+			cursorY = 0;
+			cursorPixelX = 0;
+		}
+
+		if (textSelected == id) { // Active
+			if (isKeyDown) { // Process input
+				if (key == kha.Key.LEFT) { // Move cursor
+					if (cursorX > 0) {
+						cursorX--;
+						updateCursorPixelX(text);
+					}
+				}
+				else if (key == kha.Key.RIGHT) {
+					if (cursorX < text.length) {
+						cursorX++;
+						updateCursorPixelX(text);
+					}
+				}
+				else if (key == kha.Key.BACKSPACE) { // Remove char
+					if (cursorX > 0) {
+						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
+						cursorX--;
+						updateCursorPixelX(text);
+					}
+				}
+				else if (key == kha.Key.ENTER) { // Deselect
+					textSelected = -1; // One-line text for now
+				}
+				else if (key == kha.Key.CHAR) {
+					if (char.charCodeAt(0) == 13) { // ENTER
+						textSelected = -1; // One-line text for now
+					}
+					else {
+						text = text.substr(0, cursorX) + char + text.substr(cursorX);
+						cursorX++;
+						updateCursorPixelX(text);
+					}
+				}
+			}
+
+			g.color = 0xffffffff; // Cursor
+			var cursorHeight = ELEMENT_H * 0.9;
+			var lineHeight = ELEMENT_H;
+			g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight, 1, cursorHeight);
+		}
+
+		g.color = 0xffffffff;
+		g.font = font;
+		g.drawString(text, _x, _y);
+
+		_y += ELEMENT_H;
+
+		return text;
 	}
 
 	public function button(text:String):Bool {
@@ -146,11 +216,10 @@ class Zui {
 
 	public function radio(text:String, groupId:Int, id:Int):Bool {
 		if (getPressed()) {
-			for (i in 0...radioSelected[groupId].length) radioSelected[groupId][i] = false;
-			radioSelected[groupId][id] = true;
+			radioSelected[groupId] = id;
 		}
 
-		drawRadio(radioSelected[groupId][id]); // Radio
+		drawRadio(radioSelected[groupId] == id); // Radio
 
 		g.color = 0xffffffff; // Text
 		g.font = font;
@@ -199,5 +268,17 @@ class Zui {
 		return inputReleased &&
         	inputX >= _x && inputX < (_x + _w) &&
         	inputY >= _y && inputY < (_y + ELEMENT_H);
+	}
+
+	function updateCursorPixelX(text:String) { // Set cursor to current char
+		var str = text.substr(0, cursorX);
+		cursorPixelX = font.stringWidth(str);
+	}
+
+	function capCursor(text:String) { // Make sure cursor stays in bounds
+		if (cursorX > text.length) {
+			cursorX = text.length;
+			updateCursorPixelX(text);
+		}
 	}
 }
