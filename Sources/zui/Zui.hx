@@ -6,6 +6,7 @@ class Zui {
 	public static inline var ELEMENT_H = 30; // Sizes
 	public static inline var ARROW_W = ELEMENT_H * 0.5;
 	public static inline var TITLE_OFFSET_X = ARROW_W * 1.3;
+	public static inline var SCROLL_W = 15;
 	// Colors
 
 	static var firstInstance = true;
@@ -14,6 +15,7 @@ class Zui {
 	static var inputDX:Float; // Delta
 	static var inputDY:Float;
 	static var inputReleased:Bool; // Buttons
+	static var inputDown:Bool;
 
 	static var isKeyDown = false; // Keys
 	static var key:kha.Key;
@@ -28,10 +30,17 @@ class Zui {
 
 	var _x:Float; // Cursor(stack) position
 	var _y:Float;
-	var _w:Int; // Window size
+	var _w:Int;
 	var _h:Int;
 
+	var _windowX:Float;
+	var _windowY:Float;
+	var _windowW:Float;
+	var _windowH:Float;
+	var currentWindowId:Int;
+
 	var windowExpanded:Array<Bool> = []; // Element states
+	var windowScrollOffset:Array<Float> = [];
 	var nodeExpanded:Array<Bool> = [];
 	var checkSelected:Array<Bool> = [];
 	var radioSelected:Array<Int> = [];
@@ -41,7 +50,10 @@ class Zui {
 		this.font = font;
 
 		// Fixed amount of elements for now
-		for (i in 0...10) windowExpanded.push(true);
+		for (i in 0...10) {
+			windowExpanded.push(true);
+			windowScrollOffset.push(-1); // -1 for disabled scrollbar
+		}
 		for (i in 0...100) nodeExpanded.push(true);
 		for (i in 0...100) checkSelected.push(false);
 		for (i in 0...10) radioSelected.push(0);
@@ -63,15 +75,20 @@ class Zui {
 	}
 
 	public function end() {
-		// Only one char and one zui instance for now
+		// Reset input - only one char and one zui instance for now
 		Zui.isKeyDown = false;
 		Zui.inputReleased = false;
 	}
 
 	public function window(x:Int, y:Int, w:Int, h:Int, text:String, id:Int):Bool {
+		currentWindowId = id;
+		_windowX = x;
+		_windowY = y;
+		_windowW = w;
+		_windowH = h;
 		_x = x;
-		_y = y;
-		_w = w;
+		_y = y + windowScrollOffset[id];
+		_w = windowScrollOffset[id] == -1 ? w : w - SCROLL_W; // Exclude scrollbar if present
 		_h = h;
 
 		if (getPressed()) {
@@ -90,6 +107,25 @@ class Zui {
 		_y += ELEMENT_H;
 
 		return windowExpanded[id];
+	}
+
+	public function endWindow() {
+		if (_y > _h) { // Draw window scrollbars if necessary
+			if (windowScrollOffset[currentWindowId] == -1) windowScrollOffset[currentWindowId] = 0; // Enable
+			var barY = 0;
+			var barW = SCROLL_W - 2;
+			var barH = _windowH / 2;
+			if (getDownRect(_windowX + _windowW - barW, barY, barW, barH)) { // Scroll
+				windowScrollOffset[currentWindowId] += inputDY;
+			}
+			g.color = 0xff444444; // Bg
+			g.fillRect(_windowX + _windowW - SCROLL_W, _windowY, SCROLL_W, _windowH);
+			g.color = 0xff555555; // Bar
+			g.fillRect(_windowX + _windowW - barW, barY, barW, barH);
+		}
+		else { // Disable scrollbar
+			windowScrollOffset[currentWindowId] = -1;
+		}
 	}
 
 	public function node(text:String, id:Int):Bool {
@@ -259,10 +295,16 @@ class Zui {
 		}
 	}
 
-	function getPressed():Bool {
+	function getPressed():Bool { // Input selection
 		return inputReleased &&
         	inputX >= _x && inputX < (_x + _w) &&
         	inputY >= _y && inputY < (_y + ELEMENT_H);
+	}
+
+	function getDownRect(x:Float, y:Float, w:Float, h:Float):Bool {
+		return inputDown &&
+			inputX >= x && inputX < x + w &&
+			inputY >= y && inputY < y + h;
 	}
 
 	function updateCursorPixelX(text:String) { // Set cursor to current char
@@ -277,13 +319,14 @@ class Zui {
 		}
 	}
 
-	// Input events
-    function onMouseDown(button:Int, x:Int, y:Int) {
+    function onMouseDown(button:Int, x:Int, y:Int) { // Input events
     	setInputPosition(x, y);
+    	Zui.inputDown = true;
     }
 
     function onMouseUp(button:Int, x:Int, y:Int) {
     	Zui.inputReleased = true;
+    	Zui.inputDown = false;
     	setInputPosition(x, y);
     }
 
