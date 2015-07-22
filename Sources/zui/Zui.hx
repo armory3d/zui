@@ -8,27 +8,28 @@ class Zui {
 	public static inline var TITLE_OFFSET_X = ARROW_W * 1.3;
 	// Colors
 
-	var inputX:Float; // Input position
-	var inputY:Float;
-	var inputDX:Float; // Delta
-	var inputDY:Float;
-	var inputReleased:Bool; // Buttons
+	static var firstInstance = true;
+	static var inputX:Float; // Input position
+	static var inputY:Float;
+	static var inputDX:Float; // Delta
+	static var inputDY:Float;
+	static var inputReleased:Bool; // Buttons
 
-	var isKeyDown = false; // Keys
-	var key:kha.Key;
-	var char:String;
+	static var isKeyDown = false; // Keys
+	static var key:kha.Key;
+	static var char:String;
+
+	static var cursorX = 0; // Text input
+	static var cursorY = 0;
+	static var cursorPixelX = 0.0;
 
 	var g:kha.graphics2.Graphics;
 	var font:kha.Font;
 
-	var _x:Float; // Cursor position
+	var _x:Float; // Cursor(stack) position
 	var _y:Float;
 	var _w:Int; // Window size
 	var _h:Int;
-
-	var cursorX = 0; // Text input
-	var cursorY = 0;
-	var cursorPixelX = 0.0;
 
 	var windowExpanded:Array<Bool> = []; // Element states
 	var nodeExpanded:Array<Bool> = [];
@@ -43,7 +44,14 @@ class Zui {
 		for (i in 0...10) windowExpanded.push(true);
 		for (i in 0...100) nodeExpanded.push(true);
 		for (i in 0...100) checkSelected.push(false);
-		for (i in 0...10) radioSelected.push(0); 
+		for (i in 0...10) radioSelected.push(0);
+
+		if (firstInstance) {
+			firstInstance = false;
+			kha.input.Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, null);
+			//kha.input.Surface.get().notify(onMouseDown, onMouseUp, onMouseMove);
+			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
+		}
 	}
 
 	public function begin(g:kha.graphics2.Graphics) {
@@ -55,22 +63,9 @@ class Zui {
 	}
 
 	public function end() {
-		// Only one char at once for now
-		isKeyDown = false;
-	}
-
-	public function setInput(inputX:Float, inputY:Float, inputReleased:Bool) {
-		this.inputDX = inputX - this.inputX;
-		this.inputDY = inputY - this.inputY;
-		this.inputX = inputX;
-		this.inputY = inputY;
-		this.inputReleased = inputReleased;
-	}
-
-	public function setKeyInput(isKeyDown:Bool, key:kha.Key, char:String) {
-		this.isKeyDown = isKeyDown;
-		this.key = key;
-		this.char = char;
+		// Only one char and one zui instance for now
+		Zui.isKeyDown = false;
+		Zui.inputReleased = false;
 	}
 
 	public function window(x:Int, y:Int, w:Int, h:Int, text:String, id:Int):Bool {
@@ -281,4 +276,34 @@ class Zui {
 			updateCursorPixelX(text);
 		}
 	}
+
+	// Input events
+    function onMouseDown(button:Int, x:Int, y:Int) {
+    	setInputPosition(x, y);
+    }
+
+    function onMouseUp(button:Int, x:Int, y:Int) {
+    	Zui.inputReleased = true;
+    	setInputPosition(x, y);
+    }
+
+    function onMouseMove(x:Int, y:Int) {
+    	setInputPosition(x, y);
+    }
+
+    function setInputPosition(inputX:Int, inputY:Int) {
+		Zui.inputDX = inputX - Zui.inputX;
+		Zui.inputDY = inputY - Zui.inputY;
+		Zui.inputX = inputX;
+		Zui.inputY = inputY;
+	}
+
+	function onKeyDown(key:kha.Key, char:String) {
+        Zui.isKeyDown = true;
+        Zui.key = key;
+        Zui.char = char;
+    }
+
+    function onKeyUp(key:kha.Key, char:String) {
+    }
 }
