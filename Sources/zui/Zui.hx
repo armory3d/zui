@@ -3,9 +3,10 @@ package zui;
 class Zui {
 
 	// Theme values
-	public static inline var ELEMENT_H = 30;
+	public static inline var ELEMENT_H = 30; // Sizes
 	public static inline var ARROW_W = ELEMENT_H * 0.5;
 	public static inline var TITLE_OFFSET_X = ARROW_W * 1.3;
+	// Colors
 
 	var inputX:Float; // Input position
 	var inputY:Float;
@@ -23,6 +24,8 @@ class Zui {
 
 	var windowExpanded:Array<Bool> = []; // Element states
 	var nodeExpanded:Array<Bool> = [];
+	var checkSelected:Array<Bool> = [];
+	var radioSelected:Array<Array<Bool>> = [];
 
 	public function new(font:kha.Font) {
 		this.font = font;
@@ -30,6 +33,13 @@ class Zui {
 		// Preset amount of elements for now
 		for (i in 0...10) windowExpanded.push(true);
 		for (i in 0...100) nodeExpanded.push(true);
+		for (i in 0...100) checkSelected.push(false);
+		for (i in 0...10) {
+			var ar:Array<Bool> = [];
+			ar.push(true);
+			for (j in 0...10) ar.push(false);
+			radioSelected.push(ar);
+		}
 	}
 
 	public function begin(g:kha.graphics2.Graphics) {
@@ -59,8 +69,7 @@ class Zui {
 		}
 
 		g.color = 0xff333333; // Bg
-		//windowExpanded[id] ? g.fillRect(_x, _y, _w, _h) : g.fillRect(_x, _y, _w, ELEMENT_H);
-		g.fillRect(_x, _y, _w, ELEMENT_H);
+		windowExpanded[id] ? g.fillRect(_x, _y, _w, _h) : g.fillRect(_x, _y, _w, ELEMENT_H);
 
 		drawArrow(windowExpanded[id]); // Arrow
 
@@ -120,19 +129,32 @@ class Zui {
 	}
 
 	public function check(text:String, id:Int):Bool {
-		g.color = 0xffffffff;
+		if (getPressed()) {
+			checkSelected[id] = !checkSelected[id];
+		}
+
+		drawCheck(checkSelected[id]); // Check
+
+		g.color = 0xffffffff; // Text
 		g.font = font;
-		g.drawString(text, _x, _y);
+		g.drawString(text, _x + TITLE_OFFSET_X, _y);
 
 		_y += ELEMENT_H;
 
 		return false;
 	}
 
-	public function radio(text:String, id:Int):Bool {
-		g.color = 0xffffffff;
+	public function radio(text:String, groupId:Int, id:Int):Bool {
+		if (getPressed()) {
+			for (i in 0...radioSelected[groupId].length) radioSelected[groupId][i] = false;
+			radioSelected[groupId][id] = true;
+		}
+
+		drawRadio(radioSelected[groupId][id]); // Radio
+
+		g.color = 0xffffffff; // Text
 		g.font = font;
-		g.drawString(text, _x, _y);
+		g.drawString(text, _x + TITLE_OFFSET_X, _y);
 
 		_y += ELEMENT_H;
 
@@ -150,6 +172,26 @@ class Zui {
 			g.fillTriangle(_x, _y,
 						   _x, _y + ARROW_W,
 						   _x + ARROW_W, _y + ARROW_W / 2);
+		}
+	}
+
+	function drawCheck(selected:Bool) {
+		g.color = 0xff555555;
+		g.fillRect(_x, _y, ARROW_W, ARROW_W); // Bg
+
+		if (selected) { // Check
+			g.color = 0xff777777;
+			g.fillRect(_x, _y, ARROW_W * 0.8, ARROW_W * 0.8);
+		}
+	}
+
+	function drawRadio(selected:Bool) {
+		g.color = 0xff555555;
+		g.fillRect(_x, _y, ARROW_W, ARROW_W); // Bg
+
+		if (selected) { // Check
+			g.color = 0xff777777;
+			g.fillRect(_x, _y, ARROW_W * 0.6, ARROW_W * 0.6);
 		}
 	}
 
