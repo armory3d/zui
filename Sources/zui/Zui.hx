@@ -37,9 +37,9 @@ class Zui {
 	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
 	static inline var ARROW_COL = 0xffffffff;
 
-	static inline var ALIGN_LEFT = 0;
-	static inline var ALIGN_CENTER = 1;
-	static inline var ALIGN_RIGHT = 2;
+	public static inline var ALIGN_LEFT = 0;
+	public static inline var ALIGN_CENTER = 1;
+	public static inline var ALIGN_RIGHT = 2;
 
 	static var firstInstance = true;
 	static var inputX:Float; // Input position
@@ -59,6 +59,11 @@ class Zui {
 	static var cursorX = 0; // Text input
 	static var cursorY = 0;
 	static var cursorPixelX = 0.0;
+
+	var ratios:Array<Float>; // Splitting rows
+	var curRatio:Int = -1;
+	var xBeforeSplit:Float;
+	var wBeforeSplit:Int;
 
 	var g:kha.graphics2.Graphics;
 	var font:kha.Font;
@@ -182,7 +187,7 @@ class Zui {
 		g.color = WINDOW_TEXT_COL; // Title
 		drawString(g, text, titleOffsetX, 0);
 
-		endLine();
+		endElement();
 
 		return windowExpanded[id];
 	}
@@ -241,16 +246,16 @@ class Zui {
 		g.color = NODE_TEXT_COL; // Title
 		drawString(g, text, titleOffsetX, 0);
 
-		endLine();
+		endElement();
 
 		return nodeExpanded[id];
 	}
 
-	public function text(text:String) {
+	public function text(text:String, align = ALIGN_LEFT) {
 		g.color = DEFAULT_TEXT_COL;
-		drawString(g, text);
+		drawString(g, text, DEFAULT_TEXT_OFFSET_X, 0, align);
 
-		endLine();
+		endElement();
 	}
 
 	public function inputText(text:String, id:Int, label:String = ""):String {
@@ -311,7 +316,7 @@ class Zui {
 		g.color = DEFAULT_TEXT_COL; // Text
 		drawStringSmall(g, text);
 
-		endLine();
+		endElement();
 
 		return text;
 	}
@@ -325,7 +330,7 @@ class Zui {
 		g.color = BUTTON_TEXT_COL;
 		drawStringSmall(g, text, 0, 0, ALIGN_CENTER);
 
-		endLine();
+		endElement();
 
 		return pressed;
 	}
@@ -340,7 +345,7 @@ class Zui {
 		g.color = DEFAULT_TEXT_COL; // Text
 		drawString(g, text, titleOffsetX, 0);
 
-		endLine();
+		endElement();
 
 		return false;
 	}
@@ -355,7 +360,7 @@ class Zui {
 		g.color = DEFAULT_TEXT_COL; // Text
 		drawString(g, text, titleOffsetX, 0);
 
-		endLine();
+		endElement();
 
 		return false;
 	}
@@ -422,8 +427,30 @@ class Zui {
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
-	function endLine() {
-		_y += ELEMENT_H + ELEMENT_SEPARATOR_H;
+	function endElement() {
+		if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
+			_y += ELEMENT_H + ELEMENT_SEPARATOR_H;
+			
+			if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
+				curRatio = -1;
+				ratios = null;
+				_x = xBeforeSplit;
+				_w = wBeforeSplit;
+			}
+		}
+		else { // Row
+			curRatio++;
+			_x += _w ; // More row elements to place
+			_w = Std.int(wBeforeSplit * ratios[curRatio]);
+		}
+	}
+
+	public function row(ratios:Array<Float>) {
+		this.ratios = ratios;
+		curRatio = 0;
+		xBeforeSplit = _x;
+		wBeforeSplit = _w;
+		_w = Std.int(_w * ratios[curRatio]);
 	}
 
 	function getPressed():Bool { // Input selection
