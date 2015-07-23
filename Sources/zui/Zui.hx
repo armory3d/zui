@@ -480,6 +480,7 @@ class Zui {
     	Zui.inputReleased = true;
     	Zui.inputDown = false;
     	setInputPosition(x, y);
+    	textSelected = -1;
     }
 
     function onMouseMove(x:Int, y:Int) {
