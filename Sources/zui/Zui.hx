@@ -3,38 +3,43 @@ package zui;
 class Zui {
 
 	// Theme values
-	public static inline var ELEMENT_H = 30; // Sizes
-	public static inline var ELEMENT_SEPARATOR_H = 1;
-	public static inline var ARROW_W = ELEMENT_H * 0.3;
-	public static inline var ARROW_H = ARROW_W;
-	public static inline var BUTTON_H = ELEMENT_H * 0.7;
-	public static inline var CHECK_W = ELEMENT_H * 0.5;
-	public static inline var CHECK_H = CHECK_W;
-	public static inline var CHECK_SELECT_W = ELEMENT_H * 0.3;
-	public static inline var CHECK_SELECT_H = CHECK_SELECT_W;
-	public static inline var RADIO_W = ELEMENT_H * 0.5;
-	public static inline var RADIO_H = RADIO_W;
-	public static inline var RADIO_SELECT_W = ELEMENT_H * 0.35;
-	public static inline var RADIO_SELECT_H = RADIO_SELECT_W;
-	public static inline var SCROLL_W = 13;
-	public static inline var SCROLL_BAR_W = 10;
-	public static inline var DEFAULT_TEXT_OFFSET_X = 5;
+	static inline var ELEMENT_H = 30; // Sizes
+	static inline var ELEMENT_SEPARATOR_H = 1;
+	static inline var ARROW_W = ELEMENT_H * 0.3;
+	static inline var ARROW_H = ARROW_W;
+	static inline var BUTTON_H = ELEMENT_H * 0.7;
+	static inline var CHECK_W = ELEMENT_H * 0.5;
+	static inline var CHECK_H = CHECK_W;
+	static inline var CHECK_SELECT_W = ELEMENT_H * 0.3;
+	static inline var CHECK_SELECT_H = CHECK_SELECT_W;
+	static inline var RADIO_W = ELEMENT_H * 0.5;
+	static inline var RADIO_H = RADIO_W;
+	static inline var RADIO_SELECT_W = ELEMENT_H * 0.35;
+	static inline var RADIO_SELECT_H = RADIO_SELECT_W;
+	static inline var SCROLL_W = 13;
+	static inline var SCROLL_BAR_W = 10;
+	static inline var DEFAULT_TEXT_OFFSET_X = 5;
 
-	public static inline var WINDOW_BG_COL = 0xff323232; // Colors
-	public static inline var WINDOW_HEADER_COL = 0xff444a84;
-	public static inline var WINDOW_TEXT_COL = 0xffffffff;
-	public static inline var SCROLL_BG_COL = 0xff0c0c0c;
-	public static inline var SCROLL_COL = 0xff494949;
-	public static inline var NODE_BG_COL = 0xff585da4;
-	public static inline var NODE_TEXT_COL = 0xffffffff;
-	public static inline var BUTTON_BG_COL = 0xff4d526a;
-	public static inline var BUTTON_TEXT_COL = 0xffffffff;
-	public static inline var CHECK_COL = 0xff4d526a;
-	public static inline var CHECK_SELECT_COL = 0xffa3a8c0;
-	public static inline var RADIO_COL = 0xff4d526a;
-	public static inline var RADIO_SELECT_COL = 0xffa3a8c0;
-	public static inline var DEFAULT_TEXT_COL = 0xffffffff;
-	public static inline var ARROW_COL = 0xffffffff;
+	static inline var WINDOW_BG_COL = 0xff323232; // Colors
+	static inline var WINDOW_HEADER_COL = 0xff444a84;
+	static inline var WINDOW_TEXT_COL = 0xffffffff;
+	static inline var SCROLL_BG_COL = 0xff0c0c0c;
+	static inline var SCROLL_COL = 0xff494949;
+	static inline var NODE_BG_COL = 0xff585da4;
+	static inline var NODE_TEXT_COL = 0xffffffff;
+	static inline var BUTTON_BG_COL = 0xff4d526a;
+	static inline var BUTTON_TEXT_COL = 0xffffffff;
+	static inline var CHECK_COL = 0xff4d526a;
+	static inline var CHECK_SELECT_COL = 0xffa3a8c0;
+	static inline var RADIO_COL = 0xff4d526a;
+	static inline var RADIO_SELECT_COL = 0xffa3a8c0;
+	static inline var DEFAULT_TEXT_COL = 0xffffffff;
+	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
+	static inline var ARROW_COL = 0xffffffff;
+
+	static inline var ALIGN_LEFT = 0;
+	static inline var ALIGN_CENTER = 1;
+	static inline var ALIGN_RIGHT = 2;
 
 	static var firstInstance = true;
 	static var inputX:Float; // Input position
@@ -119,7 +124,7 @@ class Zui {
 			windowScrollOffset.push(0);
 			windowScrollEnabled.push(false);
 		}
-		for (i in 0...100) nodeExpanded.push(true);
+		for (i in 0...100) nodeExpanded.push(false);
 		for (i in 0...100) checkSelected.push(false);
 		for (i in 0...10) radioSelected.push(0);
 
@@ -221,13 +226,15 @@ class Zui {
 		}
 	}
 
-	public function node(text:String, id:Int):Bool {
+	public function node(text:String, id:Int, fillBg = true):Bool {
 		if (getPressed()) {
 			nodeExpanded[id] = !nodeExpanded[id];
 		}
 
-		g.color = NODE_BG_COL; // Bg
-		g.fillRect(_x, _y, _w, ELEMENT_H);
+		if (fillBg) { // Bg
+			g.color = NODE_BG_COL;
+			g.fillRect(_x, _y, _w, ELEMENT_H);
+		}
 
 		drawArrow(nodeExpanded[id]);
 
@@ -246,7 +253,7 @@ class Zui {
 		endLine();
 	}
 
-	public function inputText(text:String, id:Int):String {
+	public function inputText(text:String, id:Int, label:String = ""):String {
 		if (textSelected != id && getPressed()) { // Passive
 			textSelected = id;
 			cursorX = 0;
@@ -259,20 +266,20 @@ class Zui {
 				if (key == kha.Key.LEFT) { // Move cursor
 					if (cursorX > 0) {
 						cursorX--;
-						updateCursorPixelX(text);
+						updateCursorPixelX(text, fontSmall);
 					}
 				}
 				else if (key == kha.Key.RIGHT) {
 					if (cursorX < text.length) {
 						cursorX++;
-						updateCursorPixelX(text);
+						updateCursorPixelX(text, fontSmall);
 					}
 				}
 				else if (key == kha.Key.BACKSPACE) { // Remove char
 					if (cursorX > 0) {
 						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
 						cursorX--;
-						updateCursorPixelX(text);
+						updateCursorPixelX(text, fontSmall);
 					}
 				}
 				else if (key == kha.Key.ENTER) { // Deselect
@@ -285,7 +292,7 @@ class Zui {
 					else {
 						text = text.substr(0, cursorX) + char + text.substr(cursorX);
 						cursorX++;
-						updateCursorPixelX(text);
+						updateCursorPixelX(text, fontSmall);
 					}
 				}
 			}
@@ -296,8 +303,13 @@ class Zui {
 			g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight, 1, cursorHeight);
 		}
 
-		g.color = DEFAULT_TEXT_COL;
-		drawString(g, text);
+		if (label != "") {
+			g.color = DEFAULT_LABEL_COL;// Label
+			drawStringSmall(g, label, 0, 0, ALIGN_RIGHT);
+		}
+
+		g.color = DEFAULT_TEXT_COL; // Text
+		drawStringSmall(g, text);
 
 		endLine();
 
@@ -311,7 +323,7 @@ class Zui {
 		g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H);
 
 		g.color = BUTTON_TEXT_COL;
-		drawString(g, text, 0, 0, true, true);
+		drawStringSmall(g, text, 0, 0, ALIGN_CENTER);
 
 		endLine();
 
@@ -392,12 +404,22 @@ class Zui {
 
 	function drawString(g:kha.graphics2.Graphics, text:String,
 						xOffset:Float = DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
-						small = false, center = false) {
-		small ? g.font = fontSmall : g.font = font;
+						align = ALIGN_LEFT) {
+		g.font = font;
+		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.stringWidth(text) / 2;
+		else if (align == ALIGN_RIGHT) xOffset = _w - font.stringWidth(text) - DEFAULT_TEXT_OFFSET_X;
 
-		if (center) xOffset = _w / 2 - font.stringWidth(text) / 2;
+		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
+	}
 
-		g.drawString(text, _x + xOffset, _y + (small ? fontSmallOffsetY : fontOffsetY) + yOffset);
+	function drawStringSmall(g:kha.graphics2.Graphics, text:String,
+							 xOffset:Float = DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
+							 align = ALIGN_LEFT) {
+		g.font = fontSmall;
+		if (align == ALIGN_CENTER) xOffset = _w / 2 - fontSmall.stringWidth(text) / 2;
+		else if (align == ALIGN_RIGHT) xOffset = _w - fontSmall.stringWidth(text) - DEFAULT_TEXT_OFFSET_X;
+
+		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
 	function endLine() {
@@ -416,16 +438,9 @@ class Zui {
 			inputY >= y && inputY < y + h;
 	}
 
-	function updateCursorPixelX(text:String) { // Set cursor to current char
+	function updateCursorPixelX(text:String, font:kha.Font) { // Set cursor to current char
 		var str = text.substr(0, cursorX);
 		cursorPixelX = font.stringWidth(str) + DEFAULT_TEXT_OFFSET_X;
-	}
-
-	function capCursor(text:String) { // Make sure cursor stays in bounds
-		if (cursorX > text.length) {
-			cursorX = text.length;
-			updateCursorPixelX(text);
-		}
 	}
 
     function onMouseDown(button:Int, x:Int, y:Int) { // Input events
