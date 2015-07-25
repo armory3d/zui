@@ -154,6 +154,7 @@ class Zui {
 		var state = windowStates.get(id);
 		if (state == null) { state = new WindowState(); windowStates.set(id, state); }
 
+
 		if (!windowEnded) { endWindow(); }
 		windowEnded = false;
 		
@@ -209,9 +210,9 @@ class Zui {
 				
 				scrolling = true;
 			}
-			if (inputReleased) { // End scrolling
-				scrolling = false;
-			}
+			//if (inputReleased) { // End scrolling
+			//	scrolling = false;
+			//}
 			if (scrolling) { // Scroll
 				state.scrollOffset -= inputDY;
 				// Stay in bounds
@@ -483,7 +484,12 @@ class Zui {
     }
 
     function onMouseUp(button:Int, x:Int, y:Int) {
-    	Zui.inputReleased = true;
+    	if (scrolling) {
+    		scrolling = false;
+    	}
+    	else { // To prevent action when scrolling is active
+    		Zui.inputReleased = true;
+    	}
     	Zui.inputDown = false;
     	setInputPosition(x, y);
     	textSelectedId = "";
@@ -512,7 +518,7 @@ class Zui {
 
 class WindowState {
 	public var expanded:Bool = true;
-	public var scrollOffset:Float;
+	public var scrollOffset:Float = 0;
 	public var scrollEnabled:Bool = false;
 	public function new() {}
 }
