@@ -140,15 +140,14 @@ class Zui {
 	}
 
 	public function end() {
-		// Reset input - only one char and one zui instance for now
-		Zui.isKeyDown = false;
+		if (!windowEnded) { endWindow(); }
+
+		Zui.isKeyDown = false; // Reset input - only one char and one zui instance for now
 		Zui.inputStarted = false;
 		Zui.inputReleased = false;
 		Zui.inputDX = 0;
 		Zui.inputDY = 0;
 		lastMaxY = _y;
-
-		if (!windowEnded) { endWindow(); }
 	}
 
 	public function window(id:String, x:Int, y:Int, w:Int, h:Int, text:String):Bool {
