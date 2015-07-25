@@ -2,11 +2,11 @@ package zui;
 
 class Ext {
 
-	public static function drawEditableList(ui:Zui, ar:Array<String>, itemCb:Int->Void = null) {
+	public static function drawEditableList(ui:Zui, id:String, ar:Array<String>, itemCb:Int->Void = null) {
         var i = 0;
         while (i < ar.length) {
             ui.row([0.8, 0.2]);
-            ar[i] = ui.textInput(Id.nest(Id.textInput(), i), ar[i]);
+            ar[i] = ui.textInput(Id.nest(id, i), ar[i]);
             if (ui.button("X")) {
                 ar.splice(i, 1);
             }
