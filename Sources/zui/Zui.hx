@@ -259,7 +259,7 @@ class Zui {
 		endElement();
 	}
 
-	public function inputText(id:String, text:String, label:String = ""):String {
+	public function textInput(id:String, text:String, label:String = ""):String {
 		if (textSelectedId != id && getPressed()) { // Passive
 			textSelectedId = id;
 			cursorX = 0;
