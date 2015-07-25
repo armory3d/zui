@@ -210,9 +210,6 @@ class Zui {
 				
 				scrolling = true;
 			}
-			//if (inputReleased) { // End scrolling
-			//	scrolling = false;
-			//}
 			if (scrolling) { // Scroll
 				state.scrollOffset -= inputDY;
 				// Stay in bounds
@@ -336,9 +333,9 @@ class Zui {
 		return pressed;
 	}
 
-	public function check(id:String, text:String):Bool {
+	public function check(id:String, text:String, initState:Bool = false):Bool {
 		var state = checkStates.get(id);
-		if (state == null) { state = new CheckState(); checkStates.set(id, state); }
+		if (state == null) { state = new CheckState(initState); checkStates.set(id, state); }
 
 		if (getPressed()) {
 			state.selected = !state.selected;
@@ -347,7 +344,7 @@ class Zui {
 		drawCheck(state.selected); // Check
 
 		g.color = DEFAULT_TEXT_COL; // Text
-		drawString(g, text, titleOffsetX, 0);
+		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
@@ -365,7 +362,7 @@ class Zui {
 		drawRadio(state.selected == pos); // Radio
 
 		g.color = DEFAULT_TEXT_COL; // Text
-		drawString(g, text, titleOffsetX, 0);
+		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
@@ -530,7 +527,7 @@ class NodeState {
 
 class CheckState {
 	public var selected:Bool = false;
-	public function new() {}
+	public function new(state:Bool) { selected = state; }
 }
 
 class RadioState {
