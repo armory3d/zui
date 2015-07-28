@@ -47,6 +47,7 @@ class Zui {
 	static var inputY:Float;
 	static var inputDX:Float; // Delta
 	static var inputDY:Float;
+	static var inputWheelDelta:Int;
 	static var inputStarted:Bool; // Buttons
 	static var inputReleased:Bool;
 	static var inputDown:Bool;
@@ -101,6 +102,8 @@ class Zui {
 	var checkStates:Map<String, CheckState> = new Map();
 	var radioStates:Map<String, RadioState> = new Map();
 	var textSelectedId:String = "";
+	var textSelectedCurrentText:String;
+	var submitTextId:String;
 
 	public function new(font:kha.Font, fontSmall:kha.Font) {
 		this.font = font;
@@ -125,7 +128,7 @@ class Zui {
 
 		if (firstInstance) {
 			firstInstance = false;
-			kha.input.Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, null);
+			kha.input.Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 			//kha.input.Surface.get().notify(onMouseDown, onMouseUp, onMouseMove);
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
@@ -147,6 +150,7 @@ class Zui {
 		Zui.inputReleased = false;
 		Zui.inputDX = 0;
 		Zui.inputDY = 0;
+		Zui.inputWheelDelta = 0;
 		lastMaxY = _y;
 	}
 
@@ -205,18 +209,14 @@ class Zui {
 			if (barH < ELEMENT_H * 2) barH = ELEMENT_H;
 			var barY = (_windowH - barH) * ratio;
 
-			if (inputStarted && // Start scrolling
+			if ((inputStarted) && // Start scrolling
 				getInputInRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH)) {
 				
 				scrolling = true;
 			}
 			if (scrolling) { // Scroll
-				state.scrollOffset -= inputDY;
-				// Stay in bounds
-				if (state.scrollOffset > 0) state.scrollOffset = 0;
-				else if (fullHeight + state.scrollOffset < _windowH) {
-					state.scrollOffset = _windowH - fullHeight;
-				}
+				var delta = inputWheelDelta != 0 ? inputWheelDelta : inputDY;
+				scroll(inputDY, fullHeight);
 			}
 			g.color = SCROLL_BG_COL; // Bg
 			g.fillRect(_windowX + _windowW - SCROLL_W, _windowY, SCROLL_W, _windowH);
@@ -224,6 +224,16 @@ class Zui {
 			g.fillRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH);
 		}
 		windowEnded = true;
+	}
+
+	function scroll(delta:Float, fullHeight:Float) {
+		var state = curWindowState;
+		state.scrollOffset -= delta;
+		// Stay in bounds
+		if (state.scrollOffset > 0) state.scrollOffset = 0;
+		else if (fullHeight + state.scrollOffset < _windowH) {
+			state.scrollOffset = _windowH - fullHeight;
+		}
 	}
 
 	public function node(id:String, text:String, fillBg = true):Bool {
@@ -242,7 +252,7 @@ class Zui {
 		drawArrow(state.expanded);
 
 		g.color = NODE_TEXT_COL; // Title
-		drawString(g, text, titleOffsetX, 0);
+		fillBg ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
@@ -257,14 +267,22 @@ class Zui {
 	}
 
 	public function textInput(id:String, text:String, label:String = ""):String {
+		if (submitTextId == id) { // Submit edited text
+			text = textSelectedCurrentText;
+			submitTextId = "";
+			textSelectedCurrentText = "";
+		}
+
 		if (textSelectedId != id && getPressed()) { // Passive
 			textSelectedId = id;
+			textSelectedCurrentText = text;
 			cursorX = 0;
 			cursorY = 0;
 			cursorPixelX = DEFAULT_TEXT_OFFSET_X;
 		}
 
 		if (textSelectedId == id) { // Active
+			var text = textSelectedCurrentText;
 			if (isKeyDown) { // Process input
 				if (key == kha.Key.LEFT) { // Move cursor
 					if (cursorX > 0) {
@@ -286,11 +304,11 @@ class Zui {
 					}
 				}
 				else if (key == kha.Key.ENTER) { // Deselect
-					textSelectedId = ""; // One-line text for now
+					deselectText(); // One-line text for now
 				}
 				else if (key == kha.Key.CHAR) {
 					if (char.charCodeAt(0) == 13) { // ENTER
-						textSelectedId = ""; // One-line text for now
+						deselectText(); // One-line text for now
 					}
 					else {
 						text = text.substr(0, cursorX) + char + text.substr(cursorX);
@@ -304,6 +322,7 @@ class Zui {
 			var cursorHeight = ELEMENT_H * 0.9;
 			var lineHeight = ELEMENT_H;
 			g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight, 1, cursorHeight);
+			textSelectedCurrentText = text;
 		}
 
 		if (label != "") {
@@ -312,11 +331,16 @@ class Zui {
 		}
 
 		g.color = DEFAULT_TEXT_COL; // Text
-		drawStringSmall(g, text);
+		textSelectedId != id ? drawStringSmall(g, text) : drawStringSmall(g, textSelectedCurrentText);
 
 		endElement();
 
 		return text;
+	}
+
+	function deselectText() {
+		submitTextId = textSelectedId;
+		textSelectedId = "";
 	}
 
 	public function button(text:String):Bool {
@@ -351,9 +375,11 @@ class Zui {
 		return state.selected;
 	}
 
-	public function radio(groupId:String, pos:Int, text:String):Bool {
+	public function radio(groupId:String, pos:Int, text:String, initState:Int = 0):Bool {
 		var state = radioStates.get(groupId);
-		if (state == null) { state = new RadioState(); radioStates.set(groupId, state); }
+		if (state == null) {
+			state = new RadioState(initState); radioStates.set(groupId, state);
+		}
 
 		if (getPressed()) {
 			state.selected = pos;
@@ -489,11 +515,15 @@ class Zui {
     	}
     	Zui.inputDown = false;
     	setInputPosition(x, y);
-    	textSelectedId = "";
+    	deselectText();
     }
 
     function onMouseMove(x:Int, y:Int) {
     	setInputPosition(x, y);
+    }
+
+    function onMouseWheel(delta:Int) {
+    	Zui.inputWheelDelta = delta;
     }
 
     function setInputPosition(inputX:Int, inputY:Int) {
@@ -532,5 +562,5 @@ class CheckState {
 
 class RadioState {
 	public var selected:Int = 0;
-	public function new() {}
+	public function new(state:Int) { selected = state; }
 }
