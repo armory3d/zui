@@ -9,7 +9,8 @@ class Ext {
                                             setNameCb:Int->String->Void = null,
                                             itemDrawCb:String->Int->Void = null,
                                             showRadio = false,
-                                            editable = true):Int {
+                                            editable = true,
+                                            showAdd = true):Int {
         var selected = 0;
 
         if (addCb == null) addCb = function(name:String) { ar.push(name); };
@@ -36,7 +37,7 @@ class Ext {
 
             if (itemDrawCb != null) itemDrawCb(Id.nest(itemId, i), i - 1);
         }
-        if (ui.button("Add")) {
+        if (showAdd && ui.button("Add")) {
             addCb("untitled");
         }
 

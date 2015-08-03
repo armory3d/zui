@@ -2,7 +2,7 @@ package zui;
 
 class Zui {
 	static inline var ELEMENT_H = 30; // Sizes
-	static inline var ELEMENT_SEPARATOR_H = 1;
+	static inline var ELEMENT_SEPARATOR_H = 0;
 	static inline var ARROW_W = ELEMENT_H * 0.3;
 	static inline var ARROW_H = ARROW_W;
 	static inline var BUTTON_H = ELEMENT_H * 0.7;
@@ -18,19 +18,20 @@ class Zui {
 	static inline var SCROLL_BAR_W = 10;
 	static inline var DEFAULT_TEXT_OFFSET_X = 5;
 
-	static inline var WINDOW_BG_COL = 0xff323232; // Colors
-	static inline var WINDOW_HEADER_COL = 0xff444a84;
+	static inline var WINDOW_BG_COL = 0xff354346; // Colors
+	static inline var WINDOW_HEADER_COL = 0xff222c2f;
 	static inline var WINDOW_TEXT_COL = 0xffffffff;
 	static inline var SCROLL_BG_COL = 0xff0c0c0c;
 	static inline var SCROLL_COL = 0xff494949;
-	static inline var NODE_BG_COL = 0xff585da4;
+	static inline var NODE_BG_COL = 0xff2a3539;
 	static inline var NODE_TEXT_COL = 0xffffffff;
-	static inline var BUTTON_BG_COL = 0xff4d526a;
+	static inline var BUTTON_BG_COL = 0xff2b393c;
 	static inline var BUTTON_TEXT_COL = 0xffffffff;
-	static inline var CHECK_COL = 0xff4d526a;
-	static inline var CHECK_SELECT_COL = 0xffa3a8c0;
-	static inline var RADIO_COL = 0xff4d526a;
-	static inline var RADIO_SELECT_COL = 0xffa3a8c0;
+	static inline var TEXT_INPUT_BG_COL = 0xff2b393c;
+	static inline var CHECK_COL = 0xff2b393c;
+	static inline var CHECK_SELECT_COL = 0xff6bb278;
+	static inline var RADIO_COL = 0xff2b393c;
+	static inline var RADIO_SELECT_COL = 0xff6bb278;
 	static inline var DEFAULT_TEXT_COL = 0xffffffff;
 	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
 	static inline var ARROW_COL = 0xffffffff;
@@ -272,6 +273,9 @@ class Zui {
 			submitTextId = "";
 			textSelectedCurrentText = "";
 		}
+
+		g.color = TEXT_INPUT_BG_COL; // Text bg
+		g.fillRect(_x, _y + fontOffsetY, _w, BUTTON_H);
 
 		if (textSelectedId != id && getPressed()) { // Passive
 			textSelectedId = id;
