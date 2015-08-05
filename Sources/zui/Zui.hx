@@ -19,11 +19,10 @@ class Zui {
 	static inline var DEFAULT_TEXT_OFFSET_X = 5;
 
 	static inline var WINDOW_BG_COL = 0xff354346; // Colors
-	static inline var WINDOW_HEADER_COL = 0xff222c2f;
-	static inline var WINDOW_TEXT_COL = 0xffffffff;
 	static inline var SCROLL_BG_COL = 0xff0c0c0c;
 	static inline var SCROLL_COL = 0xff494949;
-	static inline var NODE_BG_COL = 0xff2a3539;
+	static inline var NODE_BG1_COL = 0xff2a3539;
+	static inline var NODE_BG2_COL = 0xff222c2f;
 	static inline var NODE_TEXT_COL = 0xffffffff;
 	static inline var BUTTON_BG_COL = 0xff2b393c;
 	static inline var BUTTON_TEXT_COL = 0xffffffff;
@@ -36,11 +35,14 @@ class Zui {
 	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
 	static inline var ARROW_COL = 0xffffffff;
 
+	public static inline var LAYOUT_VERTICAL = 0; // Window layout
+	public static inline var LAYOUT_HORIZONTAL = 1;
+
 	public static inline var ALIGN_LEFT = 0; // Text align
 	public static inline var ALIGN_CENTER = 1;
 	public static inline var ALIGN_RIGHT = 2;
 
-	public static var scrolling:Bool = false;
+	public static var isScrolling:Bool = false;
 
 	static var firstInstance = true;
 
@@ -89,7 +91,6 @@ class Zui {
 	var _y:Float;
 	var _w:Int;
 	var _h:Int;
-	var lastMaxY:Float = 0;
 
 	var _windowX:Float;
 	var _windowY:Float;
@@ -152,13 +153,11 @@ class Zui {
 		Zui.inputDX = 0;
 		Zui.inputDY = 0;
 		Zui.inputWheelDelta = 0;
-		lastMaxY = _y;
 	}
 
-	public function window(id:String, x:Int, y:Int, w:Int, h:Int, text:String):Bool {
+	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL) {
 		var state = windowStates.get(id);
-		if (state == null) { state = new WindowState(); windowStates.set(id, state); }
-
+		if (state == null) { state = new WindowState(layout); windowStates.set(id, state); }
 
 		if (!windowEnded) { endWindow(); }
 		windowEnded = false;
@@ -173,28 +172,11 @@ class Zui {
 		_w = !state.scrollEnabled ? w : w - SCROLL_W; // Exclude scrollbar if present
 		_h = h;
 
-		if (getPressed()) {
-			state.expanded = !state.expanded;
-		}
-
-		if (state.expanded) { // Bg
-			g.color = WINDOW_BG_COL;
-			g.fillRect(_x, _y - state.scrollOffset, _w, lastMaxY);
-		}
-		g.color = WINDOW_HEADER_COL; // Header
-		g.fillRect(_x, _y, _w, ELEMENT_H);
-
-		drawArrow(state.expanded); // Arrow
-
-		g.color = WINDOW_TEXT_COL; // Title
-		drawString(g, text, titleOffsetX, 0);
-
-		endElement();
-
-		return state.expanded;
+		g.color = WINDOW_BG_COL;
+		g.fillRect(_x, _y - state.scrollOffset, _w, state.lastMaxY);
 	}
 
-	public function endWindow() {
+	function endWindow() {
 		var state = curWindowState;
 		var fullHeight = _y - state.scrollOffset;
 		if (fullHeight < _windowH) { // Disable scrollbar
@@ -213,9 +195,10 @@ class Zui {
 			if ((inputStarted) && // Start scrolling
 				getInputInRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH)) {
 				
-				scrolling = true;
+				state.scrolling = true;
+				isScrolling = true;
 			}
-			if (scrolling) { // Scroll
+			if (state.scrolling) { // Scroll
 				var delta = inputWheelDelta != 0 ? inputWheelDelta : inputDY;
 				scroll(inputDY, fullHeight);
 			}
@@ -224,6 +207,7 @@ class Zui {
 			g.color = SCROLL_COL; // Bar
 			g.fillRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH);
 		}
+		state.lastMaxY = _y;
 		windowEnded = true;
 	}
 
@@ -237,23 +221,23 @@ class Zui {
 		}
 	}
 
-	public function node(id:String, text:String, fillBg = true):Bool {
+	public function node(id:String, text:String, accent = 1, expanded = false):Bool {
 		var state = nodeStates.get(id);
-		if (state == null) { state = new NodeState(); nodeStates.set(id, state); }
+		if (state == null) { state = new NodeState(expanded); nodeStates.set(id, state); }
 
 		if (getPressed()) {
 			state.expanded = !state.expanded;
 		}
 
-		if (fillBg) { // Bg
-			g.color = NODE_BG_COL;
+		if (accent > 0) { // Bg
+			g.color = accent == 1 ? NODE_BG1_COL : NODE_BG2_COL;
 			g.fillRect(_x, _y, _w, ELEMENT_H);
 		}
 
 		drawArrow(state.expanded);
 
 		g.color = NODE_TEXT_COL; // Title
-		fillBg ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
+		accent > 0 ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
@@ -516,8 +500,9 @@ class Zui {
     }
 
     function onMouseUp(button:Int, x:Int, y:Int) {
-    	if (scrolling) {
-    		scrolling = false;
+    	if (isScrolling) {
+    		isScrolling = false;
+    		for (s in windowStates) s.scrolling = false;
     	}
     	else { // To prevent action when scrolling is active
     		Zui.inputReleased = true;
@@ -553,23 +538,25 @@ class Zui {
 }
 
 class WindowState {
-	public var expanded:Bool = true;
+	public var scrolling:Bool = false;
 	public var scrollOffset:Float = 0;
 	public var scrollEnabled:Bool = false;
-	public function new() {}
+	public var layout:Int;
+	public var lastMaxY:Float = 0;
+	public function new(layout:Int) { this.layout = layout; }
 }
 
 class NodeState {
-	public var expanded:Bool = false;
-	public function new() {}
+	public var expanded:Bool;
+	public function new(expanded:Bool) { this.expanded = expanded; }
 }
 
 class CheckState {
 	public var selected:Bool = false;
-	public function new(state:Bool) { selected = state; }
+	public function new(selected:Bool) { this.selected = selected; }
 }
 
 class RadioState {
 	public var selected:Int = 0;
-	public function new(state:Int) { selected = state; }
+	public function new(selected:Int) { this.selected = selected; }
 }
