@@ -1,8 +1,8 @@
 package zui;
 
 class Zui {
-	static inline var ELEMENT_H = 30; // Sizes
-	static inline var ELEMENT_SEPARATOR_H = 0;
+	public static inline var ELEMENT_H = 30; // Sizes
+	static inline var ELEMENT_SEPARATOR_SIZE = 0;
 	static inline var ARROW_W = ELEMENT_H * 0.3;
 	static inline var ARROW_H = ARROW_W;
 	static inline var BUTTON_H = ELEMENT_H * 0.7;
@@ -173,17 +173,17 @@ class Zui {
 		_h = h;
 
 		g.color = WINDOW_BG_COL;
-		g.fillRect(_x, _y - state.scrollOffset, _w, state.lastMaxY);
+		g.fillRect(_x, _y - state.scrollOffset, state.lastMaxX, state.lastMaxY);
 	}
 
 	function endWindow() {
 		var state = curWindowState;
 		var fullHeight = _y - state.scrollOffset;
-		if (fullHeight < _windowH) { // Disable scrollbar
+		if (fullHeight < _windowH || state.layout == LAYOUT_HORIZONTAL) { // Disable scrollbar
 			state.scrollEnabled = false;
 			state.scrollOffset = 0;
 		}
-		else { // Draw window scrollbars if necessary
+		else { // Draw window scrollbar if necessary
 			state.scrollEnabled = true;
 			var amountToScroll = _windowH - fullHeight;
 			var amountScrolled = state.scrollOffset;
@@ -207,6 +207,7 @@ class Zui {
 			g.color = SCROLL_COL; // Bar
 			g.fillRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH);
 		}
+		state.lastMaxX = _x;
 		state.lastMaxY = _y;
 		windowEnded = true;
 	}
@@ -451,20 +452,25 @@ class Zui {
 	}
 
 	function endElement() {
-		if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
-			_y += ELEMENT_H + ELEMENT_SEPARATOR_H;
-			
-			if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
-				curRatio = -1;
-				ratios = null;
-				_x = xBeforeSplit;
-				_w = wBeforeSplit;
+		if (curWindowState.layout == LAYOUT_VERTICAL) {
+			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
+				_y += ELEMENT_H + ELEMENT_SEPARATOR_SIZE;
+				
+				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
+					curRatio = -1;
+					ratios = null;
+					_x = xBeforeSplit;
+					_w = wBeforeSplit;
+				}
+			}
+			else { // Row
+				curRatio++;
+				_x += _w; // More row elements to place
+				_w = Std.int(wBeforeSplit * ratios[curRatio]);
 			}
 		}
-		else { // Row
-			curRatio++;
-			_x += _w ; // More row elements to place
-			_w = Std.int(wBeforeSplit * ratios[curRatio]);
+		else { // HORIZONTAL
+			_x += _w + ELEMENT_SEPARATOR_SIZE;
 		}
 	}
 
@@ -542,6 +548,7 @@ class WindowState {
 	public var scrollOffset:Float = 0;
 	public var scrollEnabled:Bool = false;
 	public var layout:Int;
+	public var lastMaxX:Float = 0;
 	public var lastMaxY:Float = 0;
 	public function new(layout:Int) { this.layout = layout; }
 }
