@@ -262,7 +262,7 @@ class Zui {
 
 	public function text(text:String, align = ALIGN_LEFT) {
 		g.color = DEFAULT_TEXT_COL;
-		drawString(g, text, DEFAULT_TEXT_OFFSET_X, 0, align);
+		drawStringSmall(g, text, DEFAULT_TEXT_OFFSET_X, 0, align);
 
 		endElement();
 	}
@@ -397,6 +397,11 @@ class Zui {
 		endElement();
 
 		return state.selected == pos;
+	}
+
+	public function setRadioSelection(groupId:String, pos:Int) {
+		var state = radioStates.get(groupId);
+		if (state != null) state.selected = pos;
 	}
 
 	function drawArrow(expanded:Bool) {

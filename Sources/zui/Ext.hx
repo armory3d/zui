@@ -43,4 +43,8 @@ class Ext {
 
         return selected;
     }
+
+    public static function setListSelection(ui:Zui, id:String, pos:Int) {
+        ui.setRadioSelection(Id.nest(id, 0), pos);
+    }
 }
