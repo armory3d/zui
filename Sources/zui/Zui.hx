@@ -209,6 +209,7 @@ class Zui {
 		}
 		state.lastMaxX = _x;
 		state.lastMaxY = _y;
+		if (state.layout == LAYOUT_HORIZONTAL) state.lastMaxY += ELEMENT_H;
 		windowEnded = true;
 	}
 
