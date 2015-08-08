@@ -8,7 +8,7 @@ class Zui {
 	static inline var BUTTON_H = ELEMENT_H * 0.7;
 	static inline var CHECK_W = ELEMENT_H * 0.5;
 	static inline var CHECK_H = CHECK_W;
-	static inline var CHECK_SELECT_W = ELEMENT_H * 0.3;
+	static inline var CHECK_SELECT_W = ELEMENT_H * 0.25;
 	static inline var CHECK_SELECT_H = CHECK_SELECT_W;
 	static inline var RADIO_W = ELEMENT_H * 0.5;
 	static inline var RADIO_H = RADIO_W;
@@ -130,10 +130,28 @@ class Zui {
 
 		if (firstInstance) {
 			firstInstance = false;
+			prerenderElements();
 			kha.input.Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 			//kha.input.Surface.get().notify(onMouseDown, onMouseUp, onMouseMove);
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
+	}
+
+	static var checkSelectImage:kha.Image = null;
+	function prerenderElements() {
+		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W), Std.int(CHECK_SELECT_H));
+		var g = checkSelectImage.g2;
+		g.begin(true, 0x00000000);
+		g.color = CHECK_SELECT_COL;
+		g.fillRect(0, 0, CHECK_SELECT_W, CHECK_SELECT_H);
+		//g.drawLine(0, CHECK_SELECT_H / 2, CHECK_SELECT_W / 2, CHECK_SELECT_H, 3);
+		//g.drawLine(CHECK_SELECT_W / 2, CHECK_SELECT_H, CHECK_SELECT_W, 0, 3);
+		g.end();
+	}
+
+	public function remove() {
+		kha.input.Mouse.get().remove(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp);
 	}
 
 	public function begin(g:kha.graphics2.Graphics) {
@@ -413,8 +431,10 @@ class Zui {
 		g.fillRect(x, y, CHECK_W, CHECK_H); // Bg
 
 		if (selected) { // Check
-			g.color = CHECK_SELECT_COL;
-			g.fillRect(x + checkSelectOffsetX, y + checkSelectOffsetY, CHECK_SELECT_W, CHECK_SELECT_H);
+			//g.color = CHECK_SELECT_COL;
+			//g.fillRect(x + checkSelectOffsetX, y + checkSelectOffsetY, CHECK_SELECT_W, CHECK_SELECT_H);
+			g.color = kha.Color.White;
+			g.drawImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY);
 		}
 	}
 
