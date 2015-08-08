@@ -8,24 +8,28 @@ class Id {
 	static var textInputId = 0;
 	static var radioId = 0;
 	static var checkId = 0;
+	static var listId = 0;
 
-	public static function nextPos():Int { return posId++; }
+	static function nextPos():Int { return posId++; }
 	macro public static function pos() { return macro $v{nextPos()}; }
 
-	public static function nextWindow():String { return (windowId++) + ""; }
+	static function nextWindow():String { return (windowId++) + ""; }
 	macro public static function window() { return macro $v{nextWindow()}; }
 
-	public static function nextNode():String { return (nodeId++) + ""; }
+	static function nextNode():String { return (nodeId++) + ""; }
 	macro public static function node() { return macro $v{nextNode()}; }
 
-    public static function nextTextInput():String { return (textInputId++) + ""; }
+    static function nextTextInput():String { return (textInputId++) + ""; }
 	macro public static function textInput() { return macro $v{nextTextInput()}; }
 
-    public static function nextRadio():String { posId = 0; return (radioId++) + ""; }
+    static function nextRadio():String { posId = 0; return (radioId++) + ""; }
 	macro public static function radio() { return macro $v{nextRadio()}; }
 
-	public static function nextCheck():String { return (checkId++) + ""; }
+	static function nextCheck():String { return (checkId++) + ""; }
 	macro public static function check() { return macro $v{nextCheck()}; }
+
+	static function nextList():String { return (listId++) + "l"; } // List postfix
+	macro public static function list() { return macro $v{nextList()}; }
 
 	public static function nest(id:String, i:Int):String { return id + "_" + i; }
 }

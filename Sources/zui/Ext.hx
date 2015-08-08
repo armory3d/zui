@@ -2,16 +2,16 @@ package zui;
 
 class Ext {
 
-	public static function drawRadioList(ui:Zui, id:String, ar:Array<Dynamic>,
-                                         addCb:String->Void = null,
-                                         removeCb:Int->Void = null,
-                                         getNameCb:Int->String = null,
-                                         setNameCb:Int->String->Void = null,
-                                         itemDrawCb:String->Int->Void = null,
-                                         showRadio = false,
-                                         editable = true,
-                                         showAdd = true,
-                                         initState = 0):Int {
+	public static function drawList(ui:Zui, id:String, ar:Array<Dynamic>,
+                                    addCb:String->Void = null,
+                                    removeCb:Int->Void = null,
+                                    getNameCb:Int->String = null,
+                                    setNameCb:Int->String->Void = null,
+                                    itemDrawCb:String->Int->Void = null,
+                                    showRadio = false,
+                                    editable = true,
+                                    showAdd = true,
+                                    initState = 0):Int {
         var selected = 0;
 
         if (addCb == null) addCb = function(name:String) { ar.push(name); };
@@ -45,7 +45,7 @@ class Ext {
         return selected;
     }
 
-    public static function setListSelection(ui:Zui, id:String, pos:Int) {
+    public static function setRadioListSelection(ui:Zui, id:String, pos:Int) {
         ui.setRadioSelection(Id.nest(id, 0), pos);
     }
 

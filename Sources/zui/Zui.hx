@@ -1,5 +1,33 @@
 package zui;
 
+// Immediate Mode UI for Haxe Kha
+// https://github.com/luboslenco/zui
+
+// Getting started:
+// var ui = new Zui(font, fontSmall);
+// ui.begin(g);
+// ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL);
+// if (button("Hello")) {
+//     trace("World");
+// }
+// ui.end();
+
+// Elements:
+// node(id:String, text:String, accent = 1, expanded = false):Bool
+// text(text:String, align = ALIGN_LEFT)
+// textInput(id:String, text:String, label:String = ""):String
+// button(text:String):Bool
+// check(id:String, text:String, initState:Bool = false):Bool
+// radio(groupId:String, pos:Int, text:String, initState:Int = 0):Bool
+// row(ratios:Array<Float>)
+
+// Ext.hx - more complex elements:
+// drawList(...)
+// drawNodeList(...)
+
+// Id.hx - simple macros to generate ids
+// var state = check(Id.check(), "Check Box");
+
 class Zui {
 	public static inline var ELEMENT_H = 30; // Sizes
 	static inline var ELEMENT_SEPARATOR_SIZE = 0;
@@ -8,7 +36,7 @@ class Zui {
 	static inline var BUTTON_H = ELEMENT_H * 0.7;
 	static inline var CHECK_W = ELEMENT_H * 0.5;
 	static inline var CHECK_H = CHECK_W;
-	static inline var CHECK_SELECT_W = ELEMENT_H * 0.25;
+	static inline var CHECK_SELECT_W = ELEMENT_H * 0.3;
 	static inline var CHECK_SELECT_H = CHECK_SELECT_W;
 	static inline var RADIO_W = ELEMENT_H * 0.5;
 	static inline var RADIO_H = RADIO_W;
@@ -42,7 +70,7 @@ class Zui {
 	public static inline var ALIGN_CENTER = 1;
 	public static inline var ALIGN_RIGHT = 2;
 
-	public static var isScrolling:Bool = false;
+	public static var isScrolling:Bool = false; // Use to limit other activities
 
 	static var firstInstance = true;
 
@@ -68,7 +96,7 @@ class Zui {
 	var xBeforeSplit:Float;
 	var wBeforeSplit:Int;
 
-	var g:kha.graphics2.Graphics;
+	var g:kha.graphics2.Graphics; // Drawing
 	var font:kha.Font;
 	var fontSmall:kha.Font;
 
@@ -92,7 +120,7 @@ class Zui {
 	var _w:Int;
 	var _h:Int;
 
-	var _windowX:Float;
+	var _windowX:Float; // Window state
 	var _windowY:Float;
 	var _windowW:Float;
 	var _windowH:Float;
@@ -138,7 +166,7 @@ class Zui {
 	}
 
 	static var checkSelectImage:kha.Image = null;
-	function prerenderElements() {
+	function prerenderElements() { // Not yet used
 		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W), Std.int(CHECK_SELECT_H));
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
@@ -149,12 +177,12 @@ class Zui {
 		g.end();
 	}
 
-	public function remove() {
+	public function remove() { // Clean up
 		kha.input.Mouse.get().remove(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp);
 	}
 
-	public function begin(g:kha.graphics2.Graphics) {
+	public function begin(g:kha.graphics2.Graphics) { // Begin UI drawing
 		this.g = g;
 		_x = 0; // Reset cursor
 		_y = 0;
@@ -162,7 +190,7 @@ class Zui {
 		_h = 0;
 	}
 
-	public function end() {
+	public function end() { // End drawing
 		if (!windowEnded) { endWindow(); }
 
 		Zui.isKeyDown = false; // Reset input - only one char and one zui instance for now
@@ -564,7 +592,7 @@ class Zui {
     }
 }
 
-class WindowState {
+class WindowState { // Cached states
 	public var scrolling:Bool = false;
 	public var scrollOffset:Float = 0;
 	public var scrollEnabled:Bool = false;
