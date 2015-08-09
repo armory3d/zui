@@ -3,33 +3,8 @@ package zui;
 // Immediate Mode UI for Haxe Kha
 // https://github.com/luboslenco/zui
 
-// Getting started:
-// var ui = new Zui(font, fontSmall);
-// ui.begin(g);
-// ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL);
-// if (button("Hello")) {
-//     trace("World");
-// }
-// ui.end();
-
-// Elements:
-// node(id:String, text:String, accent = 1, expanded = false):Bool
-// text(text:String, align = ALIGN_LEFT)
-// textInput(id:String, text:String, label:String = ""):String
-// button(text:String):Bool
-// check(id:String, text:String, initState:Bool = false):Bool
-// radio(groupId:String, pos:Int, text:String, initState:Int = 0):Bool
-// row(ratios:Array<Float>)
-
-// Ext.hx - more complex elements:
-// drawList(...)
-// drawNodeList(...)
-
-// Id.hx - simple macros to generate ids
-// var state = check(Id.check(), "Check Box");
-
 class Zui {
-	public static inline var ELEMENT_H = 30; // Sizes
+	public static inline var ELEMENT_H = 30 * 2; // Sizes
 	static inline var ELEMENT_SEPARATOR_SIZE = 0;
 	static inline var ARROW_W = ELEMENT_H * 0.3;
 	static inline var ARROW_H = ARROW_W;
@@ -307,7 +282,7 @@ class Zui {
 		}
 
 		g.color = TEXT_INPUT_BG_COL; // Text bg
-		g.fillRect(_x, _y + fontOffsetY, _w, BUTTON_H);
+		g.fillRect(_x, _y + buttonOffsetY, _w, BUTTON_H);
 
 		if (textSelectedId != id && getPressed()) { // Passive
 			textSelectedId = id;
