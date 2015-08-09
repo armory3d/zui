@@ -4,7 +4,7 @@ package zui;
 // https://github.com/luboslenco/zui
 
 class Zui {
-	public static inline var ELEMENT_H = 30 * 2; // Sizes
+	public static inline var ELEMENT_H = 30; // Sizes
 	static inline var ELEMENT_SEPARATOR_SIZE = 0;
 	static inline var ARROW_W = ELEMENT_H * 0.3;
 	static inline var ARROW_H = ARROW_W;
@@ -409,6 +409,12 @@ class Zui {
 	public function setRadioSelection(groupId:String, pos:Int) {
 		var state = radioStates.get(groupId);
 		if (state != null) state.selected = pos;
+	}
+
+	public function separator() {
+		g.color = BUTTON_BG_COL;
+		g.fillRect(_x, _y, _w, 2);
+		_y += 2;
 	}
 
 	function drawArrow(expanded:Bool) {
