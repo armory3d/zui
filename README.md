@@ -7,6 +7,7 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 ## Getting started
 ``` hx
 var ui = new Zui(font, fontSmall);
+// in render()
 ui.begin(g);
 ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL);
 if (button("Hello")) {
