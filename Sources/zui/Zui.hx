@@ -4,7 +4,8 @@ package zui;
 // https://github.com/luboslenco/zui
 
 class Zui {
-	public static inline var ELEMENT_H = 30; // Sizes
+	public static inline var ELEMENT_W = 100; // For horizontal layout
+	public static inline var ELEMENT_H = 30; // For vertical layout
 	static inline var ELEMENT_SEPARATOR_SIZE = 0;
 	static inline var ARROW_W = ELEMENT_H * 0.3;
 	static inline var ARROW_H = ARROW_W;
@@ -71,7 +72,8 @@ class Zui {
 	var xBeforeSplit:Float;
 	var wBeforeSplit:Int;
 
-	var g:kha.graphics2.Graphics; // Drawing
+	var globalG:kha.graphics2.Graphics; // Drawing
+	var g:kha.graphics2.Graphics;
 	var font:kha.Font;
 	var fontSmall:kha.Font;
 
@@ -158,7 +160,7 @@ class Zui {
 	}
 
 	public function begin(g:kha.graphics2.Graphics) { // Begin UI drawing
-		this.g = g;
+		globalG = g;
 		_x = 0; // Reset cursor
 		_y = 0;
 		_w = 0;
@@ -176,62 +178,95 @@ class Zui {
 		Zui.inputWheelDelta = 0;
 	}
 
-	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL) {
+	// Returns true if redraw is needed
+	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL):Bool {
 		var state = windowStates.get(id);
-		if (state == null) { state = new WindowState(layout); windowStates.set(id, state); }
+		if (state == null) {
+			state = new WindowState(layout, w, h); windowStates.set(id, state);
+		}
 
-		if (!windowEnded) { endWindow(); }
+		if (!windowEnded) { endWindow(); } // End previous window if necessary
 		windowEnded = false;
+
+		g = state.texture.g2; // Set g
+
+		if (getInputInRect(x, y, w, h)) { // Redraw
+			state.redraws = 2;
+		}
 		
 		curWindowState = state;
 		_windowX = x;
 		_windowY = y;
 		_windowW = w;
 		_windowH = h;
-		_x = x;
-		_y = y + state.scrollOffset;
+		_x = 0;//x;
+		_y = state.scrollOffset;//y + state.scrollOffset;
+		if (layout == LAYOUT_HORIZONTAL) w = ELEMENT_W;
 		_w = !state.scrollEnabled ? w : w - SCROLL_W; // Exclude scrollbar if present
 		_h = h;
 
+		if (state.redraws == 0) return false;
+
+		g.begin(true, 0x00000000);
 		g.color = WINDOW_BG_COL;
 		g.fillRect(_x, _y - state.scrollOffset, state.lastMaxX, state.lastMaxY);
+
+		return true;
+	}
+
+	public function redrawWindow(id:String) {
+		var state = windowStates.get(id);
+		if (state != null) state.redraws = 1;
 	}
 
 	function endWindow() {
 		var state = curWindowState;
-		var fullHeight = _y - state.scrollOffset;
-		if (fullHeight < _windowH || state.layout == LAYOUT_HORIZONTAL) { // Disable scrollbar
-			state.scrollEnabled = false;
-			state.scrollOffset = 0;
-		}
-		else { // Draw window scrollbar if necessary
-			state.scrollEnabled = true;
-			var amountToScroll = _windowH - fullHeight;
-			var amountScrolled = state.scrollOffset;
-			var ratio = amountScrolled / amountToScroll;
-			var barH = _windowH - Math.abs(amountToScroll);
-			if (barH < ELEMENT_H * 2) barH = ELEMENT_H;
-			var barY = (_windowH - barH) * ratio;
+		if (state.redraws > 0) {
+			var fullHeight = _y - state.scrollOffset;
+			if (fullHeight < _windowH || state.layout == LAYOUT_HORIZONTAL) { // Disable scrollbar
+				state.scrollEnabled = false;
+				state.scrollOffset = 0;
+			}
+			else { // Draw window scrollbar if necessary
+				state.scrollEnabled = true;
+				var amountToScroll = _windowH - fullHeight;
+				var amountScrolled = state.scrollOffset;
+				var ratio = amountScrolled / amountToScroll;
+				var barH = _windowH - Math.abs(amountToScroll);
+				if (barH < ELEMENT_H * 2) barH = ELEMENT_H;
+				var barY = (_windowH - barH) * ratio;
 
-			if ((inputStarted) && // Start scrolling
-				getInputInRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH)) {
-				
-				state.scrolling = true;
-				isScrolling = true;
+				if ((inputStarted) && // Start scrolling
+					getInputInRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH)) {
+					
+					state.scrolling = true;
+					isScrolling = true;
+				}
+				if (state.scrolling) { // Scroll
+					var delta = inputWheelDelta != 0 ? inputWheelDelta : inputDY;
+					scroll(inputDY, fullHeight);
+				}
+				g.color = SCROLL_BG_COL; // Bg
+				g.fillRect(_windowW - SCROLL_W, _windowY, SCROLL_W, _windowH);
+				g.color = SCROLL_COL; // Bar
+				g.fillRect(_windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH);
 			}
-			if (state.scrolling) { // Scroll
-				var delta = inputWheelDelta != 0 ? inputWheelDelta : inputDY;
-				scroll(inputDY, fullHeight);
-			}
-			g.color = SCROLL_BG_COL; // Bg
-			g.fillRect(_windowX + _windowW - SCROLL_W, _windowY, SCROLL_W, _windowH);
-			g.color = SCROLL_COL; // Bar
-			g.fillRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH);
+
+			state.lastMaxX = _x;
+			state.lastMaxY = _y;
+			if (state.layout == LAYOUT_VERTICAL) state.lastMaxX += _windowW;
+			else state.lastMaxY += _windowH;
+			state.redraws--;
+
+			g.end();
 		}
-		state.lastMaxX = _x;
-		state.lastMaxY = _y;
-		if (state.layout == LAYOUT_HORIZONTAL) state.lastMaxY += ELEMENT_H;
+
 		windowEnded = true;
+
+		// Draw window texture
+		globalG.begin(false);
+		globalG.drawImage(state.texture, _windowX, _windowY);
+		globalG.end();
 	}
 
 	function scroll(delta:Float, fullHeight:Float) {
@@ -514,8 +549,8 @@ class Zui {
 
 	function getPressed():Bool { // Input selection
 		return inputReleased &&
-        	inputX >= _x && inputX < (_x + _w) &&
-        	inputY >= _y && inputY < (_y + ELEMENT_H);
+        	inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
+        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
 	}
 
 	function getInputInRect(x:Float, y:Float, w:Float, h:Float):Bool {
@@ -574,13 +609,15 @@ class Zui {
 }
 
 class WindowState { // Cached states
+	public var texture:kha.Image;
+	public var redraws = 2;
 	public var scrolling:Bool = false;
 	public var scrollOffset:Float = 0;
 	public var scrollEnabled:Bool = false;
 	public var layout:Int;
 	public var lastMaxX:Float = 0;
 	public var lastMaxY:Float = 0;
-	public function new(layout:Int) { this.layout = layout; }
+	public function new(layout:Int, w:Int, h:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h); }
 }
 
 class NodeState {
