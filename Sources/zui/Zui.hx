@@ -324,7 +324,6 @@ class Zui {
 		g.color = TEXT_INPUT_BG_COL; // Text bg
 		g.fillRect(_x, _y + buttonOffsetY, _w, BUTTON_H);
 
-		// TODO: switching text fields does not save text state
 		if (textSelectedId != id && getPressed()) { // Passive
 			isTyping = true;
 			submitTextId = textSelectedId;
