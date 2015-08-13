@@ -265,6 +265,7 @@ class Zui {
 
 		// Draw window texture
 		globalG.begin(false);
+		globalG.color = kha.Color.White;
 		globalG.drawImage(state.texture, _windowX, _windowY);
 		globalG.end();
 	}
@@ -588,6 +589,7 @@ class Zui {
     }
 
     function onMouseWheel(delta:Int) {
+    	trace(delta);
     	Zui.inputWheelDelta = delta;
     }
 
