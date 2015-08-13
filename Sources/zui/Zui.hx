@@ -47,6 +47,7 @@ class Zui {
 	public static inline var ALIGN_RIGHT = 2;
 
 	public static var isScrolling:Bool = false; // Use to limit other activities
+	public static var isTyping:Bool = false;
 
 	static var firstInstance = true;
 
@@ -111,6 +112,7 @@ class Zui {
 	var textSelectedId:String = "";
 	var textSelectedCurrentText:String;
 	var submitTextId:String;
+	var textToSubmit:String = "";
 
 	public function new(font:kha.Font, fontSmall:kha.Font) {
 		this.font = font;
@@ -205,7 +207,7 @@ class Zui {
 		_w = !state.scrollEnabled ? w : w - SCROLL_W; // Exclude scrollbar if present
 		_h = h;
 
-		if (state.redraws == 0) return false;
+		if (state.redraws == 0 && !isScrolling && !isTyping) return false;
 
 		g.begin(true, 0x00000000);
 		g.color = WINDOW_BG_COL;
@@ -221,7 +223,7 @@ class Zui {
 
 	function endWindow() {
 		var state = curWindowState;
-		if (state.redraws > 0) {
+		if (state.redraws > 0 || isScrolling || isTyping) {
 			var fullHeight = _y - state.scrollOffset;
 			if (fullHeight < _windowH || state.layout == LAYOUT_HORIZONTAL) { // Disable scrollbar
 				state.scrollEnabled = false;
@@ -312,7 +314,9 @@ class Zui {
 
 	public function textInput(id:String, text:String, label:String = ""):String {
 		if (submitTextId == id) { // Submit edited text
-			text = textSelectedCurrentText;
+			//text = textSelectedCurrentText;
+			text = textToSubmit;
+			textToSubmit = "";
 			submitTextId = "";
 			textSelectedCurrentText = "";
 		}
@@ -320,12 +324,16 @@ class Zui {
 		g.color = TEXT_INPUT_BG_COL; // Text bg
 		g.fillRect(_x, _y + buttonOffsetY, _w, BUTTON_H);
 
+		// TODO: switching text fields does not save text state
 		if (textSelectedId != id && getPressed()) { // Passive
+			isTyping = true;
+			submitTextId = textSelectedId;
+			textToSubmit = textSelectedCurrentText;
 			textSelectedId = id;
 			textSelectedCurrentText = text;
-			cursorX = 0;
+			cursorX = text.length;
 			cursorY = 0;
-			cursorPixelX = DEFAULT_TEXT_OFFSET_X;
+			updateCursorPixelX(text, fontSmall);
 		}
 
 		if (textSelectedId == id) { // Active
@@ -387,7 +395,10 @@ class Zui {
 
 	function deselectText() {
 		submitTextId = textSelectedId;
+		textToSubmit = textSelectedCurrentText;
 		textSelectedId = "";
+		isTyping = false;
+		for (w in windowStates) w.redraws = 2;
 	}
 
 	public function button(text:String):Bool {
