@@ -49,6 +49,7 @@ var state = check(Id.check(), "Check Box");
 ## Example
 
 ``` hx
+// window() returns true if redraw is needed - windows are cached into textures
 if (ui.window(Id.window(), 0, 0, 250, 600)) {
 
     if (ui.node(Id.node(), "Node", 2, true)) {
