@@ -5,6 +5,8 @@ Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or
 Inspired by [imgui](https://github.com/ocornut/imgui).
 
 ## Getting started
+- Clone into 'your_kha_project/Libraries'
+- Add 'zui' into project.kha libraries list
 ``` hx
 var ui = new Zui(font, fontSmall);
 // in render()
