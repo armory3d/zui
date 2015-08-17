@@ -8,15 +8,23 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 - Clone into 'your_kha_project/Libraries'
 - Add 'zui' into project.kha libraries list
 ``` hx
+// in init()
 var ui = new Zui(font, fontSmall);
 // in render()
-ui.begin(g);
-if (ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL)) {
-    if (button("Hello")) {
-        trace("World");
+override public function render(frame:Framebuffer) {
+    var g = frame.g2;
+    g.begin();
+    // draw your stuff
+    g.end();
+    
+    ui.begin(g);
+    if (ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL)) {
+        if (button("Hello")) {
+            trace("World");
+        }
     }
+    ui.end();
 }
-ui.end();
 ```
 
 ## Elements
