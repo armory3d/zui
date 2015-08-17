@@ -10,6 +10,7 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 ``` hx
 // in init()
 var ui = new Zui(font, fontSmall);
+
 // in render()
 override public function render(frame:Framebuffer) {
     var g = frame.g2;
@@ -57,6 +58,8 @@ var state = check(Id.check(), "Check Box");
 ## Example
 
 ``` hx
+ui.begin(g);
+
 // window() returns true if redraw is needed - windows are cached into textures
 if (ui.window(Id.window(), 0, 0, 250, 600)) {
 
