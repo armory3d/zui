@@ -361,14 +361,9 @@ class Zui {
 					deselectText(); // One-line text for now
 				}
 				else if (key == kha.Key.CHAR) {
-					if (char.charCodeAt(0) == 13) { // ENTER
-						deselectText(); // One-line text for now
-					}
-					else {
-						text = text.substr(0, cursorX) + char + text.substr(cursorX);
-						cursorX++;
-						updateCursorPixelX(text, fontSmall);
-					}
+					text = text.substr(0, cursorX) + char + text.substr(cursorX);
+					cursorX++;
+					updateCursorPixelX(text, fontSmall);
 				}
 			}
 
