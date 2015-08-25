@@ -245,8 +245,10 @@ class Zui {
 					isScrolling = true;
 				}
 				if (state.scrolling) { // Scroll
-					var delta = inputWheelDelta != 0 ? inputWheelDelta : inputDY;
 					scroll(inputDY, fullHeight);
+				}
+				else if (inputWheelDelta != 0) { // Wheel
+					scroll(-inputWheelDelta * 3, fullHeight);
 				}
 				g.color = SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W, _windowY, SCROLL_W, _windowH);
@@ -594,7 +596,6 @@ class Zui {
     }
 
     function onMouseWheel(delta:Int) {
-    	trace(delta);
     	Zui.inputWheelDelta = delta;
     }
 
