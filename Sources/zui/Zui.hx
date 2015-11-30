@@ -76,7 +76,8 @@ class Zui {
 	var globalG:kha.graphics2.Graphics; // Drawing
 	var g:kha.graphics2.Graphics;
 	var font:kha.Font;
-	var fontSmall:kha.Font;
+	var fontSize:Int;
+	var fontSmallSize:Int;
 
 	var fontOffsetY:Float; // Precalculated offsets
 	var fontSmallOffsetY:Float;
@@ -114,11 +115,12 @@ class Zui {
 	var submitTextId:String;
 	var textToSubmit:String = "";
 
-	public function new(font:kha.Font, fontSmall:kha.Font) {
+	public function new(font:kha.Font, fontSize = 24, fontSmallSize = 20) {
 		this.font = font;
-		this.fontSmall = fontSmall;
-		var fontHeight = font.getHeight();
-		var fontSmallHeight = fontSmall.getHeight();
+		this.fontSize = fontSize;
+		this.fontSmallSize = fontSmallSize;
+		var fontHeight = font.height(fontSize);
+		var fontSmallHeight = font.height(fontSmallSize);
 
 		fontOffsetY = (ELEMENT_H - fontHeight) / 2; // Precalculate offsets
 		fontSmallOffsetY = (ELEMENT_H - fontSmallHeight) / 2;
@@ -334,7 +336,7 @@ class Zui {
 			textSelectedCurrentText = text;
 			cursorX = text.length;
 			cursorY = 0;
-			updateCursorPixelX(text, fontSmall);
+			updateCursorPixelX(text, font, fontSmallSize);
 		}
 
 		if (textSelectedId == id) { // Active
@@ -343,20 +345,20 @@ class Zui {
 				if (key == kha.Key.LEFT) { // Move cursor
 					if (cursorX > 0) {
 						cursorX--;
-						updateCursorPixelX(text, fontSmall);
+						updateCursorPixelX(text, font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.RIGHT) {
 					if (cursorX < text.length) {
 						cursorX++;
-						updateCursorPixelX(text, fontSmall);
+						updateCursorPixelX(text, font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.BACKSPACE) { // Remove char
 					if (cursorX > 0) {
 						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
 						cursorX--;
-						updateCursorPixelX(text, fontSmall);
+						updateCursorPixelX(text, font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.ENTER) { // Deselect
@@ -365,7 +367,7 @@ class Zui {
 				else if (key == kha.Key.CHAR) {
 					text = text.substr(0, cursorX) + char + text.substr(cursorX);
 					cursorX++;
-					updateCursorPixelX(text, fontSmall);
+					updateCursorPixelX(text, font, fontSmallSize);
 				}
 			}
 
@@ -508,8 +510,9 @@ class Zui {
 						xOffset:Float = DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
 						align = ALIGN_LEFT) {
 		g.font = font;
-		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.stringWidth(text) / 2;
-		else if (align == ALIGN_RIGHT) xOffset = _w - font.stringWidth(text) - DEFAULT_TEXT_OFFSET_X;
+		g.fontSize = fontSize;
+		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.width(fontSize, text) / 2;
+		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X;
 
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
@@ -517,9 +520,10 @@ class Zui {
 	function drawStringSmall(g:kha.graphics2.Graphics, text:String,
 							 xOffset:Float = DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
 							 align = ALIGN_LEFT) {
-		g.font = fontSmall;
-		if (align == ALIGN_CENTER) xOffset = _w / 2 - fontSmall.stringWidth(text) / 2;
-		else if (align == ALIGN_RIGHT) xOffset = _w - fontSmall.stringWidth(text) - DEFAULT_TEXT_OFFSET_X;
+		g.font = font;
+		g.fontSize = fontSmallSize;
+		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.width(fontSmallSize, text) / 2;
+		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X;
 
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
@@ -567,9 +571,9 @@ class Zui {
 			inputY >= y && inputY < y + h;
 	}
 
-	function updateCursorPixelX(text:String, font:kha.Font) { // Set cursor to current char
+	function updateCursorPixelX(text:String, font:kha.Font, fontSize:Int) { // Set cursor to current char
 		var str = text.substr(0, cursorX);
-		cursorPixelX = font.stringWidth(str) + DEFAULT_TEXT_OFFSET_X;
+		cursorPixelX = font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X;
 	}
 
     function onMouseDown(button:Int, x:Int, y:Int) { // Input events
@@ -591,7 +595,7 @@ class Zui {
     	deselectText();
     }
 
-    function onMouseMove(x:Int, y:Int) {
+    function onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int) {
     	setInputPosition(x, y);
     }
 

@@ -6,13 +6,13 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 
 ## Getting started
 - Clone into 'your_kha_project/Libraries'
-- Add 'zui' into project.kha libraries list
+- Add 'project.addLibrary('zui');' into khafile.js
 ``` hx
 // in init()
 var ui = new Zui(font, fontSmall);
 
 // in render()
-override public function render(frame:Framebuffer) {
+public function render(frame:Framebuffer) {
     var g = frame.g2;
     g.begin();
     // draw your stuff
@@ -20,7 +20,7 @@ override public function render(frame:Framebuffer) {
     
     ui.begin(g);
     if (ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL)) {
-        if (button("Hello")) {
+        if (ui.button("Hello")) {
             trace("World");
         }
     }
