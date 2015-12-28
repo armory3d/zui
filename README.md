@@ -1,6 +1,6 @@
 # zui
 
-Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or game debug. Can be used directly as Kha library included in project.kha.  
+Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or game debug. Can be used directly as Kha library included in khafile.js.  
 
 Inspired by [imgui](https://github.com/ocornut/imgui).
 
