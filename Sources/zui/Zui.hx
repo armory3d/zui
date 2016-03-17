@@ -39,6 +39,15 @@ class Zui {
 	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
 	static inline var ARROW_COL = 0xffffffff;
 
+	static inline var BUTTON_BG_COL_HOVER = 0xff808000;
+	static inline var BUTTON_BG_COL_PRESSED = 0xff404000;
+	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff00c0c0;
+	static inline var ARROW_COL_HOVER = 0xff808000;
+	static inline var NODE_TEXT_COL_HOVER = 0xff808000;
+	static inline var RADIO_COL_HOVER = 0xff808000;
+	static inline var DEFAULT_TEXT_COL_HOVER = 0xff808000;
+	static inline var CHECK_COL_HOVER = 0xff808000;
+
 	public static inline var LAYOUT_VERTICAL = 0; // Window layout
 	public static inline var LAYOUT_HORIZONTAL = 1;
 
@@ -294,18 +303,20 @@ class Zui {
 		var state = nodeStates.get(id);
 		if (state == null) { state = new NodeState(expanded); nodeStates.set(id, state); }
 
-		if (getPressed()) {
+		if (getReleased()) {
 			state.expanded = !state.expanded;
 		}
+
+		var hover = getHover();
 
 		if (accent > 0) { // Bg
 			g.color = accent == 1 ? NODE_BG1_COL : NODE_BG2_COL;
 			g.fillRect(_x, _y, _w, ELEMENT_H);
 		}
 
-		drawArrow(state.expanded);
+		drawArrow(state.expanded, hover);
 
-		g.color = NODE_TEXT_COL; // Title
+		g.color = hover ? NODE_TEXT_COL_HOVER : NODE_TEXT_COL; // Title
 		accent > 0 ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
@@ -329,10 +340,11 @@ class Zui {
 			textSelectedCurrentText = "";
 		}
 
-		g.color = TEXT_INPUT_BG_COL; // Text bg
+		var hover = getHover();
+		g.color = hover ? TEXT_INPUT_BG_COL_HOVER : TEXT_INPUT_BG_COL; // Text bg
 		g.fillRect(_x, _y + buttonOffsetY, _w, BUTTON_H);
 
-		if (textSelectedId != id && getPressed()) { // Passive
+		if (textSelectedId != id && getReleased()) { // Passive
 			isTyping = true;
 			submitTextId = textSelectedId;
 			textToSubmit = textSelectedCurrentText;
@@ -404,9 +416,16 @@ class Zui {
 	}
 
 	public function button(text:String):Bool {
-		var pressed = getPressed();
+		var wasPressed = getReleased();
+		var pushed = getPushed();
+		var hover = getHover();
 
-		g.color = BUTTON_BG_COL;
+		g.color = pushed
+			? BUTTON_BG_COL_PRESSED
+			: hover
+				? BUTTON_BG_COL_HOVER
+				: BUTTON_BG_COL;
+
 		g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H);
 
 		g.color = BUTTON_TEXT_COL;
@@ -414,20 +433,21 @@ class Zui {
 
 		endElement();
 
-		return pressed;
+		return wasPressed;
 	}
 
 	public function check(id:String, text:String, initState:Bool = false):Bool {
 		var state = checkStates.get(id);
 		if (state == null) { state = new CheckState(initState); checkStates.set(id, state); }
 
-		if (getPressed()) {
+		if (getReleased()) {
 			state.selected = !state.selected;
 		}
 
-		drawCheck(state.selected); // Check
+		var hover = getHover();
+		drawCheck(state.selected, hover); // Check
 
-		g.color = DEFAULT_TEXT_COL; // Text
+		g.color = hover ? DEFAULT_TEXT_COL_HOVER : DEFAULT_TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
@@ -441,13 +461,14 @@ class Zui {
 			state = new RadioState(initState); radioStates.set(groupId, state);
 		}
 
-		if (getPressed()) {
+		if (getReleased()) {
 			state.selected = pos;
 		}
 
-		drawRadio(state.selected == pos); // Radio
+		var hover = getHover();
+		drawRadio(state.selected == pos, hover); // Radio
 
-		g.color = DEFAULT_TEXT_COL; // Text
+		g.color = hover ? DEFAULT_TEXT_COL_HOVER : DEFAULT_TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
@@ -466,10 +487,10 @@ class Zui {
 		_y += 2;
 	}
 
-	function drawArrow(expanded:Bool) {
+	function drawArrow(expanded:Bool, hover:Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
-		g.color = ARROW_COL;
+		g.color = hover ? ARROW_COL_HOVER : ARROW_COL;
 		if (expanded) {
 			g.fillTriangle(x, y,
 						   x + ARROW_W, y,
@@ -482,10 +503,11 @@ class Zui {
 		}
 	}
 
-	function drawCheck(selected:Bool) {
+	function drawCheck(selected:Bool, hover:Bool) {
 		var x = _x + checkOffsetX;
 		var y = _y + checkOffsetY;
-		g.color = CHECK_COL;
+
+		g.color = hover ? CHECK_COL_HOVER : CHECK_COL;
 		g.fillRect(x, y, CHECK_W, CHECK_H); // Bg
 
 		if (selected) { // Check
@@ -496,10 +518,10 @@ class Zui {
 		}
 	}
 
-	function drawRadio(selected:Bool) {
+	function drawRadio(selected:Bool, hover:Bool) {
 		var x = _x + radioOffsetX;
 		var y = _y + radioOffsetY;
-		g.color = RADIO_COL;
+		g.color = hover ? RADIO_COL_HOVER : RADIO_COL;
 		g.fillRect(x, y, RADIO_W, RADIO_H); // Bg
 
 		if (selected) { // Check
@@ -563,9 +585,21 @@ class Zui {
 		_w = Std.int(_w * ratios[curRatio]);
 	}
 
-	function getPressed():Bool { // Input selection
+	function getReleased():Bool { // Input selection
 		return inputReleased &&
         	inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
+        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
+	}
+
+	function getPushed():Bool {
+		return inputDown &&
+			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
+        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
+	}
+
+	function getHover():Bool {
+		return
+			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
         	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
 	}
 
