@@ -51,22 +51,22 @@ class Zui {
 
 	static var firstInstance = true;
 
-	static var inputX:Float; // Input position
-	static var inputY:Float;
-	static var inputDX:Float; // Delta
-	static var inputDY:Float;
-	static var inputWheelDelta:Int;
-	static var inputStarted:Bool; // Buttons
-	static var inputReleased:Bool;
-	static var inputDown:Bool;
+	var inputX:Float; // Input position
+	var inputY:Float;
+	var inputDX:Float; // Delta
+	var inputDY:Float;
+	var inputWheelDelta:Int;
+	var inputStarted:Bool; // Buttons
+	var inputReleased:Bool;
+	var inputDown:Bool;
 
-	static var isKeyDown = false; // Keys
-	static var key:kha.Key;
-	static var char:String;
+	var isKeyDown = false; // Keys
+	var key:kha.Key;
+	var char:String;
 
-	static var cursorX = 0; // Text input
-	static var cursorY = 0;
-	static var cursorPixelX = 0.0;
+	var cursorX = 0; // Text input
+	var cursorY = 0;
+	var cursorPixelX = 0.0;
 
 	var ratios:Array<Float>; // Splitting rows
 	var curRatio:Int = -1;
@@ -115,12 +115,15 @@ class Zui {
 	var submitTextId:String;
 	var textToSubmit:String = "";
 
-	public function new(font:kha.Font, fontSize = 24, fontSmallSize = 20) {
+	var khaWindowId = 0;
+
+	public function new(font:kha.Font, fontSize = 24, fontSmallSize = 20, windowId = 0) {
 		this.font = font;
 		this.fontSize = fontSize;
 		this.fontSmallSize = fontSmallSize;
 		var fontHeight = font.height(fontSize);
 		var fontSmallHeight = font.height(fontSmallSize);
+		this.khaWindowId = windowId;
 
 		fontOffsetY = (ELEMENT_H - fontHeight) / 2; // Precalculate offsets
 		fontSmallOffsetY = (ELEMENT_H - fontSmallHeight) / 2;
@@ -137,10 +140,11 @@ class Zui {
 		radioSelectOffsetY = (RADIO_H - RADIO_SELECT_H) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
 
+		kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+
 		if (firstInstance) {
 			firstInstance = false;
 			prerenderElements();
-			kha.input.Mouse.get().notify(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 			//kha.input.Surface.get().notify(onMouseDown, onMouseUp, onMouseMove);
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
@@ -148,7 +152,7 @@ class Zui {
 
 	static var checkSelectImage:kha.Image = null;
 	function prerenderElements() { // Not yet used
-		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W), Std.int(CHECK_SELECT_H));
+		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W), Std.int(CHECK_SELECT_H), null, NoDepthAndStencil, 1, khaWindowId);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = CHECK_SELECT_COL;
@@ -159,7 +163,7 @@ class Zui {
 	}
 
 	public function remove() { // Clean up
-		kha.input.Mouse.get().remove(onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		kha.input.Mouse.get().removeWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp);
 	}
 
@@ -174,19 +178,19 @@ class Zui {
 	public function end() { // End drawing
 		if (!windowEnded) { endWindow(); }
 
-		Zui.isKeyDown = false; // Reset input - only one char and one zui instance for now
-		Zui.inputStarted = false;
-		Zui.inputReleased = false;
-		Zui.inputDX = 0;
-		Zui.inputDY = 0;
-		Zui.inputWheelDelta = 0;
+		isKeyDown = false; // Reset input - only one char for now
+		inputStarted = false;
+		inputReleased = false;
+		inputDX = 0;
+		inputDY = 0;
+		inputWheelDelta = 0;
 	}
 
 	// Returns true if redraw is needed
 	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL):Bool {
 		var state = windowStates.get(id);
 		if (state == null) {
-			state = new WindowState(layout, w, h); windowStates.set(id, state);
+			state = new WindowState(layout, w, h, khaWindowId); windowStates.set(id, state);
 		}
 
 		if (!windowEnded) { endWindow(); } // End previous window if necessary
@@ -197,7 +201,7 @@ class Zui {
 		if (getInputInRect(x, y, w, h)) { // Redraw
 			state.redraws = 2;
 		}
-		
+
 		curWindowState = state;
 		_windowX = x;
 		_windowY = y;
@@ -242,7 +246,7 @@ class Zui {
 
 				if ((inputStarted) && // Start scrolling
 					getInputInRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH)) {
-					
+
 					state.scrolling = true;
 					isScrolling = true;
 				}
@@ -532,7 +536,7 @@ class Zui {
 		if (curWindowState.layout == LAYOUT_VERTICAL) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
 				_y += ELEMENT_H + ELEMENT_SEPARATOR_SIZE;
-				
+
 				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
 					curRatio = -1;
 					ratios = null;
@@ -577,8 +581,8 @@ class Zui {
 	}
 
     function onMouseDown(button:Int, x:Int, y:Int) { // Input events
-    	Zui.inputStarted = true;
-    	Zui.inputDown = true;
+    	inputStarted = true;
+    	inputDown = true;
     	setInputPosition(x, y);
     }
 
@@ -588,9 +592,9 @@ class Zui {
     		for (s in windowStates) s.scrolling = false;
     	}
     	else { // To prevent action when scrolling is active
-    		Zui.inputReleased = true;
+    		inputReleased = true;
     	}
-    	Zui.inputDown = false;
+    	inputDown = false;
     	setInputPosition(x, y);
     	deselectText();
     }
@@ -600,20 +604,20 @@ class Zui {
     }
 
     function onMouseWheel(delta:Int) {
-    	Zui.inputWheelDelta = delta;
+    	inputWheelDelta = delta;
     }
 
     function setInputPosition(inputX:Int, inputY:Int) {
-		Zui.inputDX = inputX - Zui.inputX;
-		Zui.inputDY = inputY - Zui.inputY;
-		Zui.inputX = inputX;
-		Zui.inputY = inputY;
+		inputDX = inputX - this.inputX;
+		inputDY = inputY - this.inputY;
+		this.inputX = inputX;
+		this.inputY = inputY;
 	}
 
 	function onKeyDown(key:kha.Key, char:String) {
-        Zui.isKeyDown = true;
-        Zui.key = key;
-        Zui.char = char;
+        isKeyDown = true;
+        this.key = key;
+        this.char = char;
     }
 
     function onKeyUp(key:kha.Key, char:String) {
@@ -629,7 +633,7 @@ class WindowState { // Cached states
 	public var layout:Int;
 	public var lastMaxX:Float = 0;
 	public var lastMaxY:Float = 0;
-	public function new(layout:Int, w:Int, h:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h); }
+	public function new(layout:Int, w:Int, h:Int, windowId:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
 }
 
 class NodeState {
