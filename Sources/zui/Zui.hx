@@ -41,7 +41,7 @@ class Zui {
 
 	static inline var BUTTON_BG_COL_HOVER = 0xff808000;
 	static inline var BUTTON_BG_COL_PRESSED = 0xff404000;
-	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff00c0c0;
+	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff008080;
 	static inline var ARROW_COL_HOVER = 0xff808000;
 	static inline var NODE_TEXT_COL_HOVER = 0xff808000;
 	static inline var RADIO_COL_HOVER = 0xff808000;
