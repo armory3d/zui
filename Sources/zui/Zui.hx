@@ -353,6 +353,10 @@ class Zui {
 			cursorX = text.length;
 			cursorY = 0;
 			updateCursorPixelX(text, font, fontSmallSize);
+
+			if (kha.input.Keyboard.get() != null) {
+				kha.input.Keyboard.get().show();
+			}
 		}
 
 		if (textSelectedId == id) { // Active
@@ -413,6 +417,10 @@ class Zui {
 		textSelectedId = "";
 		isTyping = false;
 		for (w in windowStates) w.redraws = 2;
+
+		if (kha.input.Keyboard.get() != null) {
+			kha.input.Keyboard.get().hide();
+		}
 	}
 
 	public function button(text:String):Bool {
