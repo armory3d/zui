@@ -667,7 +667,7 @@ class WindowState { // Cached states
 	public var layout:Int;
 	public var lastMaxX:Float = 0;
 	public var lastMaxY:Float = 0;
-	public function new(layout:Int, w:Int, h:Int, windowId:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
+	public function new(layout:Int, w:Int, h:Int, windowId:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
 }
 
 class NodeState {
