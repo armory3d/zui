@@ -4,49 +4,58 @@ package zui;
 // https://github.com/luboslenco/zui
 
 class Zui {
-	public static inline var ELEMENT_W = 100; // For horizontal layout
-	public static inline var ELEMENT_H = 30; // For vertical layout
-	static inline var ELEMENT_SEPARATOR_SIZE = 0;
-	static inline var ARROW_W = ELEMENT_H * 0.3;
-	static inline var ARROW_H = ARROW_W;
-	static inline var BUTTON_H = ELEMENT_H * 0.7;
-	static inline var CHECK_W = ELEMENT_H * 0.5;
-	static inline var CHECK_H = CHECK_W;
-	static inline var CHECK_SELECT_W = ELEMENT_H * 0.3;
-	static inline var CHECK_SELECT_H = CHECK_SELECT_W;
-	static inline var RADIO_W = ELEMENT_H * 0.5;
-	static inline var RADIO_H = RADIO_W;
-	static inline var RADIO_SELECT_W = ELEMENT_H * 0.35;
-	static inline var RADIO_SELECT_H = RADIO_SELECT_W;
-	static inline var SCROLL_W = 13;
-	static inline var SCROLL_BAR_W = 10;
-	static inline var DEFAULT_TEXT_OFFSET_X = 5;
+	static inline var _ELEMENT_W = 100; // For horizontal layout
+	static inline var _ELEMENT_H = 30; // For vertical layout
+	static inline var _ELEMENT_SEPARATOR_SIZE = 0;
+	static inline var _ARROW_W = _ELEMENT_H * 0.3;
+	static inline var _ARROW_H = _ARROW_W;
+	static inline var _BUTTON_H = _ELEMENT_H * 0.7;
+	static inline var _CHECK_W = _ELEMENT_H * 0.5;
+	static inline var _CHECK_H = _CHECK_W;
+	static inline var _CHECK_SELECT_W = _ELEMENT_H * 0.3;
+	static inline var _CHECK_SELECT_H = _CHECK_SELECT_W;
+	static inline var _RADIO_W = _ELEMENT_H * 0.5;
+	static inline var _RADIO_H = _RADIO_W;
+	static inline var _RADIO_SELECT_W = _ELEMENT_H * 0.3;
+	static inline var _RADIO_SELECT_H = _RADIO_SELECT_W;
+	static inline var _SCROLL_W = 12;
+	static inline var _SCROLL_BAR_W = 8;
+	static inline var _DEFAULT_TEXT_OFFSET_X = 8;
+	static inline var _TAB_W = 12;
+	static inline var _LINE_STRENGTH = 2;
+	static var SCALE:Float;
 
-	static inline var WINDOW_BG_COL = 0xff354346; // Colors
-	static inline var SCROLL_BG_COL = 0xff0c0c0c;
+	static inline var WINDOW_BG_COL = 0xff000000; // Colors
+	static inline var WINDOW_TINT_COL = 0xddffffff;
+	static inline var SCROLL_BG_COL = 0xff101010;
 	static inline var SCROLL_COL = 0xff494949;
-	static inline var NODE_BG1_COL = 0xff2a3539;
-	static inline var NODE_BG2_COL = 0xff222c2f;
-	static inline var NODE_TEXT_COL = 0xffffffff;
-	static inline var BUTTON_BG_COL = 0xff2b393c;
-	static inline var BUTTON_TEXT_COL = 0xffffffff;
-	static inline var TEXT_INPUT_BG_COL = 0xff2b393c;
-	static inline var CHECK_COL = 0xff2b393c;
-	static inline var CHECK_SELECT_COL = 0xff6bb278;
-	static inline var RADIO_COL = 0xff2b393c;
-	static inline var RADIO_SELECT_COL = 0xff6bb278;
-	static inline var DEFAULT_TEXT_COL = 0xffffffff;
+	static inline var NODE_BG1_COL = 0xff000000;
+	static inline var NODE_BG2_COL = 0xff000000;
+	static inline var NODE_TEXT_COL = 0xff737270;
+	static inline var NODE_TEXT_COL_HOVER = NODE_TEXT_COL;
+	static inline var BUTTON_BG_COL = 0xff557ab7;
+	static inline var BUTTON_TEXT_COL = 0xffcac9c7;
+	static inline var BUTTON_BG_COL_HOVER = 0xff668ecf;
+	static inline var BUTTON_BG_COL_PRESSED = 0xffcda90b;
+	static inline var TEXT_INPUT_BG_COL = 0xff343436;
+	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff444446;
+	static inline var TEXT_CURSOR_COL = DEFAULT_TEXT_COL;
+	static inline var CHECK_COL = 0xff343436;
+	static inline var CHECK_COL_HOVER = 0xff444446;
+	static inline var CHECK_SELECT_COL = 0xffd6d6d6;
+	static inline var RADIO_COL = 0xff343436;
+	static inline var RADIO_COL_HOVER = 0xff444446;
+	static inline var RADIO_SELECT_COL = 0xffd6d6d6;
+	static inline var DEFAULT_TEXT_COL = 0xffcac9c7;
+	static inline var DEFAULT_TEXT_COL_HOVER = DEFAULT_TEXT_COL;
 	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
-	static inline var ARROW_COL = 0xffffffff;
-
-	static inline var BUTTON_BG_COL_HOVER = 0xff808000;
-	static inline var BUTTON_BG_COL_PRESSED = 0xff404000;
-	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff008080;
-	static inline var ARROW_COL_HOVER = 0xff808000;
-	static inline var NODE_TEXT_COL_HOVER = 0xff808000;
-	static inline var RADIO_COL_HOVER = 0xff808000;
-	static inline var DEFAULT_TEXT_COL_HOVER = 0xff808000;
-	static inline var CHECK_COL_HOVER = 0xff808000;
+	static inline var ARROW_COL = 0xffcac9c7;
+	static inline var ARROW_COL_HOVER = ARROW_COL;
+	static inline var SEPARATOR_COL = 0xff22211f;
+	static inline var FILL_TEXT_INPUT_BG = false;
+	static inline var FILL_BUTTON_BG = true;
+	static inline var FILL_CHECK_BG = false;
+	static inline var FILL_RADIO_BG = false;
 
 	public static inline var LAYOUT_VERTICAL = 0; // Window layout
 	public static inline var LAYOUT_HORIZONTAL = 1;
@@ -55,8 +64,8 @@ class Zui {
 	public static inline var ALIGN_CENTER = 1;
 	public static inline var ALIGN_RIGHT = 2;
 
-	public static var isScrolling:Bool = false; // Use to limit other activities
-	public static var isTyping:Bool = false;
+	public static var isScrolling = false; // Use to limit other activities
+	public static var isTyping = false;
 
 	static var firstInstance = true;
 
@@ -102,6 +111,7 @@ class Zui {
 	var radioOffsetY:Float;
 	var radioSelectOffsetX:Float;
 	var radioSelectOffsetY:Float;
+	var scrollAlign:Float;
 
 	var _x:Float; // Cursor(stack) position
 	var _y:Float;
@@ -113,61 +123,63 @@ class Zui {
 	var _windowW:Float;
 	var _windowH:Float;
 	var curWindowState:WindowState;
-	var windowEnded:Bool = true;
+	var windowEnded = true;
 
 	var windowStates:Map<String, WindowState> = new Map(); // Element states
 	var nodeStates:Map<String, NodeState> = new Map();
 	var checkStates:Map<String, CheckState> = new Map();
 	var radioStates:Map<String, RadioState> = new Map();
+	var sliderStates:Map<String, SliderState> = new Map();
+	// var colorPickerStates:Map<String, ColorPickerState> = new Map();
 	var textSelectedId:String = "";
 	var textSelectedCurrentText:String;
 	var submitTextId:String;
 	var textToSubmit:String = "";
-
 	var khaWindowId = 0;
+	var scaleFactor:Float;
 
-	public function new(font:kha.Font, fontSize = 24, fontSmallSize = 20, windowId = 0) {
+	public function new(font:kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0) {
 		this.font = font;
-		this.fontSize = fontSize;
-		this.fontSmallSize = fontSmallSize;
-		var fontHeight = font.height(fontSize);
-		var fontSmallHeight = font.height(fontSmallSize);
-		this.khaWindowId = windowId;
+		this.fontSize = Std.int(fontSize * scaleFactor);
+		this.fontSmallSize = Std.int(fontSmallSize * scaleFactor);
+		var fontHeight = font.height(this.fontSize);
+		var fontSmallHeight = font.height(this.fontSmallSize);
+		this.khaWindowId = khaWindowId;
+		SCALE = this.scaleFactor = scaleFactor;
 
-		fontOffsetY = (ELEMENT_H - fontHeight) / 2; // Precalculate offsets
-		fontSmallOffsetY = (ELEMENT_H - fontSmallHeight) / 2;
-		arrowOffsetY = (ELEMENT_H - ARROW_H) / 2;
+		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
+		fontSmallOffsetY = (ELEMENT_H() - fontSmallHeight) / 2;
+		arrowOffsetY = (ELEMENT_H() - ARROW_H()) / 2;
 		arrowOffsetX = arrowOffsetY;
-		titleOffsetX = arrowOffsetX * 2 + ARROW_W;
-		buttonOffsetY = (ELEMENT_H - BUTTON_H) / 2;
-		checkOffsetY = (ELEMENT_H - CHECK_H) / 2;
+		titleOffsetX = (arrowOffsetX * 2 + ARROW_W()) / SCALE;
+		buttonOffsetY = (ELEMENT_H() - BUTTON_H()) / 2;
+		checkOffsetY = (ELEMENT_H() - CHECK_H()) / 2;
 		checkOffsetX = checkOffsetY;
-		checkSelectOffsetY = (CHECK_H - CHECK_SELECT_H) / 2;
+		checkSelectOffsetY = (CHECK_H() - CHECK_SELECT_H()) / 2;
 		checkSelectOffsetX = checkSelectOffsetY;
-		radioOffsetY = (ELEMENT_H - RADIO_H) / 2;
+		radioOffsetY = (ELEMENT_H() - RADIO_H()) / 2;
 		radioOffsetX = radioOffsetY;
-		radioSelectOffsetY = (RADIO_H - RADIO_SELECT_H) / 2;
+		radioSelectOffsetY = (RADIO_H() - RADIO_SELECT_H()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
+		scrollAlign = 0;//(SCROLL_W() - SCROLL_BAR_W()) / 2;
 
 		kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 
 		if (firstInstance) {
 			firstInstance = false;
 			prerenderElements();
-			//kha.input.Surface.get().notify(onMouseDown, onMouseUp, onMouseMove);
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
 	}
 
 	static var checkSelectImage:kha.Image = null;
 	function prerenderElements() { // Not yet used
-		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W), Std.int(CHECK_SELECT_H), null, NoDepthAndStencil, 1, khaWindowId);
+		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, khaWindowId);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = CHECK_SELECT_COL;
-		g.fillRect(0, 0, CHECK_SELECT_W, CHECK_SELECT_H);
-		//g.drawLine(0, CHECK_SELECT_H / 2, CHECK_SELECT_W / 2, CHECK_SELECT_H, 3);
-		//g.drawLine(CHECK_SELECT_W / 2, CHECK_SELECT_H, CHECK_SELECT_W, 0, 3);
+		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), LINE_STRENGTH());
+		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), LINE_STRENGTH());
 		g.end();
 	}
 
@@ -177,6 +189,7 @@ class Zui {
 	}
 
 	public function begin(g:kha.graphics2.Graphics) { // Begin UI drawing
+		SCALE = scaleFactor;
 		globalG = g;
 		_x = 0; // Reset cursor
 		_y = 0;
@@ -197,6 +210,8 @@ class Zui {
 
 	// Returns true if redraw is needed
 	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL):Bool {
+		layout == LAYOUT_VERTICAL ? w = Std.int(w * scaleFactor) : h = Std.int(h * scaleFactor);
+		
 		var state = windowStates.get(id);
 		if (state == null) {
 			state = new WindowState(layout, w, h, khaWindowId); windowStates.set(id, state);
@@ -218,8 +233,8 @@ class Zui {
 		_windowH = h;
 		_x = 0;//x;
 		_y = state.scrollOffset;//y + state.scrollOffset;
-		if (layout == LAYOUT_HORIZONTAL) w = ELEMENT_W;
-		_w = !state.scrollEnabled ? w : w - SCROLL_W; // Exclude scrollbar if present
+		if (layout == LAYOUT_HORIZONTAL) w = Std.int(ELEMENT_W());
+		_w = !state.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
 
 		if (state.redraws == 0 && !isScrolling && !isTyping) return false;
@@ -250,11 +265,11 @@ class Zui {
 				var amountScrolled = state.scrollOffset;
 				var ratio = amountScrolled / amountToScroll;
 				var barH = _windowH - Math.abs(amountToScroll);
-				if (barH < ELEMENT_H * 2) barH = ELEMENT_H;
+				if (barH < ELEMENT_H() * 2) barH = ELEMENT_H();
 				var barY = (_windowH - barH) * ratio;
 
 				if ((inputStarted) && // Start scrolling
-					getInputInRect(_windowX + _windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH)) {
+					getInputInRect(_windowX + _windowW - SCROLL_BAR_W(), barY, SCROLL_BAR_W(), barH)) {
 
 					state.scrolling = true;
 					isScrolling = true;
@@ -266,9 +281,9 @@ class Zui {
 					scroll(-inputWheelDelta * 3, fullHeight);
 				}
 				g.color = SCROLL_BG_COL; // Bg
-				g.fillRect(_windowW - SCROLL_W, _windowY, SCROLL_W, _windowH);
+				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = SCROLL_COL; // Bar
-				g.fillRect(_windowW - SCROLL_BAR_W, barY, SCROLL_BAR_W, barH);
+				g.fillRect(_windowW - SCROLL_BAR_W() - scrollAlign, barY, SCROLL_BAR_W(), barH);
 			}
 
 			state.lastMaxX = _x;
@@ -284,14 +299,14 @@ class Zui {
 
 		// Draw window texture
 		globalG.begin(false);
-		globalG.color = kha.Color.White;
+		globalG.color = WINDOW_TINT_COL;
 		globalG.drawImage(state.texture, _windowX, _windowY);
 		globalG.end();
 	}
 
 	function scroll(delta:Float, fullHeight:Float) {
 		var state = curWindowState;
-		state.scrollOffset -= delta;
+		state.scrollOffset -= delta * SCALE;
 		// Stay in bounds
 		if (state.scrollOffset > 0) state.scrollOffset = 0;
 		else if (fullHeight + state.scrollOffset < _windowH) {
@@ -299,7 +314,7 @@ class Zui {
 		}
 	}
 
-	public function node(id:String, text:String, accent = 1, expanded = false):Bool {
+	public function node(id:String, text:String, accent = 0, expanded = false):Bool {
 		var state = nodeStates.get(id);
 		if (state == null) { state = new NodeState(expanded); nodeStates.set(id, state); }
 
@@ -311,22 +326,36 @@ class Zui {
 
 		if (accent > 0) { // Bg
 			g.color = accent == 1 ? NODE_BG1_COL : NODE_BG2_COL;
-			g.fillRect(_x, _y, _w, ELEMENT_H);
+			g.fillRect(_x, _y, _w, ELEMENT_H());
 		}
 
 		drawArrow(state.expanded, hover);
 
 		g.color = hover ? NODE_TEXT_COL_HOVER : NODE_TEXT_COL; // Title
+		g.opacity = 1.0;
 		accent > 0 ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
 		return state.expanded;
 	}
+	
+	public function image(image:kha.Image) {
+		var w = _w - buttonOffsetY * 2;
+		var ratio = w / image.width;
+		var h = image.height * ratio;
+		g.drawScaledImage(image, _x + buttonOffsetY, _y, w, h);
+		_y += h;
+		endElement(false);
+	}
 
-	public function text(text:String, align = ALIGN_LEFT) {
+	public function text(text:String, align = ALIGN_LEFT, bg:Int = 0x00000000) {
+		if (bg != 0x0000000) {
+			g.color = bg;
+			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
+		}
 		g.color = DEFAULT_TEXT_COL;
-		drawStringSmall(g, text, DEFAULT_TEXT_OFFSET_X, 0, align);
+		drawStringSmall(g, text, DEFAULT_TEXT_OFFSET_X(), 0, align);
 
 		endElement();
 	}
@@ -342,7 +371,7 @@ class Zui {
 
 		var hover = getHover();
 		g.color = hover ? TEXT_INPUT_BG_COL_HOVER : TEXT_INPUT_BG_COL; // Text bg
-		g.fillRect(_x, _y + buttonOffsetY, _w, BUTTON_H);
+		drawRect(g, FILL_TEXT_INPUT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H(), 2);
 
 		if (textSelectedId != id && getReleased()) { // Passive
 			isTyping = true;
@@ -391,9 +420,9 @@ class Zui {
 				}
 			}
 
-			g.color = DEFAULT_TEXT_COL; // Cursor
-			var cursorHeight = ELEMENT_H * 0.9;
-			var lineHeight = ELEMENT_H;
+			g.color = TEXT_CURSOR_COL; // Cursor
+			var cursorHeight = ELEMENT_H() * 0.9;
+			var lineHeight = ELEMENT_H();
 			g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight, 1, cursorHeight);
 			textSelectedCurrentText = text;
 		}
@@ -428,13 +457,11 @@ class Zui {
 		var pushed = getPushed();
 		var hover = getHover();
 
-		g.color = pushed
-			? BUTTON_BG_COL_PRESSED
-			: hover
-				? BUTTON_BG_COL_HOVER
-				: BUTTON_BG_COL;
+		g.color = pushed ? BUTTON_BG_COL_PRESSED :
+				  hover ? BUTTON_BG_COL_HOVER :
+				  BUTTON_BG_COL;
 
-		g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H);
+		drawRect(g, FILL_BUTTON_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
 		g.color = BUTTON_TEXT_COL;
 		drawStringSmall(g, text, 0, 0, ALIGN_CENTER);
@@ -488,10 +515,54 @@ class Zui {
 		var state = radioStates.get(groupId);
 		if (state != null) state.selected = pos;
 	}
+	
+	public function slider(id:String, text:String, from:Float, to:Float, filled:Bool = false, precision = 100, initValue:Float = 0):Float {
+		var state = sliderStates.get(id);
+		if (state == null) { state = new SliderState(initValue); sliderStates.set(id, state); }
 
+		if (getStarted()) {
+			state.scrolling = true;
+			isScrolling = true;
+		}
+		if (state.scrolling) { // Scroll
+			var range = to - from;
+			var sliderX = _x + _windowX + buttonOffsetY;
+			var sliderW = _w - buttonOffsetY * 2;
+			var step = range / sliderW;
+			var value = (inputX - sliderX) * step;
+			state.value = Std.int(value * precision) / precision;
+			if (state.value < from) state.value = from; // Stay in bounds
+			else if (state.value > to) state.value = to;
+		}
+		
+		var hover = getHover();
+		drawSlider(state.value, from, to, filled, hover); // Slider
+
+		g.color = DEFAULT_LABEL_COL;// Text
+		drawStringSmall(g, text, 0, 0, ALIGN_RIGHT);
+
+		g.color = DEFAULT_TEXT_COL; // Value
+		drawStringSmall(g, state.value + "");
+
+		endElement();
+		return state.value;
+	}
+	
+	// public function colorPicker(id:String, initColor:Int = 0xffffffff):Int {
+	// 	var state = colorPickerStates.get(id);
+	// 	if (state == null) { state = new ColorPickerState(initColor); colorPickerStates.set(id, state); }
+
+	// 	var w = _w - buttonOffsetY * 2;
+	// 	g.drawScaledImage(checkSelectImage, _x + buttonOffsetY, _y, w, w);
+
+	// 	_y += w;
+	// 	endElement(false);
+	// 	return state.value;
+	// }
+	
 	public function separator() {
-		g.color = BUTTON_BG_COL;
-		g.fillRect(_x, _y, _w, 2);
+		g.color = SEPARATOR_COL;
+		g.fillRect(_x, _y, _w - DEFAULT_TEXT_OFFSET_X(), LINE_STRENGTH());
 		_y += 2;
 	}
 
@@ -501,13 +572,13 @@ class Zui {
 		g.color = hover ? ARROW_COL_HOVER : ARROW_COL;
 		if (expanded) {
 			g.fillTriangle(x, y,
-						   x + ARROW_W, y,
-						   x + ARROW_W / 2, y + ARROW_H);
+						   x + ARROW_W(), y,
+						   x + ARROW_W() / 2, y + ARROW_H());
 		}
 		else {
 			g.fillTriangle(x, y,
-						   x, y + ARROW_H,
-						   x + ARROW_W, y + ARROW_H / 2);
+						   x, y + ARROW_H(),
+						   x + ARROW_W(), y + ARROW_H() / 2);
 		}
 	}
 
@@ -516,11 +587,11 @@ class Zui {
 		var y = _y + checkOffsetY;
 
 		g.color = hover ? CHECK_COL_HOVER : CHECK_COL;
-		g.fillRect(x, y, CHECK_W, CHECK_H); // Bg
+		drawRect(g, FILL_CHECK_BG, x, y, CHECK_W(), CHECK_H(), 2); // Bg
 
 		if (selected) { // Check
 			//g.color = CHECK_SELECT_COL;
-			//g.fillRect(x + checkSelectOffsetX, y + checkSelectOffsetY, CHECK_SELECT_W, CHECK_SELECT_H);
+			//g.fillRect(x + checkSelectOffsetX, y + checkSelectOffsetY, CHECK_SELECT_W(), CHECK_SELECT_H());
 			g.color = kha.Color.White;
 			g.drawImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY);
 		}
@@ -530,42 +601,57 @@ class Zui {
 		var x = _x + radioOffsetX;
 		var y = _y + radioOffsetY;
 		g.color = hover ? RADIO_COL_HOVER : RADIO_COL;
-		g.fillRect(x, y, RADIO_W, RADIO_H); // Bg
+		drawRect(g, FILL_RADIO_BG, x, y, RADIO_W(), RADIO_H()); // Bg
 
 		if (selected) { // Check
 			g.color = RADIO_SELECT_COL;
-			var xx = x + radioSelectOffsetX;
-			var yy = y + radioSelectOffsetY;
-			g.fillTriangle(xx, yy, xx, yy + RADIO_SELECT_H, xx + RADIO_SELECT_W, yy + RADIO_SELECT_H / 2);
+			g.fillRect(x + radioSelectOffsetX, y + radioSelectOffsetY, RADIO_SELECT_W(), RADIO_SELECT_H());
 		}
+	}
+	
+	function drawSlider(value:Float, from:Float, to:Float, filled:Bool, hover:Bool) {
+		var x = _x + buttonOffsetY;
+		var y = _y + buttonOffsetY;
+		var w = _w - buttonOffsetY * 2;
+
+		g.color = hover ? CHECK_COL_HOVER : CHECK_COL;
+		drawRect(g, FILL_CHECK_BG, x, y, w, BUTTON_H(), 2); // Bg
+		
+		var offset = ((to - from) / to) * (value / (to - from));
+		var barW = 8 * SCALE; // Unfilled bar
+		var sliderX = filled ? x : x + (w - barW) * offset;
+		var sliderW = filled ? w * offset : barW; 
+		g.fillRect(sliderX, y, sliderW, BUTTON_H());
 	}
 
 	function drawString(g:kha.graphics2.Graphics, text:String,
-						xOffset:Float = DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
+						xOffset:Float = _DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
 						align = ALIGN_LEFT) {
+		xOffset *= SCALE;
 		g.font = font;
 		g.fontSize = fontSize;
 		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.width(fontSize, text) / 2;
-		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X;
+		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
 
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
 	function drawStringSmall(g:kha.graphics2.Graphics, text:String,
-							 xOffset:Float = DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
+							 xOffset:Float = _DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
 							 align = ALIGN_LEFT) {
+		xOffset *= SCALE;
 		g.font = font;
 		g.fontSize = fontSmallSize;
 		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.width(fontSmallSize, text) / 2;
-		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X;
+		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
 
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
-	function endElement() {
+	function endElement(nextLine = true) {
 		if (curWindowState.layout == LAYOUT_VERTICAL) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
-				_y += ELEMENT_H + ELEMENT_SEPARATOR_SIZE;
+				if (nextLine) _y += ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
 
 				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
 					curRatio = -1;
@@ -581,7 +667,7 @@ class Zui {
 			}
 		}
 		else { // HORIZONTAL
-			_x += _w + ELEMENT_SEPARATOR_SIZE;
+			_x += _w + ELEMENT_SEPARATOR_SIZE();
 		}
 	}
 
@@ -592,23 +678,36 @@ class Zui {
 		wBeforeSplit = _w;
 		_w = Std.int(_w * ratios[curRatio]);
 	}
+	
+	public function indent() {
+		_x += TAB_W();
+		_w -= TAB_W();
+	}
+	public function unindent() {
+		_x -= TAB_W();
+		_w += TAB_W();
+	}
+	
+	inline function drawRect(g:kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength: Float = 1.0) {
+		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, LINE_STRENGTH());
+	}
 
 	function getReleased():Bool { // Input selection
-		return inputReleased &&
-        	inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
-        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
+		return inputReleased && getHover();
 	}
 
 	function getPushed():Bool {
-		return inputDown &&
-			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
-        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
+		return inputDown && getHover();
+	}
+	
+	function getStarted():Bool {
+		return inputStarted && getHover();
 	}
 
 	function getHover():Bool {
 		return
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
-        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H);
+        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
 	}
 
 	function getInputInRect(x:Float, y:Float, w:Float, h:Float):Bool {
@@ -619,7 +718,7 @@ class Zui {
 
 	function updateCursorPixelX(text:String, font:kha.Font, fontSize:Int) { // Set cursor to current char
 		var str = text.substr(0, cursorX);
-		cursorPixelX = font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X;
+		cursorPixelX = font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X();
 	}
 
     function onMouseDown(button:Int, x:Int, y:Int) { // Input events
@@ -632,6 +731,7 @@ class Zui {
     	if (isScrolling) {
     		isScrolling = false;
     		for (s in windowStates) s.scrolling = false;
+    		for (s in sliderStates) s.scrolling = false;
     	}
     	else { // To prevent action when scrolling is active
     		inputReleased = true;
@@ -664,6 +764,26 @@ class Zui {
 
     function onKeyUp(key:kha.Key, char:String) {
     }
+	
+	static inline function ELEMENT_W() { return _ELEMENT_W * SCALE; }
+	static inline function ELEMENT_H() { return _ELEMENT_H * SCALE; }
+	static inline function ELEMENT_SEPARATOR_SIZE() { return _ELEMENT_SEPARATOR_SIZE * SCALE; }
+	static inline function ARROW_W() { return _ARROW_W * SCALE; }
+	static inline function ARROW_H() { return _ARROW_H * SCALE; }
+	static inline function BUTTON_H() { return _BUTTON_H * SCALE; }
+	static inline function CHECK_W() { return _CHECK_W * SCALE; }
+	static inline function CHECK_H() { return _CHECK_H * SCALE; }
+	static inline function CHECK_SELECT_W() { return _CHECK_SELECT_W * SCALE; }
+	static inline function CHECK_SELECT_H() { return _CHECK_SELECT_H * SCALE; }
+	static inline function RADIO_W() { return _RADIO_W * SCALE; }
+	static inline function RADIO_H() { return _RADIO_H * SCALE; }
+	static inline function RADIO_SELECT_W() { return _RADIO_SELECT_W * SCALE; }
+	static inline function RADIO_SELECT_H() { return _RADIO_SELECT_H * SCALE; }
+	static inline function SCROLL_W() { return Std.int(_SCROLL_W * SCALE); }
+	static inline function SCROLL_BAR_W() { return _SCROLL_BAR_W * SCALE; }
+	static inline function DEFAULT_TEXT_OFFSET_X() { return _DEFAULT_TEXT_OFFSET_X * SCALE; }
+	static inline function TAB_W() { return Std.int(_TAB_W * SCALE); }
+	static inline function LINE_STRENGTH() { return _LINE_STRENGTH * SCALE; }
 }
 
 class WindowState { // Cached states
@@ -675,20 +795,26 @@ class WindowState { // Cached states
 	public var layout:Int;
 	public var lastMaxX:Float = 0;
 	public var lastMaxY:Float = 0;
-	public function new(layout:Int, w:Int, h:Int, windowId:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
+	public function new(layout:Int, w:Int, h:Int, windowId:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
 }
-
 class NodeState {
 	public var expanded:Bool;
 	public function new(expanded:Bool) { this.expanded = expanded; }
 }
-
 class CheckState {
 	public var selected:Bool = false;
 	public function new(selected:Bool) { this.selected = selected; }
 }
-
 class RadioState {
 	public var selected:Int = 0;
 	public function new(selected:Int) { this.selected = selected; }
 }
+class SliderState {
+	public var value:Float = 0;
+	public var scrolling:Bool = false;
+	public function new(value:Float) { this.value = value; }
+}
+// class ColorPickerState {
+// 	public var value:Int = 0;
+// 	public function new(value:Int) { this.value = value; }
+// }

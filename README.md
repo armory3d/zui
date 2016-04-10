@@ -1,48 +1,60 @@
 # zui
 
-Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or game debug. Can be used directly as Kha library included in khafile.js.  
+Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or game debug. Can be used directly as Kha library included in khafile.js. Note that internally some of the state is retained to favor simplicity.  
 
 Inspired by [imgui](https://github.com/ocornut/imgui).
+
+![](zui.jpg)
 
 ## Getting started
 - Clone into 'your_kha_project/Libraries'
 - Add 'project.addLibrary('zui');' into khafile.js
 ``` hx
-// in init()
-var ui = new Zui(font, fontSmall);
+	// In init()
+	var ui = new Zui(font);
 
-// in render()
-public function render(frame:Framebuffer) {
-    var g = frame.g2;
-    g.begin();
-    // draw your stuff
-    g.end();
-    
-    ui.begin(g);
-    if (ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL)) {
-        if (ui.button("Hello")) {
-            trace("World");
-        }
-    }
-    ui.end();
-}
+	// In render()
+	public function render(frame:Framebuffer) {
+		var g = frame.g2;
+		g.begin();
+		// Draw your stuff...
+		g.end();
+		
+		ui.begin(g);
+		if (ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL)) {
+			if (ui.button("Hello")) {
+				trace("World");
+			}
+		}
+		ui.end();
+
+		// Draw more stuff...
+	}
 ```
 
 ## Elements
 ``` hx
 node(id:String, text:String, accent = 1, expanded = false):Bool
-text(text:String, align = ALIGN_LEFT)
-textInput(id:String, text:String, label:String = ""):String
+image(image:Image)
+text(text:String, align = ALIGN_LEFT, bg = 0)
+textInput(id:String, text:String, label = ""):String
 button(text:String):Bool
-check(id:String, text:String, initState:Bool = false):Bool
-radio(groupId:String, pos:Int, text:String, initState:Int = 0):Bool
+check(id:String, text:String, initState = false):Bool
+radio(groupId:String, pos:Int, text:String, initState = 0):Bool
+slider(id:String, text:String, from:Float, to:Float, filled = false, precision = 100, initValue = 0.0):Float
+
+// Formating
 row(ratios:Array<Float>)
+separator()
+indent()
+unindent()
 ```
 
-Ext.hx - more complex elements:
+Ext.hx - prebuilt elements:
 ``` hx
-drawList(...)
-drawNodeList(...)
+list(...)
+nodeList(...)
+colorPicker(...)
 ```
 
 Id.hx - simple macros to generate ids
@@ -50,41 +62,5 @@ Id.hx - simple macros to generate ids
 var state = check(Id.check(), "Check Box");
 ```
 
-## Roadmap
-- More robust ID system
-- More elements
-- Nicer theme
-
 ## Example
-
-``` hx
-ui.begin(g);
-
-// window() returns true if redraw is needed - windows are cached into textures
-if (ui.window(Id.window(), 0, 0, 250, 600)) {
-
-    if (ui.node(Id.node(), "Node", 2, true)) {
-        ui.text("Text");
-        ui.textInput(Id.textInput(), "Hello", "Input");
-        ui.button("Button");
-        ui.check(Id.check(), "Check Box");
-        var id = Id.radio();
-        ui.radio(id, Id.pos(), "Radio 1");
-        ui.radio(id, Id.pos(), "Radio 2");
-        ui.radio(id, Id.pos(), "Radio 3");
-        if (ui.node(Id.node(), "Nested Node", 1)) {
-            ui.text("Row");
-            ui.row([2/5, 2/5, 1/5]);
-            ui.button("A");
-            ui.button("B");
-            ui.check(Id.check(), "C");
-            ui.text("Simple list");
-            Ext.drawList(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
-        }
-    }
-}
-
-ui.end();
-```
-
-<img src="https://raw.githubusercontent.com/luboslenco/zui/master/zui.png" alt="Zui Preview" width="25%"/>
+Check out test/ folder for small example projects.

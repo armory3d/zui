@@ -2,7 +2,7 @@ package zui;
 
 class Ext {
 
-	public static function drawList(ui:Zui, id:String, ar:Array<Dynamic>,
+	public static function list(ui:Zui, id:String, ar:Array<Dynamic>,
                                     addCb:String->Void = null,
                                     removeCb:Int->Void = null,
                                     getNameCb:Int->String = null,
@@ -49,7 +49,7 @@ class Ext {
         ui.setRadioSelection(Id.nest(id, 0), pos);
     }
 
-    public static function drawNodeList(ui:Zui, id:String, ar:Array<Dynamic>,
+    public static function nodeList(ui:Zui, id:String, ar:Array<Dynamic>,
                                         addCb:String->Void = null,
                                         removeCb:Int->Void = null,
                                         getNameCb:Int->String = null,
@@ -81,4 +81,15 @@ class Ext {
             addCb("untitled");
         }
     }
+	
+	public static function colorPicker(ui:Zui, id:String, alpha = false, initColor:Int = 0xff000000):Int {
+		var r = ui.slider(Id.nest(id, 0), "R", 0, 1, true);
+		var g = ui.slider(Id.nest(id, 1), "G", 0, 1, true);
+		var b = ui.slider(Id.nest(id, 2), "B", 0, 1, true);
+		var a = 1.0;
+		if (alpha) a = ui.slider(Id.nest(id, 3), "A", 0, 1, true);
+		var col = kha.Color.fromFloats(r, g, b, a);
+		ui.text("", Zui.ALIGN_RIGHT, col);
+		return col;
+	}
 }

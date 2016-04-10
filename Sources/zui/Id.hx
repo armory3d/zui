@@ -8,6 +8,8 @@ class Id {
 	static var textInputId = 0;
 	static var radioId = 0;
 	static var checkId = 0;
+	static var sliderId = 0;
+	static var colorPickerId = 0;
 	static var listId = 0;
 
 	static function nextPos():Int { return posId++; }
@@ -27,6 +29,12 @@ class Id {
 
 	static function nextCheck():String { return (checkId++) + ""; }
 	macro public static function check() { return macro $v{nextCheck()}; }
+	
+	static function nextSlider():String { return (sliderId++) + ""; }
+	macro public static function slider() { return macro $v{nextSlider()}; }
+	
+	static function nextColorPicker():String { return (colorPickerId++) + ""; }
+	macro public static function colorPicker() { return macro $v{nextColorPicker()}; }
 
 	static function nextList():String { return (listId++) + "l"; } // List postfix
 	macro public static function list() { return macro $v{nextList()}; }
