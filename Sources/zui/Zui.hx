@@ -67,6 +67,7 @@ class Zui {
 	public static var isScrolling = false; // Use to limit other activities
 	public static var isTyping = false;
 
+	public static var autoNotifyMouseEvents = true;
 	static var firstInstance = true;
 
 	var inputX:Float; // Input position
@@ -163,7 +164,7 @@ class Zui {
 		radioSelectOffsetX = radioSelectOffsetY;
 		scrollAlign = 0;//(SCROLL_W() - SCROLL_BAR_W()) / 2;
 
-		kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		if (autoNotifyMouseEvents) kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 
 		if (firstInstance) {
 			firstInstance = false;
@@ -721,13 +722,13 @@ class Zui {
 		cursorPixelX = font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X();
 	}
 
-    function onMouseDown(button:Int, x:Int, y:Int) { // Input events
+    public function onMouseDown(button:Int, x:Int, y:Int) { // Input events
     	inputStarted = true;
     	inputDown = true;
     	setInputPosition(x, y);
     }
 
-    function onMouseUp(button:Int, x:Int, y:Int) {
+    public function onMouseUp(button:Int, x:Int, y:Int) {
     	if (isScrolling) {
     		isScrolling = false;
     		for (s in windowStates) s.scrolling = false;
@@ -741,11 +742,11 @@ class Zui {
     	deselectText();
     }
 
-    function onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int) {
+    public function onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int) {
     	setInputPosition(x, y);
     }
 
-    function onMouseWheel(delta:Int) {
+    public function onMouseWheel(delta:Int) {
     	inputWheelDelta = delta;
     }
 
