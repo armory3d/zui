@@ -19,7 +19,7 @@ class Zui {
 	static inline var _RADIO_SELECT_W = _ELEMENT_H * 0.3;
 	static inline var _RADIO_SELECT_H = _RADIO_SELECT_W;
 	static inline var _SCROLL_W = 12;
-	static inline var _SCROLL_BAR_W = 8;
+	static inline var _SCROLL_BAR_W = 12;
 	static inline var _DEFAULT_TEXT_OFFSET_X = 8;
 	static inline var _TAB_W = 12;
 	static inline var _LINE_STRENGTH = 2;
@@ -40,6 +40,7 @@ class Zui {
 	static inline var TEXT_INPUT_BG_COL = 0xff343436;
 	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff444446;
 	static inline var TEXT_CURSOR_COL = DEFAULT_TEXT_COL;
+	static inline var TEXT_CURSOR_FLASH_SPEED = 0.5;
 	static inline var CHECK_COL = 0xff343436;
 	static inline var CHECK_COL_HOVER = 0xff444446;
 	static inline var CHECK_SELECT_COL = 0xffd6d6d6;
@@ -168,8 +169,10 @@ class Zui {
 		radioSelectOffsetX = radioSelectOffsetY;
 		scrollAlign = 0;//(SCROLL_W() - SCROLL_BAR_W()) / 2;
 
-		if (autoNotifyMouseEvents) kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-
+		if (autoNotifyMouseEvents){
+			kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		}
+		
 		if (firstInstance) {
 			firstInstance = false;
 			prerenderElements();
@@ -280,7 +283,7 @@ class Zui {
 					isScrolling = true;
 				}
 				if (state.scrolling) { // Scroll
-					scroll(inputDY, fullHeight);
+					scroll(inputDY / SCALE, fullHeight);
 				}
 				else if (inputWheelDelta != 0) { // Wheel
 					scroll(-inputWheelDelta * 3, fullHeight);
@@ -425,10 +428,15 @@ class Zui {
 				}
 			}
 
-			g.color = TEXT_CURSOR_COL; // Cursor
-			var cursorHeight = ELEMENT_H() * 0.9;
-			var lineHeight = ELEMENT_H();
-			g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight, 1, cursorHeight);
+			var time = kha.System.time;
+			//Flash cursor
+			if(time % (TEXT_CURSOR_FLASH_SPEED * 2.0) < TEXT_CURSOR_FLASH_SPEED){
+				g.color = TEXT_CURSOR_COL; // Cursor
+				var cursorHeight = ELEMENT_H() - buttonOffsetY * 3.0;
+				var lineHeight = ELEMENT_H();
+				g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
+			}
+			
 			textSelectedCurrentText = text;
 		}
 
@@ -769,8 +777,8 @@ class Zui {
 	}
 
     function setInputPosition(inputX:Int, inputY:Int) {
-		inputDX = inputX - this.inputX;
-		inputDY = inputY - this.inputY;
+		inputDX += inputX - this.inputX;
+		inputDY += inputY - this.inputY;
 		this.inputX = inputX;
 		this.inputY = inputY;
 	}
