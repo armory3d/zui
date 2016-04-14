@@ -280,7 +280,7 @@ class Zui {
 					isScrolling = true;
 				}
 				if (state.scrolling) { // Scroll
-					scroll(inputDY, fullHeight);
+					scroll(inputDY / SCALE, fullHeight);
 				}
 				else if (inputWheelDelta != 0) { // Wheel
 					scroll(-inputWheelDelta * 3, fullHeight);
@@ -769,8 +769,8 @@ class Zui {
 	}
 
     function setInputPosition(inputX:Int, inputY:Int) {
-		inputDX = inputX - this.inputX;
-		inputDY = inputY - this.inputY;
+		inputDX += inputX - this.inputX;
+		inputDY += inputY - this.inputY;
 		this.inputX = inputX;
 		this.inputY = inputY;
 	}
