@@ -72,6 +72,10 @@ class Zui {
 
 	var inputX:Float; // Input position
 	var inputY:Float;
+	
+	var inputInitialX:Float;
+	var inputInitialY:Float;
+
 	var inputDX:Float; // Delta
 	var inputDY:Float;
 	var inputWheelDelta:Int;
@@ -694,15 +698,21 @@ class Zui {
 	}
 
 	function getReleased():Bool { // Input selection
-		return inputReleased && getHover();
+		return inputReleased && getHover() && getInitialHover();
 	}
 
 	function getPushed():Bool {
-		return inputDown && getHover();
+		return inputDown && getHover() && getInitialHover();
 	}
 	
 	function getStarted():Bool {
 		return inputStarted && getHover();
+	}
+
+	function getInitialHover():Bool {
+		return
+			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
+        	inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + ELEMENT_H());
 	}
 
 	function getHover():Bool {
@@ -725,7 +735,8 @@ class Zui {
     public function onMouseDown(button:Int, x:Int, y:Int) { // Input events
     	inputStarted = true;
     	inputDown = true;
-    	setInputPosition(x, y);
+		
+    	setInitialInputPosition(x, y);
     }
 
     public function onMouseUp(button:Int, x:Int, y:Int) {
@@ -749,6 +760,13 @@ class Zui {
     public function onMouseWheel(delta:Int) {
     	inputWheelDelta = delta;
     }
+	
+	function setInitialInputPosition(inputX:Int, inputY:Int) {
+		setInputPosition(inputX, inputY);
+		
+		this.inputInitialX = inputX;
+		this.inputInitialY = inputY;
+	}
 
     function setInputPosition(inputX:Int, inputY:Int) {
 		inputDX = inputX - this.inputX;
