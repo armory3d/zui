@@ -2,22 +2,22 @@ package zui;
 
 class Ext {
 
-	public static function list(ui:Zui, id:String, ar:Array<Dynamic>,
-                                    addCb:String->Void = null,
-                                    removeCb:Int->Void = null,
-                                    getNameCb:Int->String = null,
-                                    setNameCb:Int->String->Void = null,
-                                    itemDrawCb:String->Int->Void = null,
+	public static function list(ui: Zui, id: String, ar: Array<Dynamic>,
+                                    addCb: String->Void = null,
+                                    removeCb: Int->Void = null,
+                                    getNameCb: Int->String = null,
+                                    setNameCb: Int->String->Void = null,
+                                    itemDrawCb: String->Int->Void = null,
                                     showRadio = false,
                                     editable = true,
                                     showAdd = true,
-                                    initState = 0):Int {
+                                    initState = 0): Int {
         var selected = 0;
 
-        if (addCb == null) addCb = function(name:String) { ar.push(name); };
-        if (removeCb == null) removeCb = function(i:Int) { ar.splice(i, 1); };
-        if (getNameCb == null) getNameCb = function(i:Int) { return ar[i]; };
-        if (setNameCb == null) setNameCb = function(i:Int, name:String) { ar[i] = name; };
+        if (addCb == null) addCb = function(name: String) { ar.push(name); };
+        if (removeCb == null) removeCb = function(i: Int) { ar.splice(i, 1); };
+        if (getNameCb == null) getNameCb = function(i: Int) { return ar[i]; };
+        if (setNameCb == null) setNameCb = function(i: Int, name: String) { ar[i] = name; };
 
         var i = 0;
         while (i < ar.length) {
@@ -45,23 +45,23 @@ class Ext {
         return selected;
     }
 
-    public static function setRadioListSelection(ui:Zui, id:String, pos:Int) {
+    public static function setRadioListSelection(ui: Zui, id: String, pos: Int) {
         ui.setRadioSelection(Id.nest(id, 0), pos);
     }
 
-    public static function nodeList(ui:Zui, id:String, ar:Array<Dynamic>,
-                                        addCb:String->Void = null,
-                                        removeCb:Int->Void = null,
-                                        getNameCb:Int->String = null,
-                                        setNameCb:Int->String->Void = null,
-                                        itemDrawCb:String->Int->Void = null,
+    public static function nodeList(ui: Zui, id: String, ar: Array<Dynamic>,
+                                        addCb: String->Void = null,
+                                        removeCb: Int->Void = null,
+                                        getNameCb: Int->String = null,
+                                        setNameCb: Int->String->Void = null,
+                                        itemDrawCb: String->Int->Void = null,
                                         editable = true,
                                         showAdd = true) {
 
-        if (addCb == null) addCb = function(name:String) { ar.push(name); };
-        if (removeCb == null) removeCb = function(i:Int) { ar.splice(i, 1); };
-        if (getNameCb == null) getNameCb = function(i:Int) { return ar[i]; };
-        if (setNameCb == null) setNameCb = function(i:Int, name:String) { ar[i] = name; };
+        if (addCb == null) addCb = function(name: String) { ar.push(name); };
+        if (removeCb == null) removeCb = function(i: Int) { ar.splice(i, 1); };
+        if (getNameCb == null) getNameCb = function(i: Int) { return ar[i]; };
+        if (setNameCb == null) setNameCb = function(i: Int, name:String) { ar[i] = name; };
 
         var i = 0;
         while (i < ar.length) {
@@ -82,7 +82,7 @@ class Ext {
         }
     }
 	
-	public static function colorPicker(ui:Zui, id:String, alpha = false, initColor:Int = 0xff000000):Int {
+	public static function colorPicker(ui: Zui, id: String, alpha = false, initColor: Int = 0xff000000): Int {
 		var r = ui.slider(Id.nest(id, 0), "R", 0, 1, true);
 		var g = ui.slider(Id.nest(id, 1), "G", 0, 1, true);
 		var b = ui.slider(Id.nest(id, 2), "B", 0, 1, true);

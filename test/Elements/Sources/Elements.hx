@@ -7,7 +7,7 @@ import zui.Ext;
 import zui.Id;
 
 class Elements {
-	var ui:Zui;
+	var ui: Zui;
 	var initialized = false;
 
 	public function new() {
@@ -16,7 +16,7 @@ class Elements {
 
 	function loadingFinished() {
 		initialized = true;
-		ui = new Zui(Assets.fonts.roboto);
+		ui = new Zui(Assets.fonts.DroidSans);
 	}
 
 	public function render(framebuffer: Framebuffer): Void {
@@ -51,7 +51,43 @@ class Elements {
 					ui.button("B");
 					ui.check(Id.check(), "C");
 					ui.text("Simple list");
-					Ext.drawList(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					ui.unindent();
+				}
+				if (ui.node(Id.node(), "Nested Node")) {
+					ui.indent();
+					ui.separator();
+					ui.text("Row");
+					ui.row([2/5, 2/5, 1/5]);
+					ui.button("A");
+					ui.button("B");
+					ui.check(Id.check(), "C");
+					ui.text("Simple list");
+					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					ui.unindent();
+				}
+				if (ui.node(Id.node(), "Nested Node")) {
+					ui.indent();
+					ui.separator();
+					ui.text("Row");
+					ui.row([2/5, 2/5, 1/5]);
+					ui.button("A");
+					ui.button("B");
+					ui.check(Id.check(), "C");
+					ui.text("Simple list");
+					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					ui.unindent();
+				}
+				if (ui.node(Id.node(), "Nested Node")) {
+					ui.indent();
+					ui.separator();
+					ui.text("Row");
+					ui.row([2/5, 2/5, 1/5]);
+					ui.button("A");
+					ui.button("B");
+					ui.check(Id.check(), "C");
+					ui.text("Simple list");
+					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
 					ui.unindent();
 				}
 				ui.unindent();

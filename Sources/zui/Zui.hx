@@ -23,7 +23,7 @@ class Zui {
 	static inline var _DEFAULT_TEXT_OFFSET_X = 8;
 	static inline var _TAB_W = 12;
 	static inline var _LINE_STRENGTH = 2;
-	static var SCALE:Float;
+	static var SCALE: Float;
 
 	static inline var WINDOW_BG_COL = 0xff000000; // Colors
 	static inline var WINDOW_TINT_COL = 0xddffffff;
@@ -71,80 +71,80 @@ class Zui {
 	public static var autoNotifyMouseEvents = true;
 	static var firstInstance = true;
 
-	var inputX:Float; // Input position
-	var inputY:Float;
+	var inputX: Float; // Input position
+	var inputY: Float;
 	
-	var inputInitialX:Float;
-	var inputInitialY:Float;
+	var inputInitialX: Float;
+	var inputInitialY: Float;
 
-	var inputDX:Float; // Delta
-	var inputDY:Float;
-	var inputWheelDelta:Int;
-	var inputStarted:Bool; // Buttons
-	var inputReleased:Bool;
-	var inputDown:Bool;
+	var inputDX: Float; // Delta
+	var inputDY: Float;
+	var inputWheelDelta: Int;
+	var inputStarted: Bool; // Buttons
+	var inputReleased: Bool;
+	var inputDown: Bool;
 
 	var isKeyDown = false; // Keys
-	var key:kha.Key;
-	var char:String;
+	var key: kha.Key;
+	var char: String;
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
 	var cursorPixelX = 0.0;
 
-	var ratios:Array<Float>; // Splitting rows
-	var curRatio:Int = -1;
-	var xBeforeSplit:Float;
-	var wBeforeSplit:Int;
+	var ratios: Array<Float>; // Splitting rows
+	var curRatio: Int = -1;
+	var xBeforeSplit: Float;
+	var wBeforeSplit: Int;
 
-	var globalG:kha.graphics2.Graphics; // Drawing
-	var g:kha.graphics2.Graphics;
-	var font:kha.Font;
-	var fontSize:Int;
-	var fontSmallSize:Int;
+	var globalG: kha.graphics2.Graphics; // Drawing
+	var g: kha.graphics2.Graphics;
+	var font: kha.Font;
+	var fontSize: Int;
+	var fontSmallSize: Int;
 
-	var fontOffsetY:Float; // Precalculated offsets
-	var fontSmallOffsetY:Float;
-	var arrowOffsetX:Float;
-	var arrowOffsetY:Float;
-	var titleOffsetX:Float;
-	var buttonOffsetY:Float;
-	var checkOffsetX:Float;
-	var checkOffsetY:Float;
-	var checkSelectOffsetX:Float;
-	var checkSelectOffsetY:Float;
-	var radioOffsetX:Float;
-	var radioOffsetY:Float;
-	var radioSelectOffsetX:Float;
-	var radioSelectOffsetY:Float;
-	var scrollAlign:Float;
+	var fontOffsetY: Float; // Precalculated offsets
+	var fontSmallOffsetY: Float;
+	var arrowOffsetX: Float;
+	var arrowOffsetY: Float;
+	var titleOffsetX: Float;
+	var buttonOffsetY: Float;
+	var checkOffsetX: Float;
+	var checkOffsetY: Float;
+	var checkSelectOffsetX: Float;
+	var checkSelectOffsetY: Float;
+	var radioOffsetX: Float;
+	var radioOffsetY: Float;
+	var radioSelectOffsetX: Float;
+	var radioSelectOffsetY: Float;
+	var scrollAlign: Float;
 
-	var _x:Float; // Cursor(stack) position
-	var _y:Float;
-	var _w:Int;
-	var _h:Int;
+	var _x: Float; // Cursor(stack) position
+	var _y: Float;
+	var _w: Int;
+	var _h: Int;
 
-	var _windowX:Float; // Window state
-	var _windowY:Float;
-	var _windowW:Float;
-	var _windowH:Float;
-	var curWindowState:WindowState;
+	var _windowX: Float; // Window state
+	var _windowY: Float;
+	var _windowW: Float;
+	var _windowH: Float;
+	var curWindowState: WindowState;
 	var windowEnded = true;
 
-	var windowStates:Map<String, WindowState> = new Map(); // Element states
-	var nodeStates:Map<String, NodeState> = new Map();
-	var checkStates:Map<String, CheckState> = new Map();
-	var radioStates:Map<String, RadioState> = new Map();
-	var sliderStates:Map<String, SliderState> = new Map();
+	var windowStates: Map<String, WindowState> = new Map(); // Element states
+	var nodeStates: Map<String, NodeState> = new Map();
+	var checkStates: Map<String, CheckState> = new Map();
+	var radioStates: Map<String, RadioState> = new Map();
+	var sliderStates: Map<String, SliderState> = new Map();
 	// var colorPickerStates:Map<String, ColorPickerState> = new Map();
-	var textSelectedId:String = "";
-	var textSelectedCurrentText:String;
-	var submitTextId:String;
-	var textToSubmit:String = "";
+	var textSelectedId: String = "";
+	var textSelectedCurrentText: String;
+	var submitTextId: String;
+	var textToSubmit: String = "";
 	var khaWindowId = 0;
-	var scaleFactor:Float;
+	var scaleFactor: Float;
 
-	public function new(font:kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0) {
+	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0) {
 		this.font = font;
 		this.fontSize = Std.int(fontSize * scaleFactor);
 		this.fontSmallSize = Std.int(fontSmallSize * scaleFactor);
@@ -169,7 +169,7 @@ class Zui {
 		radioSelectOffsetX = radioSelectOffsetY;
 		scrollAlign = 0;//(SCROLL_W() - SCROLL_BAR_W()) / 2;
 
-		if (autoNotifyMouseEvents){
+		if (autoNotifyMouseEvents) {
 			kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		}
 		
@@ -180,8 +180,8 @@ class Zui {
 		}
 	}
 
-	static var checkSelectImage:kha.Image = null;
-	function prerenderElements() { // Not yet used
+	static var checkSelectImage: kha.Image = null;
+	function prerenderElements() {
 		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, khaWindowId);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
@@ -254,7 +254,7 @@ class Zui {
 		return true;
 	}
 
-	public function redrawWindow(id:String) {
+	public function redrawWindow(id: String) {
 		var state = windowStates.get(id);
 		if (state != null) state.redraws = 1;
 	}
@@ -312,7 +312,7 @@ class Zui {
 		globalG.end();
 	}
 
-	function scroll(delta:Float, fullHeight:Float) {
+	function scroll(delta: Float, fullHeight: Float) {
 		var state = curWindowState;
 		state.scrollOffset -= delta * SCALE;
 		// Stay in bounds
@@ -322,7 +322,7 @@ class Zui {
 		}
 	}
 
-	public function node(id:String, text:String, accent = 0, expanded = false):Bool {
+	public function node(id: String, text: String, accent = 0, expanded = false): Bool {
 		var state = nodeStates.get(id);
 		if (state == null) { state = new NodeState(expanded); nodeStates.set(id, state); }
 
@@ -348,7 +348,7 @@ class Zui {
 		return state.expanded;
 	}
 	
-	public function image(image:kha.Image) {
+	public function image(image: kha.Image) {
 		var w = _w - buttonOffsetY * 2;
 		var ratio = w / image.width;
 		var h = image.height * ratio;
@@ -357,7 +357,7 @@ class Zui {
 		endElement(false);
 	}
 
-	public function text(text:String, align = ALIGN_LEFT, bg:Int = 0x00000000) {
+	public function text(text: String, align = ALIGN_LEFT, bg = 0x00000000) {
 		if (bg != 0x0000000) {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
@@ -368,7 +368,7 @@ class Zui {
 		endElement();
 	}
 
-	public function textInput(id:String, text:String, label:String = ""):String {
+	public function textInput(id: String, text: String, label = ""): String {
 		if (submitTextId == id) { // Submit edited text
 			//text = textSelectedCurrentText;
 			text = textToSubmit;
@@ -428,9 +428,9 @@ class Zui {
 				}
 			}
 
-			var time = kha.System.time;
-			//Flash cursor
-			if(time % (TEXT_CURSOR_FLASH_SPEED * 2.0) < TEXT_CURSOR_FLASH_SPEED){
+			// Flash cursor
+			var time = kha.Scheduler.time();
+			if (time % (TEXT_CURSOR_FLASH_SPEED * 2.0) < TEXT_CURSOR_FLASH_SPEED) {
 				g.color = TEXT_CURSOR_COL; // Cursor
 				var cursorHeight = ELEMENT_H() - buttonOffsetY * 3.0;
 				var lineHeight = ELEMENT_H();
@@ -465,7 +465,7 @@ class Zui {
 		}
 	}
 
-	public function button(text:String):Bool {
+	public function button(text: String): Bool {
 		var wasPressed = getReleased();
 		var pushed = getPushed();
 		var hover = getHover();
@@ -484,7 +484,7 @@ class Zui {
 		return wasPressed;
 	}
 
-	public function check(id:String, text:String, initState:Bool = false):Bool {
+	public function check(id: String, text: String, initState = false): Bool {
 		var state = checkStates.get(id);
 		if (state == null) { state = new CheckState(initState); checkStates.set(id, state); }
 
@@ -503,7 +503,7 @@ class Zui {
 		return state.selected;
 	}
 
-	public function radio(groupId:String, pos:Int, text:String, initState:Int = 0):Bool {
+	public function radio(groupId: String, pos: Int, text: String, initState = 0): Bool {
 		var state = radioStates.get(groupId);
 		if (state == null) {
 			state = new RadioState(initState); radioStates.set(groupId, state);
@@ -524,12 +524,12 @@ class Zui {
 		return state.selected == pos;
 	}
 
-	public function setRadioSelection(groupId:String, pos:Int) {
+	public function setRadioSelection(groupId: String, pos: Int) {
 		var state = radioStates.get(groupId);
 		if (state != null) state.selected = pos;
 	}
 	
-	public function slider(id:String, text:String, from:Float, to:Float, filled:Bool = false, precision = 100, initValue:Float = 0):Float {
+	public function slider(id: String, text: String, from: Float, to: Float, filled: Bool = false, precision = 100, initValue: Float = 0): Float {
 		var state = sliderStates.get(id);
 		if (state == null) { state = new SliderState(initValue); sliderStates.set(id, state); }
 
@@ -561,7 +561,7 @@ class Zui {
 		return state.value;
 	}
 	
-	// public function colorPicker(id:String, initColor:Int = 0xffffffff):Int {
+	// public function colorPicker(id: String, initColor = 0xffffffff): Int {
 	// 	var state = colorPickerStates.get(id);
 	// 	if (state == null) { state = new ColorPickerState(initColor); colorPickerStates.set(id, state); }
 
@@ -579,7 +579,7 @@ class Zui {
 		_y += 2;
 	}
 
-	function drawArrow(expanded:Bool, hover:Bool) {
+	function drawArrow(expanded: Bool, hover: Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
 		g.color = hover ? ARROW_COL_HOVER : ARROW_COL;
@@ -595,7 +595,7 @@ class Zui {
 		}
 	}
 
-	function drawCheck(selected:Bool, hover:Bool) {
+	function drawCheck(selected: Bool, hover: Bool) {
 		var x = _x + checkOffsetX;
 		var y = _y + checkOffsetY;
 
@@ -610,7 +610,7 @@ class Zui {
 		}
 	}
 
-	function drawRadio(selected:Bool, hover:Bool) {
+	function drawRadio(selected: Bool, hover: Bool) {
 		var x = _x + radioOffsetX;
 		var y = _y + radioOffsetY;
 		g.color = hover ? RADIO_COL_HOVER : RADIO_COL;
@@ -622,7 +622,7 @@ class Zui {
 		}
 	}
 	
-	function drawSlider(value:Float, from:Float, to:Float, filled:Bool, hover:Bool) {
+	function drawSlider(value: Float, from: Float, to: Float, filled: Bool, hover: Bool) {
 		var x = _x + buttonOffsetY;
 		var y = _y + buttonOffsetY;
 		var w = _w - buttonOffsetY * 2;
@@ -637,8 +637,8 @@ class Zui {
 		g.fillRect(sliderX, y, sliderW, BUTTON_H());
 	}
 
-	function drawString(g:kha.graphics2.Graphics, text:String,
-						xOffset:Float = _DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
+	function drawString(g: kha.graphics2.Graphics, text: String,
+						xOffset: Float = _DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
 						align = ALIGN_LEFT) {
 		xOffset *= SCALE;
 		g.font = font;
@@ -649,8 +649,8 @@ class Zui {
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
-	function drawStringSmall(g:kha.graphics2.Graphics, text:String,
-							 xOffset:Float = _DEFAULT_TEXT_OFFSET_X, yOffset:Float = 0,
+	function drawStringSmall(g: kha.graphics2.Graphics, text: String,
+							 xOffset: Float = _DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
 							 align = ALIGN_LEFT) {
 		xOffset *= SCALE;
 		g.font = font;
@@ -684,7 +684,7 @@ class Zui {
 		}
 	}
 
-	public function row(ratios:Array<Float>) {
+	public function row(ratios: Array<Float>) {
 		this.ratios = ratios;
 		curRatio = 0;
 		xBeforeSplit = _x;
@@ -701,53 +701,52 @@ class Zui {
 		_w += TAB_W();
 	}
 	
-	inline function drawRect(g:kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength: Float = 1.0) {
+	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength: Float = 1.0) {
 		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, LINE_STRENGTH());
 	}
 
-	function getReleased():Bool { // Input selection
+	function getReleased(): Bool { // Input selection
 		return inputReleased && getHover() && getInitialHover();
 	}
 
-	function getPushed():Bool {
+	function getPushed(): Bool {
 		return inputDown && getHover() && getInitialHover();
 	}
 	
-	function getStarted():Bool {
+	function getStarted(): Bool {
 		return inputStarted && getHover();
 	}
 
-	function getInitialHover():Bool {
+	function getInitialHover(): Bool {
 		return
 			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
         	inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + ELEMENT_H());
 	}
 
-	function getHover():Bool {
+	function getHover(): Bool {
 		return
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
         	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
 	}
 
-	function getInputInRect(x:Float, y:Float, w:Float, h:Float):Bool {
+	function getInputInRect(x: Float, y: Float, w: Float, h: Float): Bool {
 		return
 			inputX >= x && inputX < x + w &&
 			inputY >= y && inputY < y + h;
 	}
 
-	function updateCursorPixelX(text:String, font:kha.Font, fontSize:Int) { // Set cursor to current char
+	function updateCursorPixelX(text: String, font: kha.Font, fontSize: Int) { // Set cursor to current char
 		var str = text.substr(0, cursorX);
 		cursorPixelX = font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X();
 	}
 
-    public function onMouseDown(button:Int, x:Int, y:Int) { // Input events
+    public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
     	inputStarted = true;
     	inputDown = true;
-		
     	setInitialInputPosition(x, y);
     }
 
-    public function onMouseUp(button:Int, x:Int, y:Int) {
+    public function onMouseUp(button: Int, x: Int, y: Int) {
     	if (isScrolling) {
     		isScrolling = false;
     		for (s in windowStates) s.scrolling = false;
@@ -761,35 +760,34 @@ class Zui {
     	deselectText();
     }
 
-    public function onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int) {
+    public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
     	setInputPosition(x, y);
     }
 
-    public function onMouseWheel(delta:Int) {
+    public function onMouseWheel(delta: Int) {
     	inputWheelDelta = delta;
     }
 	
-	function setInitialInputPosition(inputX:Int, inputY:Int) {
+	function setInitialInputPosition(inputX: Int, inputY: Int) {
 		setInputPosition(inputX, inputY);
-		
 		this.inputInitialX = inputX;
 		this.inputInitialY = inputY;
 	}
 
-    function setInputPosition(inputX:Int, inputY:Int) {
-		inputDX += inputX - this.inputX;
-		inputDY += inputY - this.inputY;
+    function setInputPosition(inputX: Int, inputY: Int) {
+		inputDX = inputX - this.inputX;
+		inputDY = inputY - this.inputY;
 		this.inputX = inputX;
 		this.inputY = inputY;
 	}
 
-	function onKeyDown(key:kha.Key, char:String) {
+	function onKeyDown(key: kha.Key, char: String) {
         isKeyDown = true;
         this.key = key;
         this.char = char;
     }
 
-    function onKeyUp(key:kha.Key, char:String) {
+    function onKeyUp(key: kha.Key, char: String) {
     }
 	
 	static inline function ELEMENT_W() { return _ELEMENT_W * SCALE; }
@@ -814,34 +812,34 @@ class Zui {
 }
 
 class WindowState { // Cached states
-	public var texture:kha.Image;
+	public var texture: kha.Image;
 	public var redraws = 2;
-	public var scrolling:Bool = false;
-	public var scrollOffset:Float = 0;
-	public var scrollEnabled:Bool = false;
-	public var layout:Int;
-	public var lastMaxX:Float = 0;
-	public var lastMaxY:Float = 0;
-	public function new(layout:Int, w:Int, h:Int, windowId:Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
+	public var scrolling: Bool = false;
+	public var scrollOffset: Float = 0;
+	public var scrollEnabled: Bool = false;
+	public var layout: Int;
+	public var lastMaxX: Float = 0;
+	public var lastMaxY: Float = 0;
+	public function new(layout: Int, w: Int, h: Int, windowId: Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
 }
 class NodeState {
-	public var expanded:Bool;
-	public function new(expanded:Bool) { this.expanded = expanded; }
+	public var expanded: Bool;
+	public function new(expanded: Bool) { this.expanded = expanded; }
 }
 class CheckState {
-	public var selected:Bool = false;
-	public function new(selected:Bool) { this.selected = selected; }
+	public var selected: Bool = false;
+	public function new(selected: Bool) { this.selected = selected; }
 }
 class RadioState {
-	public var selected:Int = 0;
-	public function new(selected:Int) { this.selected = selected; }
+	public var selected: Int = 0;
+	public function new(selected: Int) { this.selected = selected; }
 }
 class SliderState {
-	public var value:Float = 0;
-	public var scrolling:Bool = false;
-	public function new(value:Float) { this.value = value; }
+	public var value: Float = 0;
+	public var scrolling: Bool = false;
+	public function new(value: Float) { this.value = value; }
 }
 // class ColorPickerState {
-// 	public var value:Int = 0;
-// 	public function new(value:Int) { this.value = value; }
+// 	public var value: Int = 0;
+// 	public function new(value: Int) { this.value = value; }
 // }
