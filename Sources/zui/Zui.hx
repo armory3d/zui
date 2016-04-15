@@ -70,6 +70,7 @@ class Zui {
 
 	public static var autoNotifyMouseEvents = true;
 	static var firstInstance = true;
+	static var prerenderedElements:Bool = false;
 
 	var inputX: Float; // Input position
 	var inputY: Float;
@@ -142,7 +143,7 @@ class Zui {
 	var submitTextId: String;
 	var textToSubmit: String = "";
 	var khaWindowId = 0;
-	var scaleFactor: Float;
+	var scaleFactor:Float;
 
 	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0) {
 		this.font = font;
@@ -175,13 +176,13 @@ class Zui {
 		
 		if (firstInstance) {
 			firstInstance = false;
-			prerenderElements();
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
 	}
 
 	static var checkSelectImage: kha.Image = null;
 	function prerenderElements() {
+		prerenderedElements = true;
 		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, khaWindowId);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
@@ -189,6 +190,7 @@ class Zui {
 		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), LINE_STRENGTH());
 		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), LINE_STRENGTH());
 		g.end();
+
 	}
 
 	public function remove() { // Clean up
@@ -197,6 +199,9 @@ class Zui {
 	}
 
 	public function begin(g:kha.graphics2.Graphics) { // Begin UI drawing
+		if(!prerenderedElements){
+			prerenderElements();
+		}
 		SCALE = scaleFactor;
 		globalG = g;
 		_x = 0; // Reset cursor
@@ -286,7 +291,7 @@ class Zui {
 					scroll(inputDY / SCALE, fullHeight);
 				}
 				else if (inputWheelDelta != 0) { // Wheel
-					scroll(-inputWheelDelta * 3, fullHeight);
+					scroll(inputWheelDelta / 3, fullHeight);
 				}
 				g.color = SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
