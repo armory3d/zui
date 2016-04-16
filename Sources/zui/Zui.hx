@@ -70,7 +70,7 @@ class Zui {
 
 	public static var autoNotifyMouseEvents = true;
 	static var firstInstance = true;
-	static var prerenderedElements:Bool = false;
+	static var prerenderedElements = false;
 
 	var inputX: Float; // Input position
 	var inputY: Float;
@@ -143,7 +143,7 @@ class Zui {
 	var submitTextId: String;
 	var textToSubmit: String = "";
 	var khaWindowId = 0;
-	var scaleFactor:Float;
+	var scaleFactor: Float;
 
 	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0) {
 		this.font = font;
@@ -190,7 +190,6 @@ class Zui {
 		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), LINE_STRENGTH());
 		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), LINE_STRENGTH());
 		g.end();
-
 	}
 
 	public function remove() { // Clean up
@@ -199,9 +198,7 @@ class Zui {
 	}
 
 	public function begin(g:kha.graphics2.Graphics) { // Begin UI drawing
-		if(!prerenderedElements){
-			prerenderElements();
-		}
+		if (!prerenderedElements) { prerenderElements(); }
 		SCALE = scaleFactor;
 		globalG = g;
 		_x = 0; // Reset cursor
