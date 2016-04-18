@@ -288,7 +288,7 @@ class Zui {
 					scroll(inputDY / SCALE, fullHeight);
 				}
 				else if (inputWheelDelta != 0) { // Wheel
-					scroll(inputWheelDelta / 3, fullHeight);
+					scroll(inputWheelDelta * 6 * SCALE, fullHeight);
 				}
 				g.color = SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
@@ -777,8 +777,8 @@ class Zui {
 	}
 
     function setInputPosition(inputX: Int, inputY: Int) {
-		inputDX = inputX - this.inputX;
-		inputDY = inputY - this.inputY;
+		inputDX += inputX - this.inputX;
+		inputDY += inputY - this.inputY;
 		this.inputX = inputX;
 		this.inputY = inputY;
 	}
