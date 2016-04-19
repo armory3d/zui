@@ -271,12 +271,18 @@ class Zui {
 			}
 			else { // Draw window scrollbar if necessary
 				state.scrollEnabled = true;
-				var amountToScroll = _windowH - fullHeight;
-				var amountScrolled = state.scrollOffset;
+				var amountToScroll = fullHeight - _windowH;
+				var amountScrolled = -state.scrollOffset;
 				var ratio = amountScrolled / amountToScroll;
-				var barH = _windowH - Math.abs(amountToScroll);
-				if (barH < ELEMENT_H() * 2) barH = ELEMENT_H();
-				var barY = (_windowH - barH) * ratio;
+				var barH = _windowH * Math.abs(_windowH / fullHeight);
+			
+				barH = Math.max(barH, ELEMENT_H());
+				
+				var totalScrollableArea = (_windowH - barH);
+		
+				var e = amountToScroll / totalScrollableArea;
+				
+				var barY = totalScrollableArea * ratio;
 
 				if ((inputStarted) && // Start scrolling
 					getInputInRect(_windowX + _windowW - SCROLL_BAR_W(), barY, SCROLL_BAR_W(), barH)) {
@@ -284,12 +290,14 @@ class Zui {
 					state.scrolling = true;
 					isScrolling = true;
 				}
+				
 				if (state.scrolling) { // Scroll
-					scroll(inputDY / SCALE, fullHeight);
+					scroll(inputDY * e, fullHeight);
 				}
 				else if (inputWheelDelta != 0) { // Wheel
-					scroll(inputWheelDelta * 6 * SCALE, fullHeight);
+					scroll(inputWheelDelta * ELEMENT_H(), fullHeight);
 				}
+				
 				g.color = SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = SCROLL_COL; // Bar
@@ -316,7 +324,7 @@ class Zui {
 
 	function scroll(delta: Float, fullHeight: Float) {
 		var state = curWindowState;
-		state.scrollOffset -= delta * SCALE;
+		state.scrollOffset -= delta;
 		// Stay in bounds
 		if (state.scrollOffset > 0) state.scrollOffset = 0;
 		else if (fullHeight + state.scrollOffset < _windowH) {
