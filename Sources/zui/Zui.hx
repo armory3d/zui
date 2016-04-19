@@ -220,11 +220,16 @@ class Zui {
 
 	// Returns true if redraw is needed
 	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL):Bool {
-		layout == LAYOUT_VERTICAL ? w = Std.int(w * scaleFactor) : h = Std.int(h * scaleFactor);
+		//layout == LAYOUT_VERTICAL ? w = Std.int(w * scaleFactor) : h = Std.int(h * scaleFactor);
 		
 		var state = windowStates.get(id);
 		if (state == null) {
-			state = new WindowState(layout, w, h, khaWindowId); windowStates.set(id, state);
+			state = new WindowState(layout, w, h, khaWindowId); 
+			windowStates.set(id, state);
+		}
+		
+		if(w != state.texture.width || h != state.texture.height) {
+			state.resize(w, h, khaWindowId);
 		}
 
 		if (!windowEnded) { endWindow(); } // End previous window if necessary
@@ -285,7 +290,7 @@ class Zui {
 				var barY = totalScrollableArea * ratio;
 
 				if ((inputStarted) && // Start scrolling
-					getInputInRect(_windowX + _windowW - SCROLL_BAR_W(), barY, SCROLL_BAR_W(), barH)) {
+					getInputInRect(_windowX + _windowW - SCROLL_BAR_W(), barY + _windowY, SCROLL_BAR_W(), barH)) {
 
 					state.scrolling = true;
 					isScrolling = true;
@@ -831,7 +836,14 @@ class WindowState { // Cached states
 	public var layout: Int;
 	public var lastMaxX: Float = 0;
 	public var lastMaxY: Float = 0;
-	public function new(layout: Int, w: Int, h: Int, windowId: Int) { this.layout = layout; texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId); }
+	public function resize(w:Int, h:Int, windowId:Int) {
+		redraws = 2;
+		texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId);
+	}
+	public function new(layout: Int, w: Int, h: Int, windowId: Int) {
+		this.layout = layout; 
+		resize(w, h, windowId);
+	}
 }
 class NodeState {
 	public var expanded: Bool;
