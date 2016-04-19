@@ -298,6 +298,12 @@ class Zui {
 					scroll(inputWheelDelta * ELEMENT_H(), fullHeight);
 				}
 				
+				//Stay in bounds
+				if (state.scrollOffset > 0) state.scrollOffset = 0;
+				else if (fullHeight + state.scrollOffset < _windowH) {
+					state.scrollOffset = _windowH - fullHeight;
+				}
+				
 				g.color = SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = SCROLL_COL; // Bar
@@ -325,11 +331,6 @@ class Zui {
 	function scroll(delta: Float, fullHeight: Float) {
 		var state = curWindowState;
 		state.scrollOffset -= delta;
-		// Stay in bounds
-		if (state.scrollOffset > 0) state.scrollOffset = 0;
-		else if (fullHeight + state.scrollOffset < _windowH) {
-			state.scrollOffset = _windowH - fullHeight;
-		}
 	}
 
 	public function node(id: String, text: String, accent = 0, expanded = false): Bool {
