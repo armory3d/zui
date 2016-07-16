@@ -1,0 +1,74 @@
+{
+	"files": [
+		{
+			"name": "DroidSans",
+			"type": "font",
+			"files": [
+				"DroidSans.ttf"
+			]
+		},
+		{
+			"name": "DroidSansMono",
+			"type": "font",
+			"files": [
+				"DroidSansMono.ttf"
+			]
+		},
+		{
+			"name": "painter_colored_frag",
+			"files": [
+				"painter-colored.frag.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_colored_vert",
+			"files": [
+				"painter-colored.vert.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_image_frag",
+			"files": [
+				"painter-image.frag.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_image_vert",
+			"files": [
+				"painter-image.vert.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_text_frag",
+			"files": [
+				"painter-text.frag.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_text_vert",
+			"files": [
+				"painter-text.vert.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_video_frag",
+			"files": [
+				"painter-video.frag.essl"
+			],
+			"type": "shader"
+		},
+		{
+			"name": "painter_video_vert",
+			"files": [
+				"painter-video.vert.essl"
+			],
+			"type": "shader"
+		}
+	]
+}

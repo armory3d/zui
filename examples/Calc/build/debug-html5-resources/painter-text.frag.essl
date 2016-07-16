@@ -1,0 +1,20 @@
+#version 100
+// Unknown execution mode 8
+// Unknown operation 8
+// Unknown operation 8
+// Unknown operation 8
+// Unknown operation 8
+// Unknown operation 8
+precision mediump float;
+varying vec4 fragmentColor;
+uniform sampler2D tex;
+varying vec2 texCoord;
+
+
+
+void main()
+{
+	gl_FragColor = vec4(vec3(fragmentColor[0], fragmentColor[1], fragmentColor[2])[0], vec3(fragmentColor[0], fragmentColor[1], fragmentColor[2])[1], vec3(fragmentColor[0], fragmentColor[1], fragmentColor[2])[2], (texture2D(tex, texCoord)[0] * fragmentColor[3]));
+	return;
+}
+

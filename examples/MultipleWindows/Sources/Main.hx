@@ -31,7 +31,7 @@ private class ExampleWindow {
 	var nodeExpanded = false;
 
     public function new( windowId : Int, buttonText : String ) {
-        this.z = new zui.Zui(kha.Assets.fonts.roboto, 24, 20, windowId);
+        this.z = new zui.Zui(kha.Assets.fonts.DroidSans, 24, 20, windowId);
 		this.buttonText = buttonText;
 
 		kha.System.notifyOnRender(render, windowId);

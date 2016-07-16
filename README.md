@@ -4,7 +4,7 @@ Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or
 
 Inspired by [imgui](https://github.com/ocornut/imgui).
 
-![](zui.jpg)
+![](img/zui.jpg)
 
 ## Getting started
 - Clone into 'your_kha_project/Libraries' or do 'haxelib install zui'
@@ -62,8 +62,8 @@ Id.hx - simple macros to generate ids
 var state = check(Id.check(), "Check Box");
 ```
 
-## Example
-Check out test/ folder for small example projects.
+## Examples
+Check out examples/ folder. To run specific example, simply drop it's folder into [KodeStudio](https://github.com/KTXSoftware/KodeStudio/releases) and hit run.
 
 ## Theming
 You can customize theme fairly easily, but currently only by editing constants at the top of Zui.hx file. This will be improved in the future.
@@ -76,4 +76,4 @@ zui.onMouseUp(button:Int, x:Int, y:Int)
 zui.onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int)
 zui.onMouseWheel(delta:Int)
 ```
-![](zui2.jpg)
+![](img/zui2.jpg)

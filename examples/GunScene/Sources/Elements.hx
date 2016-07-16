@@ -1,25 +1,33 @@
-package game;
-
+package;
+import kha.Framebuffer;
 import kha.Assets;
+
 import zui.Zui;
 import zui.Ext;
 import zui.Id;
 
-class Test {
-	var ui:Zui;
+class Elements {
+	var ui: Zui;
+	var initialized = false;
 
-    public function new() {
-        super();
-    }
+	public function new() {
+		Assets.loadEverything(loadingFinished);
+	}
 
-    function init() {
-        ui = new Zui(Assets.fonts.DroidSans);
-    }
+	function loadingFinished() {
+		initialized = true;
+		ui = new Zui(Assets.fonts.DroidSans);
+	}
 
-    function render(g:kha.graphics2.Graphics) {
-        g.begin();
-        g.end();
-		
+	public function render(framebuffer: Framebuffer): Void {
+		if (!initialized) return;
+
+		var g = framebuffer.g2;
+
+		g.begin();
+		// Draw your stuff...
+		g.end();
+
 		ui.begin(g);
 		if (ui.window(Id.window(), 0, 0, 250, kha.System.windowHeight())) {
 			if (ui.node(Id.node(), "Weapon Material", 0, true)) {
@@ -60,7 +68,7 @@ class Test {
 			}
 		}
 		
-		if (ui.window(Id.window(), kha.System.windowWidth() - Std.int(250 * 1.5), 0, 250, kha.System.windowHeight())) {
+		if (ui.window(Id.window(), kha.System.windowWidth() - 250, 0, 250, kha.System.windowHeight())) {
 			if (ui.node(Id.node(), "Character", 0, true)) {
 				ui.indent();
 				ui.textInput(Id.textInput(), "Unnamed Hero", "Name");
@@ -95,5 +103,11 @@ class Test {
 			}
 		}
 		ui.end();	
-    }
+
+		// Draw more of your stuff...
+	}
+
+	public function update(): Void {
+		if (!initialized) return;
+	}
 }

@@ -1,0 +1,14 @@
+#version 100
+// Unknown execution mode 8
+// Unknown operation 8
+precision mediump float;
+varying vec4 fragmentColor;
+
+
+
+void main()
+{
+	gl_FragColor = fragmentColor;
+	return;
+}
+
