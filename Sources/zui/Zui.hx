@@ -7,6 +7,13 @@ class Zui {
 	static inline var t = zui.theme.Default; // Basic theming
 	// static inline var t = zui.theme.Light;
 	static var SCALE: Float;
+	
+	public static inline var LAYOUT_VERTICAL = Layout.Vertical; // Window layout
+	public static inline var LAYOUT_HORIZONTAL = Layout.Horizontal;
+
+	public static inline var ALIGN_LEFT = Align.Left; // Text align
+	public static inline var ALIGN_CENTER = Align.Center;
+	public static inline var ALIGN_RIGHT = Align.Right;
 
 	public static var isScrolling = false; // Use to limit other activities
 	public static var isTyping = false;
