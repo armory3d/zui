@@ -34,17 +34,18 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 
 ## Elements
 ``` hx
-node(id:String, text:String, accent = 1, expanded = false):Bool;
-image(image:Image);
-text(text:String, align = ALIGN_LEFT, bg = 0);
-textInput(id:String, text:String, label = ""):String;
-button(text:String):Bool;
-check(id:String, text:String, initState = false):Bool;
-radio(groupId:String, pos:Int, text:String, initState = 0):Bool;
-slider(id:String, text:String, from:Float, to:Float, filled = false, precision = 100, initValue = 0.0):Float;
+node(id: String, text: String, accent = 1, expanded = false): Bool;
+image(image: Image): Void;
+text(text: String, align = Left, bg = 0): Void;
+textInput(id: String, text: String, label = ""): String;
+button(text: String): Bool;
+check(id: String, text: String, initState = false): Bool;
+radio(groupId: String, pos: Int, text: String, initState = 0): Bool;
+inlineRadio(id: String, texts: Array<String>, initState = 0): Int;
+slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, initValue = 0.0, displayValue = true): Float;
 
 // Formating
-row(ratios:Array<Float>);
+row(ratios: Array<Float>);
 separator();
 indent();
 unindent();
