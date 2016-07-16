@@ -64,6 +64,8 @@ var state = check(Id.check(), "Check Box");
 
 ## Examples
 Check out examples/ folder. To run specific example, simply drop it's folder into [KodeStudio](https://github.com/KTXSoftware/KodeStudio/releases) and hit run.
+  
+Generated API docs are available [here](http://luboslenco.github.io/zui/zui/index.html).
 
 ## Theming
 You can customize theme fairly easily, but currently only by editing constants at the top of Zui.hx file. This will be improved in the future.
