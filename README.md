@@ -68,7 +68,9 @@ Check out examples/ folder. To run specific example, simply drop it's folder int
 Generated API docs are available [here](http://luboslenco.github.io/zui/zui/index.html).
 
 ## Theming
-You can customize theme fairly easily, but currently only by editing constants at the top of Zui.hx file. This will be improved in the future.
+You can customize theme fairly easily, but currently only by editing constants. This will be improved in the future. Check the example theme sources [here](https://github.com/luboslenco/zui/tree/master/Sources/zui/theme).
+  
+![](img/theme.jpg)
 
 ## Custom integration
 Thanks to the powerful render target system of Kha, it is possible to easily integrate the library into any situation. Before creating a new Zui() instance, set Zui.autoNotifyMouseEvents to false. You can then manually process the input and render the resulting texture in any way you may need.
