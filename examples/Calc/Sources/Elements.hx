@@ -33,7 +33,7 @@ class Elements {
 		if (ui.window(Id.window(), 0, 0, 250, 600)) {
 			if (ui.node(Id.node(), "Calc", 0, true)) {
 				ui.separator();
-				ui.text(state, Zui.ALIGN_RIGHT);
+				ui.text(state, Right);
 				ui.row([3/4, 1/4]);
 				if (ui.button("C")) { op = ""; lastState = 0; state = "0"; }
 				if (ui.button("/")) { op = "/"; lastState = Std.parseFloat(state); state = "0"; }
