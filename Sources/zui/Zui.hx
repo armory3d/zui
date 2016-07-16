@@ -8,13 +8,6 @@ class Zui {
 	// static inline var t = zui.theme.Light;
 	static var SCALE: Float;
 
-	public static inline var LAYOUT_VERTICAL = 0; // Window layout
-	public static inline var LAYOUT_HORIZONTAL = 1;
-
-	public static inline var ALIGN_LEFT = 0; // Text align
-	public static inline var ALIGN_CENTER = 1;
-	public static inline var ALIGN_RIGHT = 2;
-
 	public static var isScrolling = false; // Use to limit other activities
 	public static var isTyping = false;
 
@@ -169,7 +162,7 @@ class Zui {
 	}
 
 	// Returns true if redraw is needed
-	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout = LAYOUT_VERTICAL):Bool {
+	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout:Layout = Vertical):Bool {
 		//layout == LAYOUT_VERTICAL ? w = Std.int(w * scaleFactor) : h = Std.int(h * scaleFactor);
 		
 		var state = windowStates.get(id);
@@ -198,7 +191,7 @@ class Zui {
 		_windowH = h;
 		_x = 0;//x;
 		_y = state.scrollOffset;//y + state.scrollOffset;
-		if (layout == LAYOUT_HORIZONTAL) w = Std.int(ELEMENT_W());
+		if (layout == Horizontal) w = Std.int(ELEMENT_W());
 		_w = !state.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
 
@@ -220,7 +213,7 @@ class Zui {
 		var state = curWindowState;
 		if (state.redraws > 0 || isScrolling || isTyping) {
 			var fullHeight = _y - state.scrollOffset;
-			if (fullHeight < _windowH || state.layout == LAYOUT_HORIZONTAL) { // Disable scrollbar
+			if (fullHeight < _windowH || state.layout == Horizontal) { // Disable scrollbar
 				state.scrollEnabled = false;
 				state.scrollOffset = 0;
 			}
@@ -267,7 +260,7 @@ class Zui {
 
 			state.lastMaxX = _x;
 			state.lastMaxY = _y;
-			if (state.layout == LAYOUT_VERTICAL) state.lastMaxX += _windowW;
+			if (state.layout == Vertical) state.lastMaxX += _windowW;
 			else state.lastMaxY += _windowH;
 			state.redraws--;
 
@@ -324,7 +317,7 @@ class Zui {
 		endElement(false);
 	}
 
-	public function text(text: String, align = ALIGN_LEFT, bg = 0x00000000) {
+	public function text(text: String, align:Align = Left, bg = 0x00000000) {
 		if (bg != 0x0000000) {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
@@ -409,7 +402,7 @@ class Zui {
 
 		if (label != "") {
 			g.color = t.DEFAULT_LABEL_COL;// Label
-			drawStringSmall(g, label, 0, 0, ALIGN_RIGHT);
+			drawStringSmall(g, label, 0, 0, Right);
 		}
 
 		g.color = t.TEXT_COL; // Text
@@ -444,7 +437,7 @@ class Zui {
 		drawRect(g, t.FILL_BUTTON_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
 		g.color = t.BUTTON_TEXT_COL;
-		drawStringSmall(g, text, 0, 0, ALIGN_CENTER);
+		drawStringSmall(g, text, 0, 0, Center);
 
 		endElement();
 
@@ -463,7 +456,7 @@ class Zui {
 		drawCheck(state.selected, hover); // Check
 
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
-		drawStringSmall(g, text, titleOffsetX, 0);
+		drawStringSmall(g, text, titleOffsetX, Left);
 
 		endElement();
 
@@ -519,7 +512,7 @@ class Zui {
 		drawSlider(state.value, from, to, filled, hover); // Slider
 
 		g.color = t.DEFAULT_LABEL_COL;// Text
-		drawStringSmall(g, text, 0, 0, ALIGN_RIGHT);
+		drawStringSmall(g, text, 0, 0, Right);
 
 		g.color = t.TEXT_COL; // Value
 		drawStringSmall(g, state.value + "");
@@ -607,30 +600,30 @@ class Zui {
 
 	function drawString(g: kha.graphics2.Graphics, text: String,
 						xOffset: Float = t._DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
-						align = ALIGN_LEFT) {
+						align:Align = Left) {
 		xOffset *= SCALE;
 		g.font = font;
 		g.fontSize = fontSize;
-		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.width(fontSize, text) / 2;
-		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
+		if (align == Center) xOffset = _w / 2 - font.width(fontSize, text) / 2;
+		else if (align == Right) xOffset = _w - font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
 
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
 	function drawStringSmall(g: kha.graphics2.Graphics, text: String,
 							 xOffset: Float = t._DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
-							 align = ALIGN_LEFT) {
+							 align:Align = Left) {
 		xOffset *= SCALE;
 		g.font = font;
 		g.fontSize = fontSmallSize;
-		if (align == ALIGN_CENTER) xOffset = _w / 2 - font.width(fontSmallSize, text) / 2;
-		else if (align == ALIGN_RIGHT) xOffset = _w - font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
+		if (align == Center) xOffset = _w / 2 - font.width(fontSmallSize, text) / 2;
+		else if (align == Right) xOffset = _w - font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
 
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
 	function endElement(nextLine = true) {
-		if (curWindowState.layout == LAYOUT_VERTICAL) {
+		if (curWindowState.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
 				if (nextLine) _y += ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
 
@@ -785,14 +778,14 @@ class WindowState { // Cached states
 	public var scrolling: Bool = false;
 	public var scrollOffset: Float = 0;
 	public var scrollEnabled: Bool = false;
-	public var layout: Int;
+	public var layout: Layout;
 	public var lastMaxX: Float = 0;
 	public var lastMaxY: Float = 0;
 	public function resize(w:Int, h:Int, windowId:Int) {
 		redraws = 2;
 		texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId);
 	}
-	public function new(layout: Int, w: Int, h: Int, windowId: Int) {
+	public function new(layout: Layout, w: Int, h: Int, windowId: Int) {
 		this.layout = layout; 
 		resize(w, h, windowId);
 	}
@@ -818,3 +811,14 @@ class SliderState {
 // 	public var value: Int = 0;
 // 	public function new(value: Int) { this.value = value; }
 // }
+
+@:enum abstract Layout(Int) from Int {
+	var Vertical = 0;
+	var Horizontal = 1;
+}
+
+@:enum abstract Align(Int) from Int {
+	var Left = 0;
+	var Center = 1;
+	var Right = 2;
+}

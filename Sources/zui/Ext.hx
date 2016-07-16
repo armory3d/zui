@@ -89,7 +89,7 @@ class Ext {
 		var a = 1.0;
 		if (alpha) a = ui.slider(Id.nest(id, 3), "A", 0, 1, true);
 		var col = kha.Color.fromFloats(r, g, b, a);
-		ui.text("", Zui.ALIGN_RIGHT, col);
+		ui.text("", Right, col);
 		return col;
 	}
 }
