@@ -23,7 +23,7 @@ class Light {
 	public static inline var _LINE_STRENGTH = Default._LINE_STRENGTH;
 
     public static inline var WINDOW_BG_COL = 0xffaaaaaa;
-	public static inline var WINDOW_TINT_COL = 0xffffffff;
+	public static inline var WINDOW_TINT_COL = 0xddffffff;
 	public static inline var SCROLL_BG_COL = 0xffaaaaaa;
 	public static inline var SCROLL_COL = 0xffd3d3d3;
 	public static inline var SCROLL_HOVER_COL = 0xffd3d3d3;
@@ -48,10 +48,10 @@ class Light {
 	public static inline var SLIDER_COL = 0xff537cbe;
 	public static inline var SLIDER_COL_HOVER = 0xff5883c7;
 	public static inline var TEXT_COL = 0xff131313;
-	public static inline var TEXT_COL_HOVER = 0xff161616;
+	public static inline var TEXT_COL_HOVER = 0xffffffff;
 	public static inline var DEFAULT_LABEL_COL = 0xff262626;
 	public static inline var ARROW_COL = 0xff525252;
-	public static inline var ARROW_COL_HOVER = 0xff525252;
+	public static inline var ARROW_COL_HOVER = 0xffffffff; // 0xff525252
 	public static inline var SEPARATOR_COL = 0xff8a8a8a;
 	public static inline var FILL_TEXT_INPUT_BG = true;
 	public static inline var FILL_BUTTON_BG = true;

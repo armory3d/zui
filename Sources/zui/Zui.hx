@@ -491,12 +491,27 @@ class Zui {
 		return state.selected == pos;
 	}
 
+	public function inlineRadio(id: String, texts: Array<String>, initState = 0): Int {
+		var state = radioStates.get(id);
+		if (state == null) state = new RadioState(initState); radioStates.set(id, state);
+
+		if (getReleased()) {
+			if (++state.selected >= texts.length) state.selected = 0;
+		}
+
+		var hover = getHover();
+		drawInlineRadio(texts[state.selected], hover); // Radio
+
+		endElement();
+		return state.selected;
+	}
+
 	public function setRadioSelection(groupId: String, pos: Int) {
 		var state = radioStates.get(groupId);
 		if (state != null) state.selected = pos;
 	}
-	
-	public function slider(id: String, text: String, from: Float, to: Float, filled: Bool = false, precision = 100, initValue: Float = 0): Float {
+
+	public function slider(id: String, text: String, from: Float, to: Float, filled: Bool = false, precision = 100, initValue: Float = 0, displayValue = true): Float {
 		var state = sliderStates.get(id);
 		if (state == null) { state = new SliderState(initValue); sliderStates.set(id, state); }
 
@@ -521,8 +536,10 @@ class Zui {
 		g.color = t.DEFAULT_LABEL_COL;// Text
 		drawStringSmall(g, text, 0, 0, ALIGN_RIGHT);
 
-		g.color = t.TEXT_COL; // Value
-		drawStringSmall(g, state.value + "");
+		if (displayValue) {
+			g.color = t.TEXT_COL; // Value
+			drawStringSmall(g, state.value + "");
+		}
 
 		endElement();
 		return state.value;
@@ -588,6 +605,22 @@ class Zui {
 			g.fillRect(x + radioSelectOffsetX, y + radioSelectOffsetY, RADIO_SELECT_W(), RADIO_SELECT_H());
 		}
 	}
+
+	function drawInlineRadio(text: String, hover: Bool) {
+		if (hover) { // Bg
+			g.color = t.RADIO_COL_HOVER;
+			g.fillRect(_x + 5, _y + 5, _w - 10, ELEMENT_H() - 10);
+		}
+		var x = _x + arrowOffsetX; // Arrows
+		var y = _y + arrowOffsetY;
+		g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
+		g.fillTriangle(x, y, x, y + ARROW_H(), x - ARROW_W() / 2, y + ARROW_H() / 2);
+		var x = _x + _w - arrowOffsetX - 5;
+		g.fillTriangle(x, y, x, y + ARROW_H(), x + ARROW_W() / 2, y + ARROW_H() / 2);
+
+		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
+		drawStringSmall(g, text, titleOffsetX, 0, ALIGN_CENTER);
+	}
 	
 	function drawSlider(value: Float, from: Float, to: Float, filled: Bool, hover: Bool) {
 		var x = _x + buttonOffsetY;
@@ -603,6 +636,7 @@ class Zui {
 		var sliderX = filled ? x : x + (w - barW) * offset;
 		var sliderW = filled ? w * offset : barW; 
 		g.fillRect(sliderX, y, sliderW, BUTTON_H());
+		// kha.graphics2.GraphicsExtension.fillCircle(g, x, y, 10, 64);
 	}
 
 	function drawString(g: kha.graphics2.Graphics, text: String,
