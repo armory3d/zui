@@ -1,0 +1,60 @@
+package zui.theme;
+
+class Default {
+    public static inline var _ELEMENT_W = 100; // For horizontal layout
+	public static inline var _ELEMENT_H = 30; // For vertical layout
+	public static inline var _ELEMENT_SEPARATOR_SIZE = 0;
+	public static inline var _ARROW_W = _ELEMENT_H * 0.3;
+	public static inline var _ARROW_H = _ARROW_W;
+	public static inline var _BUTTON_H = _ELEMENT_H * 0.7;
+	public static inline var _CHECK_W = _ELEMENT_H * 0.5;
+	public static inline var _CHECK_H = _CHECK_W;
+	public static inline var _CHECK_SELECT_W = _ELEMENT_H * 0.3;
+	public static inline var _CHECK_SELECT_H = _CHECK_SELECT_W;
+	public static inline var _RADIO_W = _ELEMENT_H * 0.5;
+	public static inline var _RADIO_H = _RADIO_W;
+	public static inline var _RADIO_SELECT_W = _ELEMENT_H * 0.3;
+	public static inline var _RADIO_SELECT_H = _RADIO_SELECT_W;
+	public static inline var _SCROLL_W = 12;
+	public static inline var _SCROLL_BAR_W = 12;
+	public static inline var _DEFAULT_TEXT_OFFSET_X = 8;
+	public static inline var _TAB_W = 12;
+	public static inline var _LINE_STRENGTH = 2;
+
+    public static inline var WINDOW_BG_COL = 0xff000000; // Colors
+	public static inline var WINDOW_TINT_COL = 0xddffffff;
+	public static inline var SCROLL_BG_COL = 0xff101010;
+	public static inline var SCROLL_COL = 0xff494949;
+	public static inline var SCROLL_HOVER_COL = 0xffd3d3d3; // Unused
+	public static inline var NODE_BG1_COL = 0xff000000;
+	public static inline var NODE_BG2_COL = 0xff000000;
+	public static inline var NODE_TEXT_COL = 0xff737270;
+	public static inline var NODE_TEXT_COL_HOVER = NODE_TEXT_COL;
+	public static inline var BUTTON_BG_COL = 0xff557ab7;
+	public static inline var BUTTON_TEXT_COL = 0xffcac9c7;
+	public static inline var BUTTON_BG_COL_HOVER = 0xff668ecf;
+	public static inline var BUTTON_BG_COL_PRESSED = 0xffcda90b;
+	public static inline var TEXT_INPUT_BG_COL = 0xff343436;
+	public static inline var TEXT_INPUT_BG_COL_HOVER = 0xff444446;
+	public static inline var TEXT_CURSOR_COL = TEXT_COL;
+	public static inline var TEXT_CURSOR_FLASH_SPEED = 0.5;
+	public static inline var CHECK_COL = 0xff343436;
+	public static inline var CHECK_COL_HOVER = 0xff444446;
+	public static inline var CHECK_SELECT_COL = 0xffd6d6d6;
+	public static inline var RADIO_COL = 0xff343436;
+	public static inline var RADIO_COL_HOVER = 0xff444446;
+	public static inline var RADIO_SELECT_COL = 0xffd6d6d6;
+	public static inline var SLIDER_COL = CHECK_COL;
+	public static inline var SLIDER_COL_HOVER = CHECK_COL_HOVER;
+	public static inline var TEXT_COL = 0xffcac9c7;
+	public static inline var TEXT_COL_HOVER = TEXT_COL;
+	public static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
+	public static inline var ARROW_COL = 0xffcac9c7;
+	public static inline var ARROW_COL_HOVER = ARROW_COL;
+	public static inline var SEPARATOR_COL = 0xff22211f;
+	public static inline var FILL_TEXT_INPUT_BG = false;
+	public static inline var FILL_BUTTON_BG = true;
+	public static inline var FILL_CHECK_BG = false;
+	public static inline var FILL_RADIO_BG = false;
+	public static inline var FILL_SLIDER_BG = false;
+}

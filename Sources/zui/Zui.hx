@@ -4,59 +4,9 @@ package zui;
 // https://github.com/luboslenco/zui
 
 class Zui {
-	static inline var _ELEMENT_W = 100; // For horizontal layout
-	static inline var _ELEMENT_H = 30; // For vertical layout
-	static inline var _ELEMENT_SEPARATOR_SIZE = 0;
-	static inline var _ARROW_W = _ELEMENT_H * 0.3;
-	static inline var _ARROW_H = _ARROW_W;
-	static inline var _BUTTON_H = _ELEMENT_H * 0.7;
-	static inline var _CHECK_W = _ELEMENT_H * 0.5;
-	static inline var _CHECK_H = _CHECK_W;
-	static inline var _CHECK_SELECT_W = _ELEMENT_H * 0.3;
-	static inline var _CHECK_SELECT_H = _CHECK_SELECT_W;
-	static inline var _RADIO_W = _ELEMENT_H * 0.5;
-	static inline var _RADIO_H = _RADIO_W;
-	static inline var _RADIO_SELECT_W = _ELEMENT_H * 0.3;
-	static inline var _RADIO_SELECT_H = _RADIO_SELECT_W;
-	static inline var _SCROLL_W = 12;
-	static inline var _SCROLL_BAR_W = 12;
-	static inline var _DEFAULT_TEXT_OFFSET_X = 8;
-	static inline var _TAB_W = 12;
-	static inline var _LINE_STRENGTH = 2;
+	static inline var t = zui.theme.Default; // Basic theming
+	// static inline var t = zui.theme.Light;
 	static var SCALE: Float;
-
-	static inline var WINDOW_BG_COL = 0xff000000; // Colors
-	static inline var WINDOW_TINT_COL = 0xddffffff;
-	static inline var SCROLL_BG_COL = 0xff101010;
-	static inline var SCROLL_COL = 0xff494949;
-	static inline var NODE_BG1_COL = 0xff000000;
-	static inline var NODE_BG2_COL = 0xff000000;
-	static inline var NODE_TEXT_COL = 0xff737270;
-	static inline var NODE_TEXT_COL_HOVER = NODE_TEXT_COL;
-	static inline var BUTTON_BG_COL = 0xff557ab7;
-	static inline var BUTTON_TEXT_COL = 0xffcac9c7;
-	static inline var BUTTON_BG_COL_HOVER = 0xff668ecf;
-	static inline var BUTTON_BG_COL_PRESSED = 0xffcda90b;
-	static inline var TEXT_INPUT_BG_COL = 0xff343436;
-	static inline var TEXT_INPUT_BG_COL_HOVER = 0xff444446;
-	static inline var TEXT_CURSOR_COL = DEFAULT_TEXT_COL;
-	static inline var TEXT_CURSOR_FLASH_SPEED = 0.5;
-	static inline var CHECK_COL = 0xff343436;
-	static inline var CHECK_COL_HOVER = 0xff444446;
-	static inline var CHECK_SELECT_COL = 0xffd6d6d6;
-	static inline var RADIO_COL = 0xff343436;
-	static inline var RADIO_COL_HOVER = 0xff444446;
-	static inline var RADIO_SELECT_COL = 0xffd6d6d6;
-	static inline var DEFAULT_TEXT_COL = 0xffcac9c7;
-	static inline var DEFAULT_TEXT_COL_HOVER = DEFAULT_TEXT_COL;
-	static inline var DEFAULT_LABEL_COL = 0xffaaaaaa;
-	static inline var ARROW_COL = 0xffcac9c7;
-	static inline var ARROW_COL_HOVER = ARROW_COL;
-	static inline var SEPARATOR_COL = 0xff22211f;
-	static inline var FILL_TEXT_INPUT_BG = false;
-	static inline var FILL_BUTTON_BG = true;
-	static inline var FILL_CHECK_BG = false;
-	static inline var FILL_RADIO_BG = false;
 
 	public static inline var LAYOUT_VERTICAL = 0; // Window layout
 	public static inline var LAYOUT_HORIZONTAL = 1;
@@ -186,7 +136,7 @@ class Zui {
 		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, khaWindowId);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
-		g.color = CHECK_SELECT_COL;
+		g.color = t.CHECK_SELECT_COL;
 		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), LINE_STRENGTH());
 		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), LINE_STRENGTH());
 		g.end();
@@ -255,7 +205,7 @@ class Zui {
 		if (state.redraws == 0 && !isScrolling && !isTyping) return false;
 
 		g.begin(true, 0x00000000);
-		g.color = WINDOW_BG_COL;
+		g.color = t.WINDOW_BG_COL;
 		g.fillRect(_x, _y - state.scrollOffset, state.lastMaxX, state.lastMaxY);
 
 		return true;
@@ -309,9 +259,9 @@ class Zui {
 					state.scrollOffset = _windowH - fullHeight;
 				}
 				
-				g.color = SCROLL_BG_COL; // Bg
+				g.color = t.SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
-				g.color = SCROLL_COL; // Bar
+				g.color = t.SCROLL_COL; // Bar
 				g.fillRect(_windowW - SCROLL_BAR_W() - scrollAlign, barY, SCROLL_BAR_W(), barH);
 			}
 
@@ -328,7 +278,7 @@ class Zui {
 
 		// Draw window texture
 		globalG.begin(false);
-		globalG.color = WINDOW_TINT_COL;
+		globalG.color = t.WINDOW_TINT_COL;
 		globalG.drawImage(state.texture, _windowX, _windowY);
 		globalG.end();
 	}
@@ -349,13 +299,13 @@ class Zui {
 		var hover = getHover();
 
 		if (accent > 0) { // Bg
-			g.color = accent == 1 ? NODE_BG1_COL : NODE_BG2_COL;
+			g.color = accent == 1 ? t.NODE_BG1_COL : t.NODE_BG2_COL;
 			g.fillRect(_x, _y, _w, ELEMENT_H());
 		}
 
 		drawArrow(state.expanded, hover);
 
-		g.color = hover ? NODE_TEXT_COL_HOVER : NODE_TEXT_COL; // Title
+		g.color = hover ? t.NODE_TEXT_COL_HOVER : t.NODE_TEXT_COL; // Title
 		g.opacity = 1.0;
 		accent > 0 ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
 
@@ -368,6 +318,7 @@ class Zui {
 		var w = _w - buttonOffsetY * 2;
 		var ratio = w / image.width;
 		var h = image.height * ratio;
+		g.color = t.WINDOW_TINT_COL;
 		g.drawScaledImage(image, _x + buttonOffsetY, _y, w, h);
 		_y += h;
 		endElement(false);
@@ -378,7 +329,7 @@ class Zui {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 		}
-		g.color = DEFAULT_TEXT_COL;
+		g.color = t.TEXT_COL;
 		drawStringSmall(g, text, DEFAULT_TEXT_OFFSET_X(), 0, align);
 
 		endElement();
@@ -394,8 +345,8 @@ class Zui {
 		}
 
 		var hover = getHover();
-		g.color = hover ? TEXT_INPUT_BG_COL_HOVER : TEXT_INPUT_BG_COL; // Text bg
-		drawRect(g, FILL_TEXT_INPUT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H(), 2);
+		g.color = hover ? t.TEXT_INPUT_BG_COL_HOVER : t.TEXT_INPUT_BG_COL; // Text bg
+		drawRect(g, t.FILL_TEXT_INPUT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H(), 2);
 
 		if (textSelectedId != id && getReleased()) { // Passive
 			isTyping = true;
@@ -446,8 +397,8 @@ class Zui {
 
 			// Flash cursor
 			var time = kha.Scheduler.time();
-			if (time % (TEXT_CURSOR_FLASH_SPEED * 2.0) < TEXT_CURSOR_FLASH_SPEED) {
-				g.color = TEXT_CURSOR_COL; // Cursor
+			if (time % (t.TEXT_CURSOR_FLASH_SPEED * 2.0) < t.TEXT_CURSOR_FLASH_SPEED) {
+				g.color = t.TEXT_CURSOR_COL; // Cursor
 				var cursorHeight = ELEMENT_H() - buttonOffsetY * 3.0;
 				var lineHeight = ELEMENT_H();
 				g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
@@ -457,11 +408,11 @@ class Zui {
 		}
 
 		if (label != "") {
-			g.color = DEFAULT_LABEL_COL;// Label
+			g.color = t.DEFAULT_LABEL_COL;// Label
 			drawStringSmall(g, label, 0, 0, ALIGN_RIGHT);
 		}
 
-		g.color = DEFAULT_TEXT_COL; // Text
+		g.color = t.TEXT_COL; // Text
 		textSelectedId != id ? drawStringSmall(g, text) : drawStringSmall(g, textSelectedCurrentText);
 
 		endElement();
@@ -486,13 +437,13 @@ class Zui {
 		var pushed = getPushed();
 		var hover = getHover();
 
-		g.color = pushed ? BUTTON_BG_COL_PRESSED :
-				  hover ? BUTTON_BG_COL_HOVER :
-				  BUTTON_BG_COL;
+		g.color = pushed ? t.BUTTON_BG_COL_PRESSED :
+				  hover ? t.BUTTON_BG_COL_HOVER :
+				  t.BUTTON_BG_COL;
 
-		drawRect(g, FILL_BUTTON_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
+		drawRect(g, t.FILL_BUTTON_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
-		g.color = BUTTON_TEXT_COL;
+		g.color = t.BUTTON_TEXT_COL;
 		drawStringSmall(g, text, 0, 0, ALIGN_CENTER);
 
 		endElement();
@@ -511,7 +462,7 @@ class Zui {
 		var hover = getHover();
 		drawCheck(state.selected, hover); // Check
 
-		g.color = hover ? DEFAULT_TEXT_COL_HOVER : DEFAULT_TEXT_COL; // Text
+		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
@@ -532,7 +483,7 @@ class Zui {
 		var hover = getHover();
 		drawRadio(state.selected == pos, hover); // Radio
 
-		g.color = hover ? DEFAULT_TEXT_COL_HOVER : DEFAULT_TEXT_COL; // Text
+		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
@@ -567,10 +518,10 @@ class Zui {
 		var hover = getHover();
 		drawSlider(state.value, from, to, filled, hover); // Slider
 
-		g.color = DEFAULT_LABEL_COL;// Text
+		g.color = t.DEFAULT_LABEL_COL;// Text
 		drawStringSmall(g, text, 0, 0, ALIGN_RIGHT);
 
-		g.color = DEFAULT_TEXT_COL; // Value
+		g.color = t.TEXT_COL; // Value
 		drawStringSmall(g, state.value + "");
 
 		endElement();
@@ -590,7 +541,7 @@ class Zui {
 	// }
 	
 	public function separator() {
-		g.color = SEPARATOR_COL;
+		g.color = t.SEPARATOR_COL;
 		g.fillRect(_x, _y, _w - DEFAULT_TEXT_OFFSET_X(), LINE_STRENGTH());
 		_y += 2;
 	}
@@ -598,7 +549,7 @@ class Zui {
 	function drawArrow(expanded: Bool, hover: Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
-		g.color = hover ? ARROW_COL_HOVER : ARROW_COL;
+		g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
 		if (expanded) {
 			g.fillTriangle(x, y,
 						   x + ARROW_W(), y,
@@ -615,11 +566,11 @@ class Zui {
 		var x = _x + checkOffsetX;
 		var y = _y + checkOffsetY;
 
-		g.color = hover ? CHECK_COL_HOVER : CHECK_COL;
-		drawRect(g, FILL_CHECK_BG, x, y, CHECK_W(), CHECK_H(), 2); // Bg
+		g.color = hover ? t.CHECK_COL_HOVER : t.CHECK_COL;
+		drawRect(g, t.FILL_CHECK_BG, x, y, CHECK_W(), CHECK_H(), 2); // Bg
 
 		if (selected) { // Check
-			//g.color = CHECK_SELECT_COL;
+			//g.color = t.CHECK_SELECT_COL;
 			//g.fillRect(x + checkSelectOffsetX, y + checkSelectOffsetY, CHECK_SELECT_W(), CHECK_SELECT_H());
 			g.color = kha.Color.White;
 			g.drawImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY);
@@ -629,11 +580,11 @@ class Zui {
 	function drawRadio(selected: Bool, hover: Bool) {
 		var x = _x + radioOffsetX;
 		var y = _y + radioOffsetY;
-		g.color = hover ? RADIO_COL_HOVER : RADIO_COL;
-		drawRect(g, FILL_RADIO_BG, x, y, RADIO_W(), RADIO_H()); // Bg
+		g.color = hover ? t.RADIO_COL_HOVER : t.RADIO_COL;
+		drawRect(g, t.FILL_RADIO_BG, x, y, RADIO_W(), RADIO_H()); // Bg
 
 		if (selected) { // Check
-			g.color = RADIO_SELECT_COL;
+			g.color = t.RADIO_SELECT_COL;
 			g.fillRect(x + radioSelectOffsetX, y + radioSelectOffsetY, RADIO_SELECT_W(), RADIO_SELECT_H());
 		}
 	}
@@ -643,9 +594,10 @@ class Zui {
 		var y = _y + buttonOffsetY;
 		var w = _w - buttonOffsetY * 2;
 
-		g.color = hover ? CHECK_COL_HOVER : CHECK_COL;
-		drawRect(g, FILL_CHECK_BG, x, y, w, BUTTON_H(), 2); // Bg
+		g.color = hover ? t.CHECK_COL_HOVER : t.CHECK_COL;
+		drawRect(g, t.FILL_SLIDER_BG, x, y, w, BUTTON_H(), 2); // Bg
 		
+		g.color = hover ? t.SLIDER_COL_HOVER : t.SLIDER_COL;
 		var offset = ((to - from) / to) * (value / (to - from));
 		var barW = 8 * SCALE; // Unfilled bar
 		var sliderX = filled ? x : x + (w - barW) * offset;
@@ -654,7 +606,7 @@ class Zui {
 	}
 
 	function drawString(g: kha.graphics2.Graphics, text: String,
-						xOffset: Float = _DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
+						xOffset: Float = t._DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
 						align = ALIGN_LEFT) {
 		xOffset *= SCALE;
 		g.font = font;
@@ -666,7 +618,7 @@ class Zui {
 	}
 
 	function drawStringSmall(g: kha.graphics2.Graphics, text: String,
-							 xOffset: Float = _DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
+							 xOffset: Float = t._DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
 							 align = ALIGN_LEFT) {
 		xOffset *= SCALE;
 		g.font = font;
@@ -806,25 +758,25 @@ class Zui {
     function onKeyUp(key: kha.Key, char: String) {
     }
 	
-	static inline function ELEMENT_W() { return _ELEMENT_W * SCALE; }
-	static inline function ELEMENT_H() { return _ELEMENT_H * SCALE; }
-	static inline function ELEMENT_SEPARATOR_SIZE() { return _ELEMENT_SEPARATOR_SIZE * SCALE; }
-	static inline function ARROW_W() { return _ARROW_W * SCALE; }
-	static inline function ARROW_H() { return _ARROW_H * SCALE; }
-	static inline function BUTTON_H() { return _BUTTON_H * SCALE; }
-	static inline function CHECK_W() { return _CHECK_W * SCALE; }
-	static inline function CHECK_H() { return _CHECK_H * SCALE; }
-	static inline function CHECK_SELECT_W() { return _CHECK_SELECT_W * SCALE; }
-	static inline function CHECK_SELECT_H() { return _CHECK_SELECT_H * SCALE; }
-	static inline function RADIO_W() { return _RADIO_W * SCALE; }
-	static inline function RADIO_H() { return _RADIO_H * SCALE; }
-	static inline function RADIO_SELECT_W() { return _RADIO_SELECT_W * SCALE; }
-	static inline function RADIO_SELECT_H() { return _RADIO_SELECT_H * SCALE; }
-	static inline function SCROLL_W() { return Std.int(_SCROLL_W * SCALE); }
-	static inline function SCROLL_BAR_W() { return _SCROLL_BAR_W * SCALE; }
-	static inline function DEFAULT_TEXT_OFFSET_X() { return _DEFAULT_TEXT_OFFSET_X * SCALE; }
-	static inline function TAB_W() { return Std.int(_TAB_W * SCALE); }
-	static inline function LINE_STRENGTH() { return _LINE_STRENGTH * SCALE; }
+	static inline function ELEMENT_W() { return t._ELEMENT_W * SCALE; }
+	static inline function ELEMENT_H() { return t._ELEMENT_H * SCALE; }
+	static inline function ELEMENT_SEPARATOR_SIZE() { return t._ELEMENT_SEPARATOR_SIZE * SCALE; }
+	static inline function ARROW_W() { return t._ARROW_W * SCALE; }
+	static inline function ARROW_H() { return t._ARROW_H * SCALE; }
+	static inline function BUTTON_H() { return t._BUTTON_H * SCALE; }
+	static inline function CHECK_W() { return t._CHECK_W * SCALE; }
+	static inline function CHECK_H() { return t._CHECK_H * SCALE; }
+	static inline function CHECK_SELECT_W() { return t._CHECK_SELECT_W * SCALE; }
+	static inline function CHECK_SELECT_H() { return t._CHECK_SELECT_H * SCALE; }
+	static inline function RADIO_W() { return t._RADIO_W * SCALE; }
+	static inline function RADIO_H() { return t._RADIO_H * SCALE; }
+	static inline function RADIO_SELECT_W() { return t._RADIO_SELECT_W * SCALE; }
+	static inline function RADIO_SELECT_H() { return t._RADIO_SELECT_H * SCALE; }
+	static inline function SCROLL_W() { return Std.int(t._SCROLL_W * SCALE); }
+	static inline function SCROLL_BAR_W() { return t._SCROLL_BAR_W * SCALE; }
+	static inline function DEFAULT_TEXT_OFFSET_X() { return t._DEFAULT_TEXT_OFFSET_X * SCALE; }
+	static inline function TAB_W() { return Std.int(t._TAB_W * SCALE); }
+	static inline function LINE_STRENGTH() { return t._LINE_STRENGTH * SCALE; }
 }
 
 class WindowState { // Cached states
