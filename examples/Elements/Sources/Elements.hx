@@ -30,7 +30,7 @@ class Elements {
 
 		ui.begin(g);
 		// window() returns true if redraw is needed - windows are cached into textures
-		if (ui.window(Id.window(), 0, 0, 150, 600)) {
+		if (ui.window(Id.window(), 0, 0, 250, 600)) {
 			if (ui.node(Id.node(), "Node", 0, true)) {
 				ui.indent();
 				ui.text("Text");
