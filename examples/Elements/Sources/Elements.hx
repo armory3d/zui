@@ -30,10 +30,9 @@ class Elements {
 
 		ui.begin(g);
 		// window() returns true if redraw is needed - windows are cached into textures
-		if (ui.window(Id.window(), 0, 0, 250, 600)) {
+		if (ui.window(Id.window(), 0, 0, 150, 600)) {
 			if (ui.node(Id.node(), "Node", 0, true)) {
 				ui.indent();
-				ui.separator();
 				ui.text("Text");
 				ui.textInput(Id.textInput(), "Hello", "Input");
 				ui.button("Button");
@@ -44,7 +43,6 @@ class Elements {
 				ui.radio(id, Id.pos(), "Radio 3");
 				if (ui.node(Id.node(), "Nested Node")) {
 					ui.indent();
-					ui.separator();
 					ui.text("Row");
 					ui.row([2/5, 2/5, 1/5]);
 					ui.button("A");
@@ -54,9 +52,9 @@ class Elements {
 					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
 					ui.unindent();
 				}
+				ui.separator();
 				if (ui.node(Id.node(), "Nested Node")) {
 					ui.indent();
-					ui.separator();
 					ui.text("Row");
 					ui.row([2/5, 2/5, 1/5]);
 					ui.button("A");
@@ -66,9 +64,9 @@ class Elements {
 					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
 					ui.unindent();
 				}
+				ui.separator();
 				if (ui.node(Id.node(), "Nested Node")) {
 					ui.indent();
-					ui.separator();
 					ui.text("Row");
 					ui.row([2/5, 2/5, 1/5]);
 					ui.button("A");
@@ -78,9 +76,9 @@ class Elements {
 					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
 					ui.unindent();
 				}
+				ui.separator();
 				if (ui.node(Id.node(), "Nested Node")) {
 					ui.indent();
-					ui.separator();
 					ui.text("Row");
 					ui.row([2/5, 2/5, 1/5]);
 					ui.button("A");
@@ -90,6 +88,7 @@ class Elements {
 					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
 					ui.unindent();
 				}
+				ui.separator();
 				ui.unindent();
 			}
 		}

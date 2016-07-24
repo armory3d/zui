@@ -94,15 +94,17 @@ class Zui {
 	var textToSubmit: String = "";
 	var khaWindowId = 0;
 	var scaleFactor: Float;
+	var scaleTexture: Float;
 
-	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0) {
+	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0, scaleTexture = 1.0) {
+		SCALE = this.scaleFactor = scaleFactor * scaleTexture;
+		this.scaleTexture = scaleTexture;
 		this.font = font;
-		this.fontSize = Std.int(fontSize * scaleFactor);
-		this.fontSmallSize = Std.int(fontSmallSize * scaleFactor);
+		this.fontSize = Std.int(fontSize * this.scaleFactor);
+		this.fontSmallSize = Std.int(fontSmallSize * this.scaleFactor);
 		var fontHeight = font.height(this.fontSize);
 		var fontSmallHeight = font.height(this.fontSmallSize);
 		this.khaWindowId = khaWindowId;
-		SCALE = this.scaleFactor = scaleFactor;
 
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
 		fontSmallOffsetY = (ELEMENT_H() - fontSmallHeight) / 2;
@@ -170,15 +172,14 @@ class Zui {
 
 	// Returns true if redraw is needed
 	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout:Layout = Vertical):Bool {
-		//layout == LAYOUT_VERTICAL ? w = Std.int(w * scaleFactor) : h = Std.int(h * scaleFactor);
-		
+		w = Std.int(w * scaleFactor);
+		h = Std.int(h * scaleFactor);
 		var state = windowStates.get(id);
 		if (state == null) {
 			state = new WindowState(layout, w, h, khaWindowId); 
 			windowStates.set(id, state);
 		}
-		
-		if(w != state.texture.width || h != state.texture.height) {
+		if (w != state.texture.width || h != state.texture.height) {
 			state.resize(w, h, khaWindowId);
 		}
 
@@ -279,7 +280,8 @@ class Zui {
 		// Draw window texture
 		globalG.begin(false);
 		globalG.color = t.WINDOW_TINT_COL;
-		globalG.drawImage(state.texture, _windowX, _windowY);
+		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
+		globalG.drawScaledImage(state.texture, _windowX, _windowY, state.texture.width / scaleTexture, state.texture.height / scaleTexture);
 		globalG.end();
 	}
 
@@ -745,7 +747,7 @@ class Zui {
     public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
     	inputStarted = true;
     	inputDown = true;
-    	setInitialInputPosition(x, y);
+    	setInitialInputPosition(Std.int(x * scaleTexture), Std.int(y * scaleTexture));
     }
 
     public function onMouseUp(button: Int, x: Int, y: Int) {
@@ -758,12 +760,12 @@ class Zui {
     		inputReleased = true;
     	}
     	inputDown = false;
-    	setInputPosition(x, y);
+    	setInputPosition(Std.int(x * scaleTexture), Std.int(y * scaleTexture));
     	deselectText();
     }
 
     public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
-    	setInputPosition(x, y);
+    	setInputPosition(Std.int(x * scaleTexture), Std.int(y * scaleTexture));
     }
 
     public function onMouseWheel(delta: Int) {
@@ -822,13 +824,13 @@ class WindowState { // Cached states
 	public var layout: Layout;
 	public var lastMaxX: Float = 0;
 	public var lastMaxY: Float = 0;
-	public function resize(w:Int, h:Int, windowId:Int) {
-		redraws = 2;
-		texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId);
-	}
 	public function new(layout: Layout, w: Int, h: Int, windowId: Int) {
 		this.layout = layout; 
 		resize(w, h, windowId);
+	}
+	public function resize(w: Int, h: Int, windowId: Int) {
+		redraws = 2;
+		texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId);
 	}
 }
 class NodeState {
