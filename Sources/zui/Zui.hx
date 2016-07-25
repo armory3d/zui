@@ -463,7 +463,7 @@ class Zui {
 		drawCheck(state.selected, hover); // Check
 
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
-		drawStringSmall(g, text, titleOffsetX, Left);
+		drawStringSmall(g, text, titleOffsetX, 0, Left);
 
 		endElement();
 
