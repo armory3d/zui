@@ -82,11 +82,11 @@ class Zui {
 	var curWindowState: WindowState;
 	var windowEnded = true;
 
-	var windowStates: Map<String, WindowState> = new Map(); // Element states
-	var nodeStates: Map<String, NodeState> = new Map();
-	var checkStates: Map<String, CheckState> = new Map();
-	var radioStates: Map<String, RadioState> = new Map();
-	var sliderStates: Map<String, SliderState> = new Map();
+	public var windowStates: Map<String, WindowState> = new Map(); // Element states
+	public var nodeStates: Map<String, NodeState> = new Map();
+	public var checkStates: Map<String, CheckState> = new Map();
+	public var radioStates: Map<String, RadioState> = new Map();
+	public var sliderStates: Map<String, SliderState> = new Map();
 	// var colorPickerStates:Map<String, ColorPickerState> = new Map();
 	var textSelectedId: String = "";
 	var textSelectedCurrentText: String;
