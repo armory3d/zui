@@ -95,16 +95,33 @@ class Zui {
 	var khaWindowId = 0;
 	var scaleFactor: Float;
 	var scaleTexture: Float;
+	var originalFontSize:Int;
+	var originalFontSmallSize:Int;
 
 	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0, scaleTexture = 1.0) {
-		SCALE = this.scaleFactor = scaleFactor * scaleTexture;
+		this.originalFontSize= fontSize;
+		this.originalFontSmallSize = fontSmallSize;
+		this.khaWindowId = khaWindowId;
 		this.scaleTexture = scaleTexture;
 		this.font = font;
-		this.fontSize = Std.int(fontSize * this.scaleFactor);
-		this.fontSmallSize = Std.int(fontSmallSize * this.scaleFactor);
+		setScaleFactor(scaleFactor);
+
+		if (autoNotifyMouseEvents) {
+			kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		}
+		
+		if (firstInstance) {
+			firstInstance = false;
+			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
+		}
+	}
+	
+	public function setScaleFactor(scaleFactor:Float):Void {
+		SCALE = this.scaleFactor = scaleFactor * scaleTexture;
+		fontSize = Std.int(originalFontSize * this.scaleFactor);
+		fontSmallSize = Std.int(originalFontSmallSize * this.scaleFactor);
 		var fontHeight = font.height(this.fontSize);
 		var fontSmallHeight = font.height(this.fontSmallSize);
-		this.khaWindowId = khaWindowId;
 
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
 		fontSmallOffsetY = (ELEMENT_H() - fontSmallHeight) / 2;
@@ -121,15 +138,6 @@ class Zui {
 		radioSelectOffsetY = (RADIO_H() - RADIO_SELECT_H()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
 		scrollAlign = 0;//(SCROLL_W() - SCROLL_BAR_W()) / 2;
-
-		if (autoNotifyMouseEvents) {
-			kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		}
-		
-		if (firstInstance) {
-			firstInstance = false;
-			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
-		}
 	}
 
 	static var checkSelectImage: kha.Image = null;
