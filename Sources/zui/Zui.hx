@@ -534,7 +534,7 @@ class Zui {
 			var sliderX = _x + _windowX + buttonOffsetY;
 			var sliderW = _w - buttonOffsetY * 2;
 			var step = range / sliderW;
-			var value = (inputX - sliderX) * step;
+			var value = from + (inputX - sliderX) * step;
 			state.value = Std.int(value * precision) / precision;
 			if (state.value < from) state.value = from; // Stay in bounds
 			else if (state.value > to) state.value = to;
@@ -641,7 +641,7 @@ class Zui {
 		drawRect(g, t.FILL_SLIDER_BG, x, y, w, BUTTON_H(), 2); // Bg
 		
 		g.color = hover ? t.SLIDER_COL_HOVER : t.SLIDER_COL;
-		var offset = ((to - from) / to) * (value / (to - from));
+		var offset = (value - from) / (to - from);
 		var barW = 8 * SCALE; // Unfilled bar
 		var sliderX = filled ? x : x + (w - barW) * offset;
 		var sliderW = filled ? w * offset : barW; 
