@@ -9,9 +9,16 @@ import zui.Id;
 class Elements {
 	var ui: Zui;
 	var initialized = false;
+	var itemLists:Array<Array<String>>;
 
 	public function new() {
 		Assets.loadEverything(loadingFinished);
+		itemLists = [
+			["Item 1", "Item 2", "Item 3"],
+			["Item 1", "Item 2", "Item 3"],
+			["Item 1", "Item 2", "Item 3"],
+			["Item 1", "Item 2", "Item 3"]
+		];
 	}
 
 	function loadingFinished() {
@@ -49,7 +56,7 @@ class Elements {
 					ui.button("B");
 					ui.check(Id.check(), "C");
 					ui.text("Simple list");
-					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					Ext.list(ui, Id.list(), itemLists[0]);
 					ui.unindent();
 				}
 				ui.separator();
@@ -61,7 +68,7 @@ class Elements {
 					ui.button("B");
 					ui.check(Id.check(), "C");
 					ui.text("Simple list");
-					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					Ext.list(ui, Id.list(), itemLists[1]);
 					ui.unindent();
 				}
 				ui.separator();
@@ -73,7 +80,7 @@ class Elements {
 					ui.button("B");
 					ui.check(Id.check(), "C");
 					ui.text("Simple list");
-					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					Ext.list(ui, Id.list(), itemLists[2]);
 					ui.unindent();
 				}
 				ui.separator();
@@ -85,7 +92,7 @@ class Elements {
 					ui.button("B");
 					ui.check(Id.check(), "C");
 					ui.text("Simple list");
-					Ext.list(ui, Id.list(), ["Item 1", "Item 2", "Item 3"]);
+					Ext.list(ui, Id.list(), itemLists[3]);
 					ui.unindent();
 				}
 				ui.separator();
