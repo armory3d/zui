@@ -1,17 +1,26 @@
 # zui
 
-Immediate Mode Graphical User interface for Haxe Kha, mainly useful for tools or game debug. Can be used directly as Kha library included in khafile.js. Note that internally some of the state is retained to favor simplicity.  
+Immediate-mode graphical user interface designed for tools and game debug. The library is built with Haxe and Kha to reach ultra portability. Inspired by [imgui](https://github.com/ocornut/imgui).
 
-Inspired by [imgui](https://github.com/ocornut/imgui).
+## Update notice
+The library went through a slight makeover which brings a few breaking changes.
+If you wish, revert to [older build](https://github.com/armory3d/zui/releases/tag/17.02).
+
+Changes:
+- Create Zui instance using ZuiOptions:
+`var ui = new Zui({ font: myFont, theme: myTheme, ... });`
+- Replace `Id.*()` calls with the new unified `Id.handle()` for all elements
+- Replace `ui.node()` with `ui.panel()`
+- Pass initial element state in a handle: `ui.check(Id.handle({ selected: true }), "Check Box")`
 
 ![](img/zui.jpg)
 
 ## Getting started
-- Clone into 'your_kha_project/Libraries' or do 'haxelib install zui'
+- Clone into 'your_kha_project/Libraries'
 - Add 'project.addLibrary('zui');' into khafile.js
 ``` hx
 	// In init()
-	var ui = new Zui(font:Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0);
+	var ui = new Zui({ font:Font, khaWindowId = 0, scaleFactor = 1.0 });
 
 	// In render()
 	public function render(frame:Framebuffer) {
@@ -21,7 +30,7 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 		g.end();
 		
 		ui.begin(g);
-		if (ui.window(Id.window(), x, y, w, h, Zui.LAYOUT_VERTICAL)) {
+		if (ui.window(Id.handle(), x, y, w, h, drag)) {
 			if (ui.button("Hello")) {
 				trace("World");
 			}
@@ -34,15 +43,15 @@ Inspired by [imgui](https://github.com/ocornut/imgui).
 
 ## Elements
 ``` hx
-node(id: String, text: String, accent = 1, expanded = false): Bool;
+panel(id: String, text: String, accent = 1): Bool;
 image(image: Image): Void;
 text(text: String, align = Left, bg = 0): Void;
 textInput(id: String, text: String, label = ""): String;
 button(text: String): Bool;
-check(id: String, text: String, initState = false): Bool;
-radio(groupId: String, pos: Int, text: String, initState = 0): Bool;
-inlineRadio(id: String, texts: Array<String>, initState = 0): Int;
-slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, initValue = 0.0, displayValue = true): Float;
+check(id: String, text: String): Bool;
+radio(groupId: String, pos: Int, text: String): Bool;
+inlineRadio(id: String, texts: Array<String>): Int;
+slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
 
 // Formating
 row(ratios: Array<Float>);
@@ -54,27 +63,23 @@ unindent();
 Ext.hx - prebuilt elements:
 ``` hx
 list(...);
-nodeList(...);
+panelList(...);
 colorPicker(...);
 ```
 
-Id.hx - simple macros to generate ids
+Id.hx - simple macros to generate handles
 ``` hx
-var state = check(Id.check(), "Check Box");
+var state = ui.check(Id.handle(), "Check Box");
 ```
 
 ## Examples
 Check out examples/ folder. To run specific example, simply drop it's folder into [KodeStudio](https://github.com/KTXSoftware/KodeStudio/releases) and hit run.
-  
-Generated API docs are available [here](http://luboslenco.github.io/zui/zui/index.html).
 
 ## Theming
-You can customize theme fairly easily, but currently only by editing constants. This will be improved in the future. Check the example theme sources [here](https://github.com/luboslenco/zui/tree/master/Sources/zui/theme).
-  
-![](img/theme.jpg)
+Themes can be defined using TTheme typedef. Check zui.Themes class for example. Set ZuiOptions.theme when creating new Zui instance to overwrite default theme.
 
 ## Custom integration
-Thanks to the powerful render target system of Kha, it is possible to easily integrate the library into any situation. Before creating a new Zui() instance, set Zui.autoNotifyMouseEvents to false. You can then manually process the input and render the resulting texture in any way you may need.
+Thanks to the powerful render target system of Kha, it is possible to easily integrate the library into any scenario. Set ZuiOptions.autoNotifyInput to false when creating a new Zui instance. You can then manually process the input and render the resulting texture in any way you may need.
 ``` hx
 zui.onMouseDown(button:Int, x:Int, y:Int)
 zui.onMouseUp(button:Int, x:Int, y:Int)

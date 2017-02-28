@@ -1,40 +1,38 @@
 package zui;
 
-// Immediate Mode UI for Haxe Kha
-// https://github.com/luboslenco/zui
+// Immediate Mode UI Library
+// https://github.com/armory3d/zui
+
+@:structInit
+typedef ZuiOptions = {
+	font: kha.Font,
+	?theme: zui.Themes.TTheme,
+	?khaWindowId: Int,
+	?scaleFactor: Float,
+	?scaleTexture: Float,
+	?autoNotifyInput: Bool
+}
 
 class Zui {
-	static inline var t = zui.theme.Default; // Basic theming
-	// static inline var t = zui.theme.Light;
+	static var t:zui.Themes.TTheme;
 	static var SCALE: Float;
-	
-	public static inline var LAYOUT_VERTICAL = Layout.Vertical; // Window layout
-	public static inline var LAYOUT_HORIZONTAL = Layout.Horizontal;
-
-	public static inline var ALIGN_LEFT = Align.Left; // Text align
-	public static inline var ALIGN_CENTER = Align.Center;
-	public static inline var ALIGN_RIGHT = Align.Right;
 
 	public static var isScrolling = false; // Use to limit other activities
 	public static var isTyping = false;
 
-	public static var autoNotifyMouseEvents = true;
 	static var firstInstance = true;
-	static var prerenderedElements = false;
+	static var elementsBaked = false;
 
 	var inputX: Float; // Input position
 	var inputY: Float;
-	
 	var inputInitialX: Float;
 	var inputInitialY: Float;
-
 	var inputDX: Float; // Delta
 	var inputDY: Float;
 	var inputWheelDelta: Int;
 	var inputStarted: Bool; // Buttons
 	var inputReleased: Bool;
 	var inputDown: Bool;
-
 	var isKeyDown = false; // Keys
 	var key: kha.Key;
 	var char: String;
@@ -44,13 +42,14 @@ class Zui {
 	var cursorPixelX = 0.0;
 
 	var ratios: Array<Float>; // Splitting rows
-	var curRatio: Int = -1;
+	var curRatio = -1;
 	var xBeforeSplit: Float;
 	var wBeforeSplit: Int;
 
 	var globalG: kha.graphics2.Graphics; // Drawing
 	var g: kha.graphics2.Graphics;
-	var font: kha.Font;
+
+	var ops: ZuiOptions;
 	var fontSize: Int;
 	var fontSmallSize: Int;
 
@@ -79,49 +78,38 @@ class Zui {
 	var _windowY: Float;
 	var _windowW: Float;
 	var _windowH: Float;
-	var curWindowState: WindowState;
+	var currentWindow: Handle;
 	var windowEnded = true;
+	var scrollingHandle: Handle = null; // Window or slider being scrolled
 
-	public var windowStates: Map<String, WindowState> = new Map(); // Element states
-	public var nodeStates: Map<String, NodeState> = new Map();
-	public var checkStates: Map<String, CheckState> = new Map();
-	public var radioStates: Map<String, RadioState> = new Map();
-	public var sliderStates: Map<String, SliderState> = new Map();
-	// var colorPickerStates:Map<String, ColorPickerState> = new Map();
-	var textSelectedId: String = "";
+	var textSelectedHandle: Handle = null;
 	var textSelectedCurrentText: String;
-	var submitTextId: String;
-	var textToSubmit: String = "";
-	var khaWindowId = 0;
-	var scaleFactor: Float;
-	var scaleTexture: Float;
-	var originalFontSize:Int;
-	var originalFontSmallSize:Int;
+	var submitTextHandle: Handle = null;
+	var textToSubmit = "";
 
-	public function new(font: kha.Font, fontSize = 17, fontSmallSize = 16, khaWindowId = 0, scaleFactor = 1.0, scaleTexture = 1.0) {
-		this.originalFontSize= fontSize;
-		this.originalFontSmallSize = fontSmallSize;
-		this.khaWindowId = khaWindowId;
-		this.scaleTexture = scaleTexture;
-		this.font = font;
-		setScaleFactor(scaleFactor);
+	public function new(ops: ZuiOptions) {
+		if (ops.theme == null) ops.theme = Themes.dark;
+		t = ops.theme;
+		if (ops.khaWindowId == null) ops.khaWindowId = 0;
+		if (ops.scaleFactor == null) ops.scaleFactor = 1.0;
+		if (ops.scaleTexture == null) ops.scaleTexture = 1.0;
+		if (ops.autoNotifyInput == null) ops.autoNotifyInput = true;
+		this.ops = ops;
+		setScaleFactor(ops.scaleFactor);
 
-		if (autoNotifyMouseEvents) {
-			kha.input.Mouse.get().notifyWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		}
-		
-		if (firstInstance) {
-			firstInstance = false;
+		if (ops.autoNotifyInput && firstInstance) {
+			kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
+		firstInstance = false;
 	}
 	
-	public function setScaleFactor(scaleFactor:Float):Void {
-		SCALE = this.scaleFactor = scaleFactor * scaleTexture;
-		fontSize = Std.int(originalFontSize * this.scaleFactor);
-		fontSmallSize = Std.int(originalFontSmallSize * this.scaleFactor);
-		var fontHeight = font.height(this.fontSize);
-		var fontSmallHeight = font.height(this.fontSmallSize);
+	public function setScaleFactor(scaleFactor: Float) {
+		SCALE = ops.scaleFactor = scaleFactor * ops.scaleTexture;
+		fontSize = Std.int(t._FONT_SIZE * ops.scaleFactor);
+		fontSmallSize = Std.int(t._FONT_SMALL_SIZE * ops.scaleFactor);
+		var fontHeight = ops.font.height(fontSize);
+		var fontSmallHeight = ops.font.height(fontSmallSize);
 
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
 		fontSmallOffsetY = (ELEMENT_H() - fontSmallHeight) / 2;
@@ -137,13 +125,13 @@ class Zui {
 		radioOffsetX = radioOffsetY;
 		radioSelectOffsetY = (RADIO_H() - RADIO_SELECT_H()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
-		scrollAlign = 0;//(SCROLL_W() - SCROLL_BAR_W()) / 2;
+		scrollAlign = 0;
 	}
 
 	static var checkSelectImage: kha.Image = null;
-	function prerenderElements() {
-		prerenderedElements = true;
-		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, khaWindowId);
+	function bakeElements() {
+		elementsBaked = true;
+		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, ops.khaWindowId);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = t.CHECK_SELECT_COL;
@@ -153,13 +141,15 @@ class Zui {
 	}
 
 	public function remove() { // Clean up
-		kha.input.Mouse.get().removeWindowed(khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp);
+		if (ops.autoNotifyInput) {
+			kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+			kha.input.Keyboard.get().remove(onKeyDown, onKeyUp);
+		}
 	}
 
-	public function begin(g:kha.graphics2.Graphics) { // Begin UI drawing
-		if (!prerenderedElements) { prerenderElements(); }
-		SCALE = scaleFactor;
+	public function begin(g: kha.graphics2.Graphics) { // Begin UI drawing
+		if (!elementsBaked) bakeElements();
+		SCALE = ops.scaleFactor;
 		globalG = g;
 		_x = 0; // Reset cursor
 		_y = 0;
@@ -168,8 +158,7 @@ class Zui {
 	}
 
 	public function end() { // End drawing
-		if (!windowEnded) { endWindow(); }
-
+		if (!windowEnded) endWindow();
 		isKeyDown = false; // Reset input - only one char for now
 		inputStarted = false;
 		inputReleased = false;
@@ -179,83 +168,92 @@ class Zui {
 	}
 
 	// Returns true if redraw is needed
-	public function window(id:String, x:Int, y:Int, w:Int, h:Int, layout:Layout = Vertical):Bool {
-		w = Std.int(w * scaleFactor);
-		h = Std.int(h * scaleFactor);
-		var state = windowStates.get(id);
-		if (state == null) {
-			state = new WindowState(layout, w, h, khaWindowId); 
-			windowStates.set(id, state);
-		}
-		if (w != state.texture.width || h != state.texture.height) {
-			state.resize(w, h, khaWindowId);
+	public function window(handle: Handle, x: Int, y: Int, w: Int, h: Int, drag = false): Bool {
+		w = Std.int(w * ops.scaleFactor);
+		h = Std.int(h * ops.scaleFactor);
+
+		if (handle.texture == null || w != handle.texture.width || h != handle.texture.height) {
+			resize(handle, w, h, ops.khaWindowId);
 		}
 
-		if (!windowEnded) { endWindow(); } // End previous window if necessary
+		if (!windowEnded) endWindow(); // End previous window if necessary
 		windowEnded = false;
 
-		g = state.texture.g2; // Set g
-
-		if (getInputInRect(x, y, w, h)) { // Redraw
-			state.redraws = 2;
-		}
-
-		curWindowState = state;
-		_windowX = x;
-		_windowY = y;
+		g = handle.texture.g2; // Set g
+		currentWindow = handle;
+		_windowX = x + handle.dragX;
+		_windowY = y + handle.dragY;
 		_windowW = w;
 		_windowH = h;
-		_x = 0;//x;
-		_y = state.scrollOffset;//y + state.scrollOffset;
-		if (layout == Horizontal) w = Std.int(ELEMENT_W());
-		_w = !state.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
+
+		if (getInputInRect(_windowX, _windowY, _windowW, _windowH)) handle.redraws = 2; // Redraw
+
+		_x = 0;
+		_y = handle.scrollOffset;
+		if (handle.layout == Horizontal) w = Std.int(ELEMENT_W());
+		_w = !handle.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
 
-		if (state.redraws == 0 && !isScrolling && !isTyping) return false;
+		if (handle.redraws == 0 && !isScrolling && !isTyping) return false;
 
 		g.begin(true, 0x00000000);
 		g.color = t.WINDOW_BG_COL;
-		g.fillRect(_x, _y - state.scrollOffset, state.lastMaxX, state.lastMaxY);
+		g.fillRect(_x, _y - handle.scrollOffset, handle.lastMaxX, handle.lastMaxY);
+
+		handle.dragEnabled = drag;
+		if (drag) {
+			if (inputStarted && getInputInRect(_windowX, _windowY, _windowW, 15)) {
+				handle.dragging = true;
+			}
+			else if (inputReleased) {
+				handle.dragging = false;
+			}
+			if (handle.dragging) {
+				handle.redraws = 2;
+				handle.dragX += Std.int(inputDX);
+				handle.dragY += Std.int(inputDY);
+			}
+			_y += 15; // Header offset 
+		}
 
 		return true;
 	}
 
-	public function redrawWindow(id: String) {
-		var state = windowStates.get(id);
-		if (state != null) state.redraws = 1;
-	}
-
 	function endWindow() {
-		var state = curWindowState;
-		if (state.redraws > 0 || isScrolling || isTyping) {
-			var fullHeight = _y - state.scrollOffset;
-			if (fullHeight < _windowH || state.layout == Horizontal) { // Disable scrollbar
-				state.scrollEnabled = false;
-				state.scrollOffset = 0;
+		var handle = currentWindow;
+		if (handle.redraws > 0 || isScrolling || isTyping) {
+
+			if (handle.dragEnabled) { // Draggable header
+				g.color = t.SEPARATOR_COL;
+				g.fillRect(0, 0, _windowW, 15);
+			}
+
+			var fullHeight = _y - handle.scrollOffset;
+			if (fullHeight < _windowH || handle.layout == Horizontal) { // Disable scrollbar
+				handle.scrollEnabled = false;
+				handle.scrollOffset = 0;
 			}
 			else { // Draw window scrollbar if necessary
-				state.scrollEnabled = true;
+				handle.scrollEnabled = true;
 				var amountToScroll = fullHeight - _windowH;
-				var amountScrolled = -state.scrollOffset;
+				var amountScrolled = -handle.scrollOffset;
 				var ratio = amountScrolled / amountToScroll;
 				var barH = _windowH * Math.abs(_windowH / fullHeight);
-			
 				barH = Math.max(barH, ELEMENT_H());
 				
-				var totalScrollableArea = (_windowH - barH);
-		
+				var totalScrollableArea = _windowH - barH;
 				var e = amountToScroll / totalScrollableArea;
-				
 				var barY = totalScrollableArea * ratio;
 
 				if ((inputStarted) && // Start scrolling
 					getInputInRect(_windowX + _windowW - SCROLL_BAR_W(), barY + _windowY, SCROLL_BAR_W(), barH)) {
 
-					state.scrolling = true;
+					handle.scrolling = true;
+					scrollingHandle = handle;
 					isScrolling = true;
 				}
 				
-				if (state.scrolling) { // Scroll
+				if (handle.scrolling) { // Scroll
 					scroll(inputDY * e, fullHeight);
 				}
 				else if (inputWheelDelta != 0) { // Wheel
@@ -263,9 +261,11 @@ class Zui {
 				}
 				
 				//Stay in bounds
-				if (state.scrollOffset > 0) state.scrollOffset = 0;
-				else if (fullHeight + state.scrollOffset < _windowH) {
-					state.scrollOffset = _windowH - fullHeight;
+				if (handle.scrollOffset > 0) {
+					handle.scrollOffset = 0;
+				}
+				else if (fullHeight + handle.scrollOffset < _windowH) {
+					handle.scrollOffset = _windowH - fullHeight;
 				}
 				
 				g.color = t.SCROLL_BG_COL; // Bg
@@ -274,11 +274,11 @@ class Zui {
 				g.fillRect(_windowW - SCROLL_BAR_W() - scrollAlign, barY, SCROLL_BAR_W(), barH);
 			}
 
-			state.lastMaxX = _x;
-			state.lastMaxY = _y;
-			if (state.layout == Vertical) state.lastMaxX += _windowW;
-			else state.lastMaxY += _windowH;
-			state.redraws--;
+			handle.lastMaxX = _x;
+			handle.lastMaxY = _y;
+			if (handle.layout == Vertical) handle.lastMaxX += _windowW;
+			else handle.lastMaxY += _windowH;
+			handle.redraws--;
 
 			g.end();
 		}
@@ -289,39 +289,32 @@ class Zui {
 		globalG.begin(false);
 		globalG.color = t.WINDOW_TINT_COL;
 		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
-		globalG.drawScaledImage(state.texture, _windowX, _windowY, state.texture.width / scaleTexture, state.texture.height / scaleTexture);
+		globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
 		globalG.end();
 	}
 
 	function scroll(delta: Float, fullHeight: Float) {
-		var state = curWindowState;
-		state.scrollOffset -= delta;
+		currentWindow.scrollOffset -= delta;
 	}
 
-	public function node(id: String, text: String, accent = 0, expanded = false): Bool {
-		var state = nodeStates.get(id);
-		if (state == null) { state = new NodeState(expanded); nodeStates.set(id, state); }
-
-		if (getReleased()) {
-			state.expanded = !state.expanded;
-		}
-
+	public function panel(handle: Handle, text: String, accent = 0): Bool {
+		if (getReleased()) handle.selected = !handle.selected;
 		var hover = getHover();
 
 		if (accent > 0) { // Bg
-			g.color = accent == 1 ? t.NODE_BG1_COL : t.NODE_BG2_COL;
+			g.color = accent == 1 ? t.PANEL_BG1_COL : t.PANEL_BG2_COL;
 			g.fillRect(_x, _y, _w, ELEMENT_H());
 		}
 
-		drawArrow(state.expanded, hover);
+		drawArrow(handle.selected, hover);
 
-		g.color = hover ? t.NODE_TEXT_COL_HOVER : t.NODE_TEXT_COL; // Title
+		g.color = hover ? t.PANEL_TEXT_COL_HOVER : t.PANEL_TEXT_COL; // Title
 		g.opacity = 1.0;
 		accent > 0 ? drawString(g, text, titleOffsetX, 0) : drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
-		return state.expanded;
+		return handle.selected;
 	}
 	
 	public function image(image: kha.Image) {
@@ -345,12 +338,11 @@ class Zui {
 		endElement();
 	}
 
-	public function textInput(id: String, text: String, label = ""): String {
-		if (submitTextId == id) { // Submit edited text
-			//text = textSelectedCurrentText;
-			text = textToSubmit;
+	public function textInput(handle: Handle, label = ""): String {
+		if (submitTextHandle == handle) { // Submit edited text
+			handle.text = textToSubmit;
 			textToSubmit = "";
-			submitTextId = "";
+			submitTextHandle = null;
 			textSelectedCurrentText = "";
 		}
 
@@ -358,41 +350,41 @@ class Zui {
 		g.color = hover ? t.TEXT_INPUT_BG_COL_HOVER : t.TEXT_INPUT_BG_COL; // Text bg
 		drawRect(g, t.FILL_TEXT_INPUT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H(), 2);
 
-		if (textSelectedId != id && getReleased()) { // Passive
+		if (textSelectedHandle != handle && getReleased()) { // Passive
 			isTyping = true;
-			submitTextId = textSelectedId;
+			submitTextHandle = textSelectedHandle;
 			textToSubmit = textSelectedCurrentText;
-			textSelectedId = id;
-			textSelectedCurrentText = text;
-			cursorX = text.length;
+			textSelectedHandle = handle;
+			textSelectedCurrentText = handle.text;
+			cursorX = handle.text.length;
 			cursorY = 0;
-			updateCursorPixelX(text, font, fontSmallSize);
+			updateCursorPixelX(handle.text, ops.font, fontSmallSize);
 
 			if (kha.input.Keyboard.get() != null) {
 				kha.input.Keyboard.get().show();
 			}
 		}
 
-		if (textSelectedId == id) { // Active
+		if (textSelectedHandle == handle) { // Active
 			var text = textSelectedCurrentText;
 			if (isKeyDown) { // Process input
 				if (key == kha.Key.LEFT) { // Move cursor
 					if (cursorX > 0) {
 						cursorX--;
-						updateCursorPixelX(text, font, fontSmallSize);
+						updateCursorPixelX(text, ops.font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.RIGHT) {
 					if (cursorX < text.length) {
 						cursorX++;
-						updateCursorPixelX(text, font, fontSmallSize);
+						updateCursorPixelX(text, ops.font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.BACKSPACE) { // Remove char
 					if (cursorX > 0) {
 						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
 						cursorX--;
-						updateCursorPixelX(text, font, fontSmallSize);
+						updateCursorPixelX(text, ops.font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.ENTER) { // Deselect
@@ -401,7 +393,7 @@ class Zui {
 				else if (key == kha.Key.CHAR) {
 					text = text.substr(0, cursorX) + char + text.substr(cursorX);
 					cursorX++;
-					updateCursorPixelX(text, font, fontSmallSize);
+					updateCursorPixelX(text, ops.font, fontSmallSize);
 				}
 			}
 
@@ -418,24 +410,24 @@ class Zui {
 		}
 
 		if (label != "") {
-			g.color = t.DEFAULT_LABEL_COL;// Label
+			g.color = t.DEFAULT_LABEL_COL; // Label
 			drawStringSmall(g, label, 0, 0, Right);
 		}
 
 		g.color = t.TEXT_COL; // Text
-		textSelectedId != id ? drawStringSmall(g, text) : drawStringSmall(g, textSelectedCurrentText);
+		textSelectedHandle != handle ? drawStringSmall(g, handle.text) : drawStringSmall(g, textSelectedCurrentText);
 
 		endElement();
 
-		return text;
+		return handle.text;
 	}
 
 	function deselectText() {
-		submitTextId = textSelectedId;
+		submitTextHandle = textSelectedHandle;
 		textToSubmit = textSelectedCurrentText;
-		textSelectedId = "";
+		textSelectedHandle = null;
 		isTyping = false;
-		for (w in windowStates) w.redraws = 2;
+		currentWindow.redraws = 2;
 
 		if (kha.input.Keyboard.get() != null) {
 			kha.input.Keyboard.get().hide();
@@ -461,111 +453,77 @@ class Zui {
 		return wasPressed;
 	}
 
-	public function check(id: String, text: String, initState = false): Bool {
-		var state = checkStates.get(id);
-		if (state == null) { state = new CheckState(initState); checkStates.set(id, state); }
-
-		if (getReleased()) {
-			state.selected = !state.selected;
-		}
+	public function check(handle: Handle, text: String): Bool {
+		if (getReleased()) handle.selected = !handle.selected;
 
 		var hover = getHover();
-		drawCheck(state.selected, hover); // Check
+		drawCheck(handle.selected, hover); // Check
 
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0, Left);
 
 		endElement();
 
-		return state.selected;
+		return handle.selected;
 	}
 
-	public function radio(groupId: String, pos: Int, text: String, initState = 0): Bool {
-		var state = radioStates.get(groupId);
-		if (state == null) {
-			state = new RadioState(initState); radioStates.set(groupId, state);
-		}
-
-		if (getReleased()) {
-			state.selected = pos;
-		}
+	public function radio(handle: Handle, position: Int, text: String): Bool {
+		if (getReleased()) handle.position = position;
 
 		var hover = getHover();
-		drawRadio(state.selected == pos, hover); // Radio
+		drawRadio(handle.position == position, hover); // Radio
 
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0);
 
 		endElement();
 
-		return state.selected == pos;
+		return handle.position == position;
 	}
 
-	public function inlineRadio(id: String, texts: Array<String>, initState = 0): Int {
-		var state = radioStates.get(id);
-		if (state == null) state = new RadioState(initState); radioStates.set(id, state);
-
+	public function inlineRadio(handle: Handle, texts: Array<String>): Int {
 		if (getReleased()) {
-			if (++state.selected >= texts.length) state.selected = 0;
+			if (++handle.position >= texts.length) handle.position = 0;
 		}
 
 		var hover = getHover();
-		drawInlineRadio(texts[state.selected], hover); // Radio
+		drawInlineRadio(texts[handle.position], hover); // Radio
 
 		endElement();
-		return state.selected;
+		return handle.position;
 	}
 
-	public function setRadioSelection(groupId: String, pos: Int) {
-		var state = radioStates.get(groupId);
-		if (state != null) state.selected = pos;
-	}
-
-	public function slider(id: String, text: String, from: Float, to: Float, filled: Bool = false, precision = 100, initValue: Float = 0, displayValue = true): Float {
-		var state = sliderStates.get(id);
-		if (state == null) { state = new SliderState(initValue); sliderStates.set(id, state); }
-
+	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true): Float {
 		if (getStarted()) {
-			state.scrolling = true;
+			handle.scrolling = true;
+			scrollingHandle = handle;
 			isScrolling = true;
 		}
-		if (state.scrolling) { // Scroll
+		if (handle.scrolling) { // Scroll
 			var range = to - from;
 			var sliderX = _x + _windowX + buttonOffsetY;
 			var sliderW = _w - buttonOffsetY * 2;
 			var step = range / sliderW;
 			var value = from + (inputX - sliderX) * step;
-			state.value = Std.int(value * precision) / precision;
-			if (state.value < from) state.value = from; // Stay in bounds
-			else if (state.value > to) state.value = to;
+			handle.value = Std.int(value * precision) / precision;
+			if (handle.value < from) handle.value = from; // Stay in bounds
+			else if (handle.value > to) handle.value = to;
 		}
 		
 		var hover = getHover();
-		drawSlider(state.value, from, to, filled, hover); // Slider
+		drawSlider(handle.value, from, to, filled, hover); // Slider
 
 		g.color = t.DEFAULT_LABEL_COL;// Text
 		drawStringSmall(g, text, 0, 0, Right);
 
 		if (displayValue) {
 			g.color = t.TEXT_COL; // Value
-			drawStringSmall(g, state.value + "");
+			drawStringSmall(g, handle.value + "");
 		}
 
 		endElement();
-		return state.value;
+		return handle.value;
 	}
-	
-	// public function colorPicker(id: String, initColor = 0xffffffff): Int {
-	// 	var state = colorPickerStates.get(id);
-	// 	if (state == null) { state = new ColorPickerState(initColor); colorPickerStates.set(id, state); }
-
-	// 	var w = _w - buttonOffsetY * 2;
-	// 	g.drawScaledImage(checkSelectImage, _x + buttonOffsetY, _y, w, w);
-
-	// 	_y += w;
-	// 	endElement(false);
-	// 	return state.value;
-	// }
 	
 	public function separator() {
 		g.color = t.SEPARATOR_COL;
@@ -573,11 +531,11 @@ class Zui {
 		_y += 2;
 	}
 
-	function drawArrow(expanded: Bool, hover: Bool) {
+	function drawArrow(selected: Bool, hover: Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
 		g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
-		if (expanded) {
+		if (selected) {
 			g.fillTriangle(x, y,
 						   x + ARROW_W(), y,
 						   x + ARROW_W() / 2, y + ARROW_H());
@@ -629,7 +587,7 @@ class Zui {
 		g.fillTriangle(x, y, x, y + ARROW_H(), x + ARROW_W() / 2, y + ARROW_H() / 2);
 
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
-		drawStringSmall(g, text, titleOffsetX, 0, ALIGN_CENTER);
+		drawStringSmall(g, text, titleOffsetX, 0, Align.Center);
 	}
 	
 	function drawSlider(value: Float, from: Float, to: Float, filled: Bool, hover: Bool) {
@@ -646,35 +604,36 @@ class Zui {
 		var sliderX = filled ? x : x + (w - barW) * offset;
 		var sliderW = filled ? w * offset : barW; 
 		g.fillRect(sliderX, y, sliderW, BUTTON_H());
-		// kha.graphics2.GraphicsExtension.fillCircle(g, x, y, 10, 64);
 	}
 
 	function drawString(g: kha.graphics2.Graphics, text: String,
-						xOffset: Float = t._DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
+						xOffset: Null<Float> = null, yOffset: Float = 0,
 						align:Align = Left) {
+		if (xOffset == null) xOffset = t._DEFAULT_TEXT_OFFSET_X;
 		xOffset *= SCALE;
-		g.font = font;
+		g.font = ops.font;
 		g.fontSize = fontSize;
-		if (align == Center) xOffset = _w / 2 - font.width(fontSize, text) / 2;
-		else if (align == Right) xOffset = _w - font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
+		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
+		else if (align == Right) xOffset = _w - ops.font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
 
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
 	function drawStringSmall(g: kha.graphics2.Graphics, text: String,
-							 xOffset: Float = t._DEFAULT_TEXT_OFFSET_X, yOffset: Float = 0,
+							 xOffset: Null<Float> = null, yOffset: Float = 0,
 							 align:Align = Left) {
+		if (xOffset == null) xOffset = t._DEFAULT_TEXT_OFFSET_X;
 		xOffset *= SCALE;
-		g.font = font;
+		g.font = ops.font;
 		g.fontSize = fontSmallSize;
-		if (align == Center) xOffset = _w / 2 - font.width(fontSmallSize, text) / 2;
-		else if (align == Right) xOffset = _w - font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
+		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSmallSize, text) / 2;
+		else if (align == Right) xOffset = _w - ops.font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
 
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
 	function endElement(nextLine = true) {
-		if (curWindowState.layout == Vertical) {
+		if (currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
 				if (nextLine) _y += ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
 
@@ -713,7 +672,7 @@ class Zui {
 		_w += TAB_W();
 	}
 	
-	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength: Float = 1.0) {
+	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 1.0) {
 		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, LINE_STRENGTH());
 	}
 
@@ -749,31 +708,30 @@ class Zui {
 
 	function updateCursorPixelX(text: String, font: kha.Font, fontSize: Int) { // Set cursor to current char
 		var str = text.substr(0, cursorX);
-		cursorPixelX = font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X();
+		cursorPixelX = ops.font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X();
 	}
 
     public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
     	inputStarted = true;
     	inputDown = true;
-    	setInitialInputPosition(Std.int(x * scaleTexture), Std.int(y * scaleTexture));
+    	setInitialInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
     }
 
     public function onMouseUp(button: Int, x: Int, y: Int) {
     	if (isScrolling) {
     		isScrolling = false;
-    		for (s in windowStates) s.scrolling = false;
-    		for (s in sliderStates) s.scrolling = false;
+    		if (scrollingHandle != null) scrollingHandle.scrolling = false;
     	}
     	else { // To prevent action when scrolling is active
     		inputReleased = true;
     	}
     	inputDown = false;
-    	setInputPosition(Std.int(x * scaleTexture), Std.int(y * scaleTexture));
+    	setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
     	deselectText();
     }
 
     public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
-    	setInputPosition(Std.int(x * scaleTexture), Std.int(y * scaleTexture));
+    	setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
     }
 
     public function onMouseWheel(delta: Int) {
@@ -821,47 +779,62 @@ class Zui {
 	static inline function DEFAULT_TEXT_OFFSET_X() { return t._DEFAULT_TEXT_OFFSET_X * SCALE; }
 	static inline function TAB_W() { return Std.int(t._TAB_W * SCALE); }
 	static inline function LINE_STRENGTH() { return t._LINE_STRENGTH * SCALE; }
+
+	public function resize(handle:Handle, w: Int, h: Int, khaWindowId = 0) {
+		handle.redraws = 2;
+		if (handle.texture != null) handle.texture.unload();
+		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
+	}
 }
 
-class WindowState { // Cached states
-	public var texture: kha.Image;
+typedef HandleOptions = {
+	?selected: Bool,
+	?position: Int,
+	?value: Float,
+	?text: String,
+	?color: kha.Color,
+	?layout: Layout
+}
+
+class Handle {
+	public var selected = false;
+	public var position = 0;
+	public var color = kha.Color.White;
+	public var value = 0.0;
+	public var text = "";
+	public var texture: kha.Image = null;
 	public var redraws = 2;
-	public var scrolling: Bool = false;
-	public var scrollOffset: Float = 0;
-	public var scrollEnabled: Bool = false;
-	public var layout: Layout;
-	public var lastMaxX: Float = 0;
-	public var lastMaxY: Float = 0;
-	public function new(layout: Layout, w: Int, h: Int, windowId: Int) {
-		this.layout = layout; 
-		resize(w, h, windowId);
+	public var scrolling = false;
+	public var scrollOffset = 0.0;
+	public var scrollEnabled = false;
+	public var layout: Layout = 0;
+	public var lastMaxX = 0.0;
+	public var lastMaxY = 0.0;
+	public var dragging = false;
+	public var dragEnabled = false;
+	public var dragX = 0;
+	public var dragY = 0;
+	var children: Array<Handle>;
+
+	public function new(ops: HandleOptions = null) {
+		if (ops != null) {
+			if (ops.selected != null) selected = ops.selected;
+			if (ops.position != null) position = ops.position;
+			if (ops.value != null) value = ops.value;
+			if (ops.text != null) text = ops.text;
+			if (ops.color != null) color = ops.color;
+			if (ops.layout != null) layout = ops.layout;
+		}
 	}
-	public function resize(w: Int, h: Int, windowId: Int) {
-		redraws = 2;
-		texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, windowId);
+
+	public function nest(i: Int, ops: HandleOptions = null): Handle {
+		if (children == null) children = [];
+		while (children.length <= i) children.push(new Handle(ops));
+		return children[i];
 	}
+
+	public static var global = new Handle();
 }
-class NodeState {
-	public var expanded: Bool;
-	public function new(expanded: Bool) { this.expanded = expanded; }
-}
-class CheckState {
-	public var selected: Bool = false;
-	public function new(selected: Bool) { this.selected = selected; }
-}
-class RadioState {
-	public var selected: Int = 0;
-	public function new(selected: Int) { this.selected = selected; }
-}
-class SliderState {
-	public var value: Float = 0;
-	public var scrolling: Bool = false;
-	public function new(value: Float) { this.value = value; }
-}
-// class ColorPickerState {
-// 	public var value: Int = 0;
-// 	public function new(value: Int) { this.value = value; }
-// }
 
 @:enum abstract Layout(Int) from Int {
 	var Vertical = 0;

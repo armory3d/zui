@@ -24,34 +24,32 @@ class Main {
 }
 
 private class ExampleWindow {
-    var z : zui.Zui;
+    var ui : zui.Zui;
 	var buttonText : String;
 
 	var counter = 0;
-	var nodeExpanded = false;
+	var panelExpanded = false;
 
     public function new( windowId : Int, buttonText : String ) {
-        this.z = new zui.Zui(kha.Assets.fonts.DroidSans, 24, 20, windowId);
+		this.ui = new zui.Zui({ font: kha.Assets.fonts.DroidSans, khaWindowId: windowId});
 		this.buttonText = buttonText;
 
 		kha.System.notifyOnRender(render, windowId);
     }
 
     function render( fb : kha.Framebuffer ) {
-        fb.g2.begin();
-            z.begin(fb.g2);
-				if (z.window(zui.Id.window(), 8, 8, 240, 240)) {
-					nodeExpanded = z.node(zui.Id.node(), nodeExpanded ? 'close me' : 'open me', 1, nodeExpanded);
+		ui.begin(fb.g2);
+			if (ui.window(zui.Id.handle(), 8, 8, 240, 240)) {
+				panelExpanded = ui.panel(zui.Id.handle(), panelExpanded ? 'close me' : 'open me', 1);
 
-					if (nodeExpanded) {
-						if (z.button(buttonText)) {
-							++counter;
-						}
-
-						z.text('you clicked ${counter} time(s)');
+				if (panelExpanded) {
+					if (ui.button(buttonText)) {
+						++counter;
 					}
+
+					ui.text('you clicked ${counter} time(s)');
 				}
-            z.end();
-        fb.g2.end();
+			}
+		ui.end();
     }
 }

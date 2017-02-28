@@ -2,28 +2,21 @@ package;
 import kha.Framebuffer;
 import kha.Assets;
 
-import zui.Zui;
-import zui.Ext;
-import zui.Id;
+import zui.*;
 
 class Elements {
 	var ui: Zui;
 	var initialized = false;
-	var itemLists:Array<Array<String>>;
+	var itemList:Array<String>;
 
 	public function new() {
 		Assets.loadEverything(loadingFinished);
-		itemLists = [
-			["Item 1", "Item 2", "Item 3"],
-			["Item 1", "Item 2", "Item 3"],
-			["Item 1", "Item 2", "Item 3"],
-			["Item 1", "Item 2", "Item 3"]
-		];
+		itemList = ["Item 1", "Item 2", "Item 3"];
 	}
 
 	function loadingFinished() {
 		initialized = true;
-		ui = new Zui(Assets.fonts.DroidSans);
+		ui = new Zui({font: Assets.fonts.DroidSans});
 	}
 
 	public function render(framebuffer: Framebuffer): Void {
@@ -37,64 +30,32 @@ class Elements {
 
 		ui.begin(g);
 		// window() returns true if redraw is needed - windows are cached into textures
-		if (ui.window(Id.window(), 0, 0, 250, 600)) {
-			if (ui.node(Id.node(), "Node", 0, true)) {
+		if (ui.window(Id.handle(), 10, 10, 240, 600, true)) {
+			if (ui.panel(Id.handle({selected: true}), "Panel")) {
 				ui.indent();
 				ui.text("Text");
-				ui.textInput(Id.textInput(), "Hello", "Input");
+				ui.textInput(Id.handle({text: "Hello"}), "Input");
 				ui.button("Button");
-				ui.check(Id.check(), "Check Box");
-				var id = Id.radio();
-				ui.radio(id, Id.pos(), "Radio 1");
-				ui.radio(id, Id.pos(), "Radio 2");
-				ui.radio(id, Id.pos(), "Radio 3");
-				if (ui.node(Id.node(), "Nested Node")) {
+				ui.check(Id.handle(), "Check Box");
+				var hradio = Id.handle();
+				ui.radio(hradio, 0, "Radio 1");
+				ui.radio(hradio, 1, "Radio 2");
+				ui.radio(hradio, 2, "Radio 3");
+				ui.inlineRadio(Id.handle(), ["High", "Medium", "Low"]);
+				if (ui.panel(Id.handle({selected: false}), "Nested Panel")) {
 					ui.indent();
 					ui.text("Row");
 					ui.row([2/5, 2/5, 1/5]);
 					ui.button("A");
 					ui.button("B");
-					ui.check(Id.check(), "C");
+					ui.check(Id.handle(), "C");
 					ui.text("Simple list");
-					Ext.list(ui, Id.list(), itemLists[0]);
+					Ext.list(ui, Id.handle(), itemList);
 					ui.unindent();
 				}
-				ui.separator();
-				if (ui.node(Id.node(), "Nested Node")) {
-					ui.indent();
-					ui.text("Row");
-					ui.row([2/5, 2/5, 1/5]);
-					ui.button("A");
-					ui.button("B");
-					ui.check(Id.check(), "C");
-					ui.text("Simple list");
-					Ext.list(ui, Id.list(), itemLists[1]);
-					ui.unindent();
-				}
-				ui.separator();
-				if (ui.node(Id.node(), "Nested Node")) {
-					ui.indent();
-					ui.text("Row");
-					ui.row([2/5, 2/5, 1/5]);
-					ui.button("A");
-					ui.button("B");
-					ui.check(Id.check(), "C");
-					ui.text("Simple list");
-					Ext.list(ui, Id.list(), itemLists[2]);
-					ui.unindent();
-				}
-				ui.separator();
-				if (ui.node(Id.node(), "Nested Node")) {
-					ui.indent();
-					ui.text("Row");
-					ui.row([2/5, 2/5, 1/5]);
-					ui.button("A");
-					ui.button("B");
-					ui.check(Id.check(), "C");
-					ui.text("Simple list");
-					Ext.list(ui, Id.list(), itemLists[3]);
-					ui.unindent();
-				}
+				ui.slider(Id.handle({value: 0.2}), "Slider", 0, 1);
+				ui.slider(Id.handle({value: 0.4}), "Slider 2", 0, 1.2, true);
+				Ext.colorPicker(ui, Id.handle());
 				ui.separator();
 				ui.unindent();
 			}

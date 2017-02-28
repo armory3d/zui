@@ -1,2 +1,0 @@
-# Elements
-- simple calculator
