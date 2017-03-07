@@ -80,7 +80,7 @@ Themes can be defined using TTheme typedef. Check zui.Themes class for example. 
 
 ## Snippets
 
-### Force redrawing zui window on demand
+**Force redrawing zui window on demand**
 ```hx
 function render(..) {
     // Get window handle
@@ -91,7 +91,7 @@ function render(..) {
 }
 ```
 
-### Using render targets - prevent nested begin/end calls
+**Using render targets - prevent nested begin/end calls**
 ```hx
 g2.begin();
 ..
