@@ -78,6 +78,38 @@ Check out examples/ folder. To run specific example, simply drop it's folder int
 ## Theming
 Themes can be defined using TTheme typedef. Check zui.Themes class for example. Set ZuiOptions.theme when creating new Zui instance to overwrite default theme.
 
+## Snippets
+
+### Force redrawing zui window on demand
+```hx
+function render(..) {
+    // Get window handle
+    var hwin = Id.handle();
+    // Force redraw - set each frame or whenever desired
+    hwin.redraws = 1;
+    if (ui.window(hwin, x, y, w, h)) { ... }
+}
+```
+
+### Using render targets - prevent nested begin/end calls
+```hx
+g2.begin();
+..
+g2.end();
+
+renderTarget.g2.begin();
+..
+renderTarget.g2.end();
+
+zui.begin(); // Zui also draws to texture..
+..
+zui.end();
+
+g2.begin();
+..
+g2.end();
+```
+
 ## Custom integration
 Thanks to the powerful render target system of Kha, it is possible to easily integrate the library into any scenario. Set ZuiOptions.autoNotifyInput to false when creating a new Zui instance. You can then manually process the input and render the resulting texture in any way you may need.
 ``` hx
