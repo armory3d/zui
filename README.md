@@ -2,17 +2,6 @@
 
 Immediate-mode graphical user interface designed for tools and game debug. The library is built with Haxe and Kha to reach ultra portability. Inspired by [imgui](https://github.com/ocornut/imgui).
 
-## Update notice
-The library went through a slight makeover which brings a few breaking changes.
-If you wish, revert to [older build](https://github.com/armory3d/zui/releases/tag/17.02).
-
-Changes:
-- Create Zui instance using ZuiOptions:
-`var ui = new Zui({ font: myFont, theme: myTheme, ... });`
-- Replace `Id.*()` calls with the new unified `Id.handle()` for all elements
-- Replace `ui.node()` with `ui.panel()`
-- Pass initial element state in a handle: `ui.check(Id.handle({ selected: true }), "Check Box")`
-
 ![](img/zui.jpg)
 
 ## Getting started

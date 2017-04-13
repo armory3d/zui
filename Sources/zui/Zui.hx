@@ -13,6 +13,7 @@ typedef ZuiOptions = {
 	?autoNotifyInput: Bool
 }
 
+@:allow(zui.Nodes)
 class Zui {
 	static var t:zui.Themes.TTheme;
 	static var SCALE: Float;
@@ -524,7 +525,7 @@ class Zui {
 		endElement();
 		return handle.value;
 	}
-	
+
 	public function separator() {
 		g.color = t.SEPARATOR_COL;
 		g.fillRect(_x, _y, _w - DEFAULT_TEXT_OFFSET_X(), LINE_STRENGTH());
