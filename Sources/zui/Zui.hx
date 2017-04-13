@@ -14,14 +14,14 @@ typedef ZuiOptions = {
 }
 
 @:allow(zui.Nodes)
+@:allow(zui.Canvas)
 class Zui {
-	static var t:zui.Themes.TTheme;
-	static var SCALE: Float;
+	var t:zui.Themes.TTheme;
+	var SCALE: Float;
 
 	public static var isScrolling = false; // Use to limit other activities
 	public static var isTyping = false;
 
-	static var firstInstance = true;
 	static var elementsBaked = false;
 
 	var inputX: Float; // Input position
@@ -40,7 +40,6 @@ class Zui {
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
-	var cursorPixelX = 0.0;
 
 	var ratios: Array<Float>; // Splitting rows
 	var curRatio = -1;
@@ -98,11 +97,10 @@ class Zui {
 		this.ops = ops;
 		setScaleFactor(ops.scaleFactor);
 
-		if (ops.autoNotifyInput && firstInstance) {
+		if (ops.autoNotifyInput) {
 			kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
 		}
-		firstInstance = false;
 	}
 	
 	public function setScaleFactor(scaleFactor: Float) {
@@ -197,9 +195,14 @@ class Zui {
 
 		if (handle.redraws == 0 && !isScrolling && !isTyping) return false;
 
-		g.begin(true, 0x00000000);
-		g.color = t.WINDOW_BG_COL;
-		g.fillRect(_x, _y - handle.scrollOffset, handle.lastMaxX, handle.lastMaxY);
+		if (t.FILL_WINDOW_BG) {
+			g.begin(true, t.WINDOW_BG_COL);
+		}
+		else {
+			g.begin(true, 0x00000000);
+			g.color = t.WINDOW_BG_COL;
+			g.fillRect(_x, _y - handle.scrollOffset, handle.lastMaxX, handle.lastMaxY);
+		}
 
 		handle.dragEnabled = drag;
 		if (drag) {
@@ -272,7 +275,7 @@ class Zui {
 				g.color = t.SCROLL_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = t.SCROLL_COL; // Bar
-				g.fillRect(_windowW - SCROLL_BAR_W() - scrollAlign, barY, SCROLL_BAR_W(), barH);
+				g.drawRect(_windowW - SCROLL_BAR_W() - scrollAlign, barY, SCROLL_BAR_W(), barH);
 			}
 
 			handle.lastMaxX = _x;
@@ -324,8 +327,7 @@ class Zui {
 		var h = image.height * ratio;
 		g.color = t.WINDOW_TINT_COL;
 		g.drawScaledImage(image, _x + buttonOffsetY, _y, w, h);
-		_y += h;
-		endElement(false);
+		endElement(h);
 	}
 
 	public function text(text: String, align:Align = Left, bg = 0x00000000) {
@@ -339,7 +341,7 @@ class Zui {
 		endElement();
 	}
 
-	public function textInput(handle: Handle, label = ""): String {
+	public function textInput(handle: Handle, label = "", align:Align = Left): String {
 		if (submitTextHandle == handle) { // Submit edited text
 			handle.text = textToSubmit;
 			textToSubmit = "";
@@ -359,7 +361,6 @@ class Zui {
 			textSelectedCurrentText = handle.text;
 			cursorX = handle.text.length;
 			cursorY = 0;
-			updateCursorPixelX(handle.text, ops.font, fontSmallSize);
 
 			if (kha.input.Keyboard.get() != null) {
 				kha.input.Keyboard.get().show();
@@ -372,20 +373,17 @@ class Zui {
 				if (key == kha.Key.LEFT) { // Move cursor
 					if (cursorX > 0) {
 						cursorX--;
-						updateCursorPixelX(text, ops.font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.RIGHT) {
 					if (cursorX < text.length) {
 						cursorX++;
-						updateCursorPixelX(text, ops.font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.BACKSPACE) { // Remove char
 					if (cursorX > 0) {
 						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
 						cursorX--;
-						updateCursorPixelX(text, ops.font, fontSmallSize);
 					}
 				}
 				else if (key == kha.Key.ENTER) { // Deselect
@@ -394,7 +392,6 @@ class Zui {
 				else if (key == kha.Key.CHAR) {
 					text = text.substr(0, cursorX) + char + text.substr(cursorX);
 					cursorX++;
-					updateCursorPixelX(text, ops.font, fontSmallSize);
 				}
 			}
 
@@ -404,7 +401,11 @@ class Zui {
 				g.color = t.TEXT_CURSOR_COL; // Cursor
 				var cursorHeight = ELEMENT_H() - buttonOffsetY * 3.0;
 				var lineHeight = ELEMENT_H();
-				g.fillRect(_x + cursorPixelX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
+				var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
+				var strw = g.font.width(g.fontSize, str);
+				var off = DEFAULT_TEXT_OFFSET_X();
+				var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
+				g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 			}
 			
 			textSelectedCurrentText = text;
@@ -412,11 +413,13 @@ class Zui {
 
 		if (label != "") {
 			g.color = t.DEFAULT_LABEL_COL; // Label
-			drawStringSmall(g, label, 0, 0, Right);
+			var labelAlign = align == Right ? Left : Right;
+			var xOffset = labelAlign == Left ? 7 : 0;
+			drawStringSmall(g, label, xOffset, 0, labelAlign);
 		}
 
 		g.color = t.TEXT_COL; // Text
-		textSelectedHandle != handle ? drawStringSmall(g, handle.text) : drawStringSmall(g, textSelectedCurrentText);
+		textSelectedHandle != handle ? drawStringSmall(g, handle.text, null, 0, align) : drawStringSmall(g, textSelectedCurrentText, null, 0, align);
 
 		endElement();
 
@@ -428,7 +431,7 @@ class Zui {
 		textToSubmit = textSelectedCurrentText;
 		textSelectedHandle = null;
 		isTyping = false;
-		currentWindow.redraws = 2;
+		if (currentWindow != null) currentWindow.redraws = 2;
 
 		if (kha.input.Keyboard.get() != null) {
 			kha.input.Keyboard.get().hide();
@@ -633,10 +636,12 @@ class Zui {
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
-	function endElement(nextLine = true) {
+	function endElement(elementSize:Null<Float> = null) {
+		if (currentWindow == null) return;
 		if (currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
-				if (nextLine) _y += ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
+				if (elementSize == null) elementSize = ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
+				_y += elementSize;
 
 				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
 					curRatio = -1;
@@ -707,11 +712,6 @@ class Zui {
 			inputY >= y && inputY < y + h;
 	}
 
-	function updateCursorPixelX(text: String, font: kha.Font, fontSize: Int) { // Set cursor to current char
-		var str = text.substr(0, cursorX);
-		cursorPixelX = ops.font.width(fontSize, str) + DEFAULT_TEXT_OFFSET_X();
-	}
-
     public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
     	inputStarted = true;
     	inputDown = true;
@@ -761,25 +761,25 @@ class Zui {
     function onKeyUp(key: kha.Key, char: String) {
     }
 	
-	static inline function ELEMENT_W() { return t._ELEMENT_W * SCALE; }
-	static inline function ELEMENT_H() { return t._ELEMENT_H * SCALE; }
-	static inline function ELEMENT_SEPARATOR_SIZE() { return t._ELEMENT_SEPARATOR_SIZE * SCALE; }
-	static inline function ARROW_W() { return t._ARROW_W * SCALE; }
-	static inline function ARROW_H() { return t._ARROW_H * SCALE; }
-	static inline function BUTTON_H() { return t._BUTTON_H * SCALE; }
-	static inline function CHECK_W() { return t._CHECK_W * SCALE; }
-	static inline function CHECK_H() { return t._CHECK_H * SCALE; }
-	static inline function CHECK_SELECT_W() { return t._CHECK_SELECT_W * SCALE; }
-	static inline function CHECK_SELECT_H() { return t._CHECK_SELECT_H * SCALE; }
-	static inline function RADIO_W() { return t._RADIO_W * SCALE; }
-	static inline function RADIO_H() { return t._RADIO_H * SCALE; }
-	static inline function RADIO_SELECT_W() { return t._RADIO_SELECT_W * SCALE; }
-	static inline function RADIO_SELECT_H() { return t._RADIO_SELECT_H * SCALE; }
-	static inline function SCROLL_W() { return Std.int(t._SCROLL_W * SCALE); }
-	static inline function SCROLL_BAR_W() { return t._SCROLL_BAR_W * SCALE; }
-	static inline function DEFAULT_TEXT_OFFSET_X() { return t._DEFAULT_TEXT_OFFSET_X * SCALE; }
-	static inline function TAB_W() { return Std.int(t._TAB_W * SCALE); }
-	static inline function LINE_STRENGTH() { return t._LINE_STRENGTH * SCALE; }
+	inline function ELEMENT_W() { return t._ELEMENT_W * SCALE; }
+	inline function ELEMENT_H() { return t._ELEMENT_H * SCALE; }
+	inline function ELEMENT_SEPARATOR_SIZE() { return t._ELEMENT_SEPARATOR_SIZE * SCALE; }
+	inline function ARROW_W() { return t._ARROW_W * SCALE; }
+	inline function ARROW_H() { return t._ARROW_H * SCALE; }
+	inline function BUTTON_H() { return t._BUTTON_H * SCALE; }
+	inline function CHECK_W() { return t._CHECK_W * SCALE; }
+	inline function CHECK_H() { return t._CHECK_H * SCALE; }
+	inline function CHECK_SELECT_W() { return t._CHECK_SELECT_W * SCALE; }
+	inline function CHECK_SELECT_H() { return t._CHECK_SELECT_H * SCALE; }
+	inline function RADIO_W() { return t._RADIO_W * SCALE; }
+	inline function RADIO_H() { return t._RADIO_H * SCALE; }
+	inline function RADIO_SELECT_W() { return t._RADIO_SELECT_W * SCALE; }
+	inline function RADIO_SELECT_H() { return t._RADIO_SELECT_H * SCALE; }
+	inline function SCROLL_W() { return Std.int(t._SCROLL_W * SCALE); }
+	inline function SCROLL_BAR_W() { return t._SCROLL_BAR_W * SCALE; }
+	inline function DEFAULT_TEXT_OFFSET_X() { return t._DEFAULT_TEXT_OFFSET_X * SCALE; }
+	inline function TAB_W() { return Std.int(t._TAB_W * SCALE); }
+	inline function LINE_STRENGTH() { return t._LINE_STRENGTH * SCALE; }
 
 	public function resize(handle:Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;
