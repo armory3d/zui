@@ -60,6 +60,23 @@ class Elements {
 				ui.unindent();
 			}
 		}
+
+		if (ui.window(Id.handle(), 400, 10, 240, 200, true)) {
+			if (ui.panel(Id.handle({selected: true}), "Panel")) {
+				ui.indent();
+				ui.button("A");
+				ui.button("B");
+				ui.button("C");
+				ui.button("D");
+				ui.button("E");
+				ui.button("F");
+				ui.button("G");
+				ui.button("H");
+				ui.button("I");
+				ui.button("J");
+			}
+		}
+
 		ui.end();	
 
 		// Draw more of your stuff...
