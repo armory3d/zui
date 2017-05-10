@@ -19,8 +19,8 @@ class Zui {
 	var t:zui.Themes.TTheme;
 	var SCALE: Float;
 
-	public static var isScrolling = false; // Use to limit other activities
-	public static var isTyping = false;
+	public var isScrolling = false; // Use to limit other activities
+	public var isTyping = false;
 
 	static var elementsBaked = false;
 
@@ -47,7 +47,7 @@ class Zui {
 	var wBeforeSplit: Int;
 
 	var globalG: kha.graphics2.Graphics; // Drawing
-	var g: kha.graphics2.Graphics;
+	public var g: kha.graphics2.Graphics;
 
 	var ops: ZuiOptions;
 	var fontSize: Int;
@@ -81,6 +81,7 @@ class Zui {
 	var currentWindow: Handle;
 	var windowEnded = true;
 	var scrollingHandle: Handle = null; // Window or slider being scrolled
+	public var scrollEnabled = true;
 
 	var textSelectedHandle: Handle = null;
 	var textSelectedCurrentText: String;
@@ -134,8 +135,8 @@ class Zui {
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = t.CHECK_SELECT_COL;
-		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), LINE_STRENGTH());
-		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), LINE_STRENGTH());
+		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), 2);//LINE_STRENGTH());
+		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), 2);//LINE_STRENGTH());
 		g.end();
 	}
 
@@ -164,6 +165,21 @@ class Zui {
 		inputDX = 0;
 		inputDY = 0;
 		inputWheelDelta = 0;
+	}
+
+	public function beginLayout(g: kha.graphics2.Graphics, x: Int, y: Int, w: Int) {
+		this.g = g;
+		SCALE = 1.0;
+		_windowX = 0;
+		_windowY = 0;
+		_windowW = w;
+		_x = x;
+		_y = y;
+		_w = w;
+	}
+
+	public function endLayout() {
+
 	}
 
 	// Returns true if redraw is needed
@@ -223,7 +239,7 @@ class Zui {
 		return true;
 	}
 
-	function endWindow() {
+	public function endWindow() {
 		var handle = currentWindow;
 		if (handle.redraws > 0 || isScrolling || isTyping) {
 
@@ -233,7 +249,7 @@ class Zui {
 			}
 
 			var fullHeight = _y - handle.scrollOffset;
-			if (fullHeight < _windowH || handle.layout == Horizontal) { // Disable scrollbar
+			if (fullHeight < _windowH || handle.layout == Horizontal || !scrollEnabled) { // Disable scrollbar
 				handle.scrollEnabled = false;
 				handle.scrollOffset = 0;
 			}
@@ -785,6 +801,7 @@ class Zui {
 		handle.redraws = 2;
 		if (handle.texture != null) handle.texture.unload();
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
+		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 	}
 }
 
