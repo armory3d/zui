@@ -318,6 +318,7 @@ class Zui {
 	}
 
 	public function panel(handle: Handle, text: String, accent = 0): Bool {
+		if (!isVisible()) { endElement(); return handle.selected; }
 		if (getReleased()) handle.selected = !handle.selected;
 		var hover = getHover();
 
@@ -341,12 +342,14 @@ class Zui {
 		var w = _w - buttonOffsetY * 2;
 		var ratio = w / image.width;
 		var h = image.height * ratio;
+		if (!isVisible()) { endElement(h); return; }
 		g.color = t.WINDOW_TINT_COL;
 		g.drawScaledImage(image, _x + buttonOffsetY, _y, w, h);
 		endElement(h);
 	}
 
 	public function text(text: String, align:Align = Left, bg = 0x00000000) {
+		if (!isVisible()) { endElement(); return; }
 		if (bg != 0x0000000) {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
@@ -358,6 +361,7 @@ class Zui {
 	}
 
 	public function textInput(handle: Handle, label = "", align:Align = Left): String {
+		if (!isVisible()) { endElement(); return handle.text; }
 		if (submitTextHandle == handle) { // Submit edited text
 			handle.text = textToSubmit;
 			textToSubmit = "";
@@ -455,6 +459,7 @@ class Zui {
 	}
 
 	public function button(text: String): Bool {
+		if (!isVisible()) { endElement(); return false; }
 		var wasPressed = getReleased();
 		var pushed = getPushed();
 		var hover = getHover();
@@ -474,6 +479,7 @@ class Zui {
 	}
 
 	public function check(handle: Handle, text: String): Bool {
+		if (!isVisible()) { endElement(); return handle.selected; }
 		if (getReleased()) handle.selected = !handle.selected;
 
 		var hover = getHover();
@@ -488,6 +494,7 @@ class Zui {
 	}
 
 	public function radio(handle: Handle, position: Int, text: String): Bool {
+		if (!isVisible()) { endElement(); return handle.position == position; }
 		if (getReleased()) handle.position = position;
 
 		var hover = getHover();
@@ -502,6 +509,7 @@ class Zui {
 	}
 
 	public function inlineRadio(handle: Handle, texts: Array<String>): Int {
+		if (!isVisible()) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (++handle.position >= texts.length) handle.position = 0;
 		}
@@ -514,6 +522,7 @@ class Zui {
 	}
 
 	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true): Float {
+		if (!isVisible()) { endElement(); return handle.value; }
 		if (getStarted()) {
 			handle.scrolling = true;
 			scrollingHandle = handle;
@@ -546,6 +555,7 @@ class Zui {
 	}
 
 	public function separator() {
+		if (!isVisible()) { _y += 2; return; }
 		g.color = t.SEPARATOR_COL;
 		g.fillRect(_x, _y, _w - DEFAULT_TEXT_OFFSET_X(), LINE_STRENGTH());
 		_y += 2;
@@ -696,6 +706,12 @@ class Zui {
 	
 	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 1.0) {
 		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, LINE_STRENGTH());
+	}
+
+	function isVisible():Bool {
+		if (currentWindow == null) return true;
+		// Assume vertical layout for now
+		return (_y + ELEMENT_H() > 0 && _y < currentWindow.texture.height);
 	}
 
 	function getReleased(): Bool { // Input selection
