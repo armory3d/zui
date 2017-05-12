@@ -34,6 +34,7 @@ class Zui {
 	var inputStarted: Bool; // Buttons
 	var inputReleased: Bool;
 	var inputDown: Bool;
+	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
 	var key: kha.Key;
 	var char: String;
@@ -168,6 +169,7 @@ class Zui {
 	}
 
 	public function beginLayout(g: kha.graphics2.Graphics, x: Int, y: Int, w: Int) {
+		currentWindow = null;
 		this.g = g;
 		SCALE = 1.0;
 		_windowX = 0;
@@ -663,7 +665,7 @@ class Zui {
 	}
 
 	function endElement(elementSize:Null<Float> = null) {
-		if (currentWindow == null) return;
+		if (currentWindow == null) { _y += ELEMENT_H() + ELEMENT_SEPARATOR_SIZE(); return; }
 		if (currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
 				if (elementSize == null) elementSize = ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
@@ -738,15 +740,15 @@ class Zui {
         	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
 	}
 
-	function getInputInRect(x: Float, y: Float, w: Float, h: Float): Bool {
+	function getInputInRect(x: Float, y: Float, w: Float, h: Float, scale = 1.0): Bool {
 		return
-			inputX >= x && inputX < x + w &&
-			inputY >= y && inputY < y + h;
+			inputX >= x * scale && inputX < (x + w) * scale &&
+			inputY >= y * scale && inputY < (y + h) * scale;
 	}
 
     public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
     	inputStarted = true;
-    	inputDown = true;
+    	button == 0 ? inputDown = true : inputDownR = true;
     	setInitialInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
     }
 
@@ -758,7 +760,7 @@ class Zui {
     	else { // To prevent action when scrolling is active
     		inputReleased = true;
     	}
-    	inputDown = false;
+    	button == 0 ? inputDown = false : inputDownR = false;
     	setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
     	deselectText();
     }
@@ -863,7 +865,8 @@ class Handle {
 
 	public function nest(i: Int, ops: HandleOptions = null): Handle {
 		if (children == null) children = [];
-		while (children.length <= i) children.push(new Handle(ops));
+		while (children.length <= i) children.push(null);
+		if (children[i] == null) children[i] = new Handle(ops);
 		return children[i];
 	}
 

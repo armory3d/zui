@@ -10,8 +10,27 @@ class Nodes {
 	var snapSocket = 0;
 	var snapX = 0.0;
 	var snapY = 0.0;
+	var panX = 0.0;
+	var panY = 0.0;
+	var SCALE = 1.0;
+	var handle = new Zui.Handle();
 
 	public function new() {}
+
+	inline function NODE_W() { return 140; }
+	function NODE_H(node:TNode):Int {
+		var buttonsH = 0;
+		for (but in node.buttons) {
+			if (but.type == 'RGBA') buttonsH += 80;
+			else buttonsH += 20;
+		}
+		return 40 + node.inputs.length * 20 + node.outputs.length * 20 + buttonsH;
+	}
+	inline function NODE_X(node:TNode) { return node.x + panX; }
+	inline function NODE_Y(node:TNode) { return node.y + panY; }
+
+	inline function p(f:Float):Int { return Std.int(f * SCALE); }
+	inline function SOCKET_Y(pos:Int):Int { return 40 + pos * 20; }
 
 	function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -39,17 +58,21 @@ class Nodes {
 		return id;
 	}
 
-	var nodew = 140;
 	public function nodeCanvas(ui: Zui, canvas: TNodeCanvas) {
+		SCALE = ui.ops.scaleFactor;
 		var wx = ui._windowX;
 		var wy = ui._windowY;
+
+		// Pan cavas
+		if (ui.inputDownR) { panX += ui.inputDX; panY += ui.inputDY; }
+
 		for (link in canvas.links) {
 			var from = getNode(canvas.nodes, link.from_id);
 			var to = getNode(canvas.nodes, link.to_id);
-			var fromX = from == null ? ui.inputX : wx + from.x + nodew;
-			var fromY = from == null ? ui.inputY : wy + from.y + nodeSocketY(link.from_socket);
-			var toX = to == null ? ui.inputX : wx + to.x;
-			var toY = to == null ? ui.inputY : wy + to.y + nodeSocketY(link.to_socket + to.outputs.length);
+			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W();
+			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + SOCKET_Y(link.from_socket);
+			var toX = to == null ? ui.inputX : wx + NODE_X(to);
+			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length);
 
 			// Snap to nearest socket
 			if (linkDrag == link) {
@@ -60,13 +83,13 @@ class Nodes {
 				for (node in canvas.nodes) {
 					var inps = node.inputs;
 					var outs = node.outputs;
-					var nodeh = nodeHeight(node);
-					if (ui.getInputInRect(wx + node.x - 10, wy + node.y - 10, nodew + 20, nodeh + 20)) {
+					var nodeh = NODE_H(node);
+					if (ui.getInputInRect(wx + NODE_X(node) - 10, wy + NODE_Y(node) - 10, NODE_W() + 20, nodeh + 20)) {
 						// Snap to output
 						if (from == null && node.id != to.id) {
 							for (i in 0...outs.length) {
-								var sx = wx + node.x + nodew;
-								var sy = wy + node.y + nodeSocketY(i);
+								var sx = wx + NODE_X(node) + NODE_W();
+								var sy = wy + NODE_Y(node) + SOCKET_Y(i);
 								if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
 									snapX = sx;
 									snapY = sy;
@@ -79,8 +102,8 @@ class Nodes {
 						// Snap to input
 						else if (to == null && node.id != from.id) {
 							for (i in 0...inps.length) {
-								var sx = wx + node.x ;
-								var sy = wy + node.y + nodeSocketY(i + outs.length);
+								var sx = wx + NODE_X(node) ;
+								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
 								if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
 									snapX = sx;
 									snapY = sy;
@@ -100,17 +123,17 @@ class Nodes {
 			var inps = node.inputs;
 			var outs = node.outputs;
 
-			// Drag
-			var nodeh = nodeHeight(node);
-			if (ui.inputStarted && ui.getInputInRect(wx + node.x - 10, wy + node.y, nodew + 20, 20)) {
+			// Drag node
+			var nodeh = NODE_H(node);
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - 10, wy + NODE_Y(node), NODE_W() + 20, 20)) {
 				nodeDrag = node;
 				nodeSelected = nodeDrag;
 			}
-			if (ui.inputStarted && ui.getInputInRect(wx + node.x - 10, wy + node.y - 10, nodew + 20, nodeh + 20)) {
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - 10, wy + NODE_Y(node) - 10, NODE_W() + 20, nodeh + 20)) {
 				// Check sockets
 				for (i in 0...outs.length) {
-					var sx = wx + node.x + nodew;
-					var sy = wy + node.y + nodeSocketY(i);
+					var sx = wx + NODE_X(node) + NODE_W();
+					var sy = wy + NODE_Y(node) + SOCKET_Y(i);
 					if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
 						// New link from output
 						var l = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
@@ -121,8 +144,8 @@ class Nodes {
 				}
 				if (linkDrag == null) {
 					for (i in 0...inps.length) {
-						var sx = wx + node.x;
-						var sy = wy + node.y + nodeSocketY(i + outs.length);
+						var sx = wx + NODE_X(node);
+						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
 						if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
@@ -178,29 +201,16 @@ class Nodes {
 		}
 	}
 
-	function nodeHeight(node:TNode):Int {
-		var buttonsH = 0;
-		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 80;
-			else buttonsH += 20;
-		}
-		return 40 + node.inputs.length * 20 + node.outputs.length * 20 + buttonsH;
-	}
-
-	function nodeSocketY(pos:Int):Int {
-		return 40 + pos * 20;
-	}
-
-	var handle = new Zui.Handle();
 	public function drawNode(ui: Zui, node: TNode) {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
-		var w = nodew;
+		var w = p(NODE_W());
 		var g = ui.g;
-		var h = nodeHeight(node);
-		var nx = node.x;
-		var ny = node.y;
+		var h = p(NODE_H(node));
+		var nx = p(NODE_X(node));
+		var ny = p(NODE_Y(node));
 		var text = node.name;
+		var lineh = p(20);
 
 		// Outline
 		g.color = node == nodeSelected ? 0xffaaaaaa : 0xff202020;
@@ -208,7 +218,7 @@ class Nodes {
 
 		// Header
 		g.color = node.color;
-		g.fillRect(nx, ny, w, 20);
+		g.fillRect(nx, ny, w, lineh);
 
 		// Title
 		g.color = 0xffe7e7e7;
@@ -218,13 +228,13 @@ class Nodes {
 		g.drawString(text, nx + w / 2 - textw / 2, ny + 3);
 
 		// Body
-		ny += 20;
+		ny += lineh;
 		g.color = 0xff303030;
-		g.fillRect(nx, ny, w, h - 20);
+		g.fillRect(nx, ny, w, h - lineh);
 
 		// Outputs
 		for (out in node.outputs) {
-			ny += 20;
+			ny += lineh;
 			g.color = out.color;
 			kha.graphics2.GraphicsExtension.fillCircle(g, nx + w, ny, 5);
 			var strw = ui.ops.font.width(ui.fontSize, out.name);
@@ -239,23 +249,23 @@ class Nodes {
 			if (but.type == 'RGBA') {
 				var val = node.outputs[but.output].default_value;
 
-				ny += 20; // 18 + 2 separator
+				ny += lineh; // 18 + 2 separator
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
 				val[0] = ui.slider(nhandle.nest(0, {value: val[0]}), "R", 0.0, 1.0, true);
 
-				ny += 20;
+				ny += lineh;
 				val[1] = ui.slider(nhandle.nest(1, {value: val[1]}), "G", 0.0, 1.0, true);
 			
-				ny += 20;
+				ny += lineh;
 				val[2] = ui.slider(nhandle.nest(2, {value: val[2]}), "B", 0.0, 1.0, true);
 
-				ny += 20;
+				ny += lineh;
 				ui.text("", Right, kha.Color.fromFloats(val[0], val[1], val[2], val[3]));
 			}
 			else if (but.type == 'VALUE') {
-				ny += 20;
+				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
@@ -263,7 +273,7 @@ class Nodes {
 				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", 0.0, 1.0, true);
 			}
 			else if (but.type == 'STRING') {
-				ny += 20;
+				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
@@ -276,7 +286,7 @@ class Nodes {
 
 		// Inputs
 		for (inp in node.inputs) {
-			ny += 20;
+			ny += lineh;
 			g.color = inp.color;
 			kha.graphics2.GraphicsExtension.fillCircle(g, nx, ny, 5);
 			g.color = 0xffe7e7e7;
@@ -289,7 +299,7 @@ class Nodes {
 		var curve = Math.min(Math.abs(y2 - y1) / 6.0, 40.0);
 		g.color = 0xffadadad;
 		// kha.graphics2.GraphicsExtension.drawCubicBezier(g, [x1, x1 + curve, x2 - curve, x2], [y1, y1 + curve, y2 - curve, y2], 20, 2.0);
-		g.drawLine(x1, y1, x2, y2, 2.0);
+		g.drawLine(p(x1), p(y1), p(x2), p(y2), 2.0);
 	}
 }
 
