@@ -304,42 +304,42 @@ class Nodes {
 }
 
 typedef TNodeCanvas = {
-	public var nodes: Array<TNode>;
-	public var links: Array<TNodeLink>;
+	var nodes: Array<TNode>;
+	var links: Array<TNodeLink>;
 }
 
 typedef TNode = {
-	public var id: Int;
-	public var name: String;
-	public var type: String;
-	public var x: Float;
-	public var y: Float;
-	public var inputs: Array<TNodeSocket>;
-	public var outputs: Array<TNodeSocket>;
-	public var buttons: Array<TNodeButton>;
-	public var color: Int;
+	var id: Int;
+	var name: String;
+	var type: String;
+	var x: Float;
+	var y: Float;
+	var inputs: Array<TNodeSocket>;
+	var outputs: Array<TNodeSocket>;
+	var buttons: Array<TNodeButton>;
+	var color: Int;
 }
 
 typedef TNodeSocket = {
-	public var id: Int;
-	public var node_id: Int;
-	public var name: String;
-	public var type: String;
-	public var default_value: Dynamic;
-	public var color: Int;
+	var id: Int;
+	var node_id: Int;
+	var name: String;
+	var type: String;
+	var default_value: Dynamic;
+	var color: Int;
 }
 
 typedef TNodeLink = {
-	public var id: Int;
-	public var from_id: Int;
-	public var from_socket: Int;
-	public var to_id: Int;
-	public var to_socket: Int;
+	var id: Int;
+	var from_id: Int;
+	var from_socket: Int;
+	var to_id: Int;
+	var to_socket: Int;
 }
 
 typedef TNodeButton = {
-	public var name: String;
-	public var type: String;
-	public var output: Int;
-	@:optional public var default_value: Dynamic;
+	var name: String;
+	var type: String;
+	var output: Int;
+	@:optional var default_value: Dynamic;
 }

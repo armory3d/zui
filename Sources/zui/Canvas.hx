@@ -41,36 +41,36 @@ class Canvas {
 }
 
 typedef TCanvas = {
-	public var name: String;
-	public var x: Float;
-	public var y: Float;
-	public var width: Int;
-	public var height: Int;
-	public var elements: Array<TElement>;
-	@:optional public var assets: Array<TAsset>;
+	var name: String;
+	var x: Float;
+	var y: Float;
+	var width: Int;
+	var height: Int;
+	var elements: Array<TElement>;
+	@:optional var assets: Array<TAsset>;
 }
 
 typedef TElement = {
-	public var id: Int;
-	public var type: ElementType;
-	public var name: String;
-	public var event: String;
-	public var x: Float;
-	public var y: Float;
-	public var width: Int;
-	public var height: Int;
-	public var text: String;
-	public var asset: String;
-	public var color: Int;
-	public var anchor: Int;
-	public var children: Array<TElement>;
-	@:optional public var image: kha.Image;
+	var id: Int;
+	var type: ElementType;
+	var name: String;
+	var event: String;
+	var x: Float;
+	var y: Float;
+	var width: Int;
+	var height: Int;
+	var text: String;
+	var asset: String;
+	var color: Int;
+	var anchor: Int;
+	var children: Array<TElement>;
+	@:optional var image: kha.Image;
 }
 
 typedef TAsset = {
-	public var name:String;
-	public var file:String;
-	public var image:kha.Image;
+	var name:String;
+	var file:String;
+	var image:kha.Image;
 }
 
 @:enum abstract ElementType(Int) from Int {
