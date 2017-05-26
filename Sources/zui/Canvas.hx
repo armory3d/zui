@@ -2,7 +2,10 @@ package zui;
 
 class Canvas {
 
-	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics) {
+	static var events:Array<String> = [];
+
+	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics):Array<String> {
+		events = [];
 
 		ui.begin(g);
 		ui.g = g;
@@ -10,6 +13,7 @@ class Canvas {
 		for (elem in canvas.elements) drawElement(ui, canvas, elem);
 
 		ui.end();
+		return events;
 	}
 
 	static function getAsset(canvas: TCanvas, asset:String): kha.Image {
@@ -30,7 +34,9 @@ class Canvas {
 			ui.text(element.text);
 			ui.fontSmallSize = size;
 		case Button:
-			ui.button(element.text);
+			if (ui.button(element.text)) {
+				events.push(element.event);
+			}
 		case Image:
 			if (element.image == null) element.image = getAsset(canvas, element.asset);
 			if (element.image != null) ui.image(element.image);
