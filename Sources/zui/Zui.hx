@@ -144,7 +144,7 @@ class Zui {
 	public function remove() { // Clean up
 		if (ops.autoNotifyInput) {
 			kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-			kha.input.Keyboard.get().remove(onKeyDown, onKeyUp);
+			kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, null);
 		}
 	}
 
