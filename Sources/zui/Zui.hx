@@ -36,7 +36,7 @@ class Zui {
 	var inputDown: Bool;
 	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
-	var key: kha.Key;
+	var key: Int;
 	var char: String;
 
 	var cursorX = 0; // Text input
@@ -101,7 +101,7 @@ class Zui {
 
 		if (ops.autoNotifyInput) {
 			kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp);
+			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
 		}
 	}
 	
@@ -144,7 +144,7 @@ class Zui {
 	public function remove() { // Clean up
 		if (ops.autoNotifyInput) {
 			kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-			kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, null);
+			kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
 		}
 	}
 
@@ -392,26 +392,26 @@ class Zui {
 		if (textSelectedHandle == handle) { // Active
 			var text = textSelectedCurrentText;
 			if (isKeyDown) { // Process input
-				if (key == kha.Key.LEFT) { // Move cursor
+				if (key == kha.input.KeyCode.Left) { // Move cursor
 					if (cursorX > 0) {
 						cursorX--;
 					}
 				}
-				else if (key == kha.Key.RIGHT) {
+				else if (key == kha.input.KeyCode.Right) {
 					if (cursorX < text.length) {
 						cursorX++;
 					}
 				}
-				else if (key == kha.Key.BACKSPACE) { // Remove char
+				else if (key == kha.input.KeyCode.Backspace) { // Remove char
 					if (cursorX > 0) {
 						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
 						cursorX--;
 					}
 				}
-				else if (key == kha.Key.ENTER) { // Deselect
+				else if (key == kha.input.KeyCode.Return) { // Deselect
 					deselectText(); // One-line text for now
 				}
-				else if (key == kha.Key.CHAR) {
+				else if (char != "") {
 					text = text.substr(0, cursorX) + char + text.substr(cursorX);
 					cursorX++;
 				}
@@ -786,13 +786,18 @@ class Zui {
 		this.inputY = inputY;
 	}
 
-	function onKeyDown(key: kha.Key, char: String) {
+	function onKeyDown(code: Int) {
         isKeyDown = true;
-        this.key = key;
-        this.char = char;
+        this.key = code;
     }
 
-    function onKeyUp(key: kha.Key, char: String) {
+    function onKeyUp(code: Int) {
+    	
+    }
+
+    function onKeyPress(char: String) {
+    	isKeyDown = true;
+    	this.char = char;
     }
 	
 	inline function ELEMENT_W() { return t._ELEMENT_W * SCALE; }
