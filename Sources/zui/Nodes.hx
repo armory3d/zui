@@ -10,8 +10,8 @@ class Nodes {
 	var snapSocket = 0;
 	var snapX = 0.0;
 	var snapY = 0.0;
-	var panX = 0.0;
-	var panY = 0.0;
+	public var panX = 0.0;
+	public var panY = 0.0;
 	var SCALE = 1.0;
 	var handle = new Zui.Handle();
 
@@ -201,6 +201,10 @@ class Nodes {
 		}
 	}
 
+	// Global enum mapping for now..
+	public static var getEnumTexts:Void->Array<String> = null;
+	public static var mapEnum:String->String = null;
+	
 	public function drawNode(ui: Zui, node: TNode) {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
@@ -281,6 +285,16 @@ class Nodes {
 				var soc = node.outputs[but.output];
 				soc.default_value = but.default_value = ui.textInput(nhandle.nest(0, {text: soc.default_value}), "");
 				ny += 10; // Fix align?
+			}
+			else if (but.type == 'ENUM') {
+				ny += lineh;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				var soc = node.outputs[but.output];
+				var texts = getEnumTexts();
+				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, "Asset");
+				soc.default_value = mapEnum(texts[but.default_value]);
 			}
 		}
 

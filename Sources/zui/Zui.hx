@@ -24,6 +24,8 @@ class Zui {
 
 	static var elementsBaked = false;
 
+	public var inputRegistered = false;
+	public var inputEnabled = true;
 	var inputX: Float; // Input position
 	var inputY: Float;
 	var inputInitialX: Float;
@@ -88,6 +90,12 @@ class Zui {
 	var textSelectedCurrentText: String;
 	var submitTextHandle: Handle = null;
 	var textToSubmit = "";
+	var comboSelectedHandle: Handle = null;
+	var comboSelectedTexts: Array<String>;
+	var comboSelectedLabel: String;
+	var comboSelectedX: Int;
+	var comboSelectedY: Int;
+	var comboSelectedW: Int;
 
 	public function new(ops: ZuiOptions) {
 		if (ops.theme == null) ops.theme = Themes.dark;
@@ -99,10 +107,7 @@ class Zui {
 		this.ops = ops;
 		setScaleFactor(ops.scaleFactor);
 
-		if (ops.autoNotifyInput) {
-			kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-			kha.input.Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
-		}
+		if (ops.autoNotifyInput) registerInput();
 	}
 	
 	public function setScaleFactor(scaleFactor: Float) {
@@ -142,10 +147,21 @@ class Zui {
 	}
 
 	public function remove() { // Clean up
-		if (ops.autoNotifyInput) {
-			kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-			kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
-		}
+		if (ops.autoNotifyInput) unregisterInput();
+	}
+
+	public function registerInput() {
+		kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		kha.input.Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
+		inputRegistered = true;
+	}
+
+	public function unregisterInput() {
+		kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
+		endInput();
+		inputX = inputY = 0;
+		inputRegistered = false;
 	}
 
 	public function begin(g: kha.graphics2.Graphics) { // Begin UI drawing
@@ -160,6 +176,11 @@ class Zui {
 
 	public function end() { // End drawing
 		if (!windowEnded) endWindow();
+		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
+		endInput();
+	}
+
+	function endInput() {
 		isKeyDown = false; // Reset input - only one char for now
 		inputStarted = false;
 		inputReleased = false;
@@ -180,8 +201,8 @@ class Zui {
 		_w = w;
 	}
 
-	public function endLayout() {
-
+	public function endLayout(last = true) {
+		if (last) endInput();
 	}
 
 	// Returns true if redraw is needed
@@ -460,7 +481,7 @@ class Zui {
 		}
 	}
 
-	public function button(text: String): Bool {
+	public function button(text: String, align:Align = Center): Bool {
 		if (!isVisible()) { endElement(); return false; }
 		var wasPressed = getReleased();
 		var pushed = getPushed();
@@ -473,7 +494,7 @@ class Zui {
 		drawRect(g, t.FILL_BUTTON_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
 		g.color = t.BUTTON_TEXT_COL;
-		drawStringSmall(g, text, 0, 0, Center);
+		drawStringSmall(g, text, DEFAULT_TEXT_OFFSET_X(), 0, align);
 
 		endElement();
 
@@ -518,6 +539,44 @@ class Zui {
 
 		var hover = getHover();
 		drawInlineRadio(texts[handle.position], hover); // Radio
+
+		endElement();
+		return handle.position;
+	}
+
+	public function combo(handle: Handle, texts: Array<String>, label = ""): Int {
+		if (!isVisible()) { endElement(); return handle.position; }
+		if (getReleased()) {
+			if (comboSelectedHandle == null) {
+				inputEnabled = false;
+				comboSelectedHandle = handle;
+				comboSelectedTexts = texts;
+				comboSelectedLabel = label;
+				comboSelectedX = Std.int(_x + _windowX);
+				comboSelectedY = Std.int(_y + _windowY + BUTTON_H());
+				comboSelectedW = Std.int(_w);
+			}
+		}
+
+		var hover = getHover();
+		if (hover) { // Bg
+			g.color = t.RADIO_COL_HOVER;
+			g.drawRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
+		}
+		else {
+			g.color = t.RADIO_COL;
+			g.drawRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
+		}
+
+		var x = _x + _w - arrowOffsetX - 8;
+		var y = _y + arrowOffsetY + 2;
+		g.fillTriangle(x, y, x + ARROW_W(), y, x + ARROW_W() / 2, y + ARROW_H() / 2);
+
+		g.color = t.TEXT_COL; // Value
+		drawStringSmall(g, texts[handle.position]);
+
+		// g.color = t.DEFAULT_LABEL_COL; // Label
+		// drawStringSmall(g, label, 0, 0, Right);
 
 		endElement();
 		return handle.position;
@@ -609,14 +668,18 @@ class Zui {
 	function drawInlineRadio(text: String, hover: Bool) {
 		if (hover) { // Bg
 			g.color = t.RADIO_COL_HOVER;
-			g.fillRect(_x + 5, _y + 5, _w - 10, ELEMENT_H() - 10);
+			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 		}
-		var x = _x + arrowOffsetX; // Arrows
-		var y = _y + arrowOffsetY;
-		g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
-		g.fillTriangle(x, y, x, y + ARROW_H(), x - ARROW_W() / 2, y + ARROW_H() / 2);
-		var x = _x + _w - arrowOffsetX - 5;
-		g.fillTriangle(x, y, x, y + ARROW_H(), x + ARROW_W() / 2, y + ARROW_H() / 2);
+		else {
+			g.color = t.RADIO_COL;
+			g.drawRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
+		}
+		// var x = _x + arrowOffsetX; // Arrows
+		// var y = _y + arrowOffsetY;
+		// g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
+		// g.fillTriangle(x, y, x, y + ARROW_H(), x - ARROW_W() / 2, y + ARROW_H() / 2);
+		// var x = _x + _w - arrowOffsetX - 4;
+		// g.fillTriangle(x, y, x, y + ARROW_H(), x + ARROW_W() / 2, y + ARROW_H() / 2);
 
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0, Align.Center);
@@ -636,6 +699,30 @@ class Zui {
 		var sliderX = filled ? x : x + (w - barW) * offset;
 		var sliderW = filled ? w * offset : barW; 
 		g.fillRect(sliderX, y, sliderW, BUTTON_H());
+	}
+
+	static var comboFirst = true;
+	function drawCombo() {
+		globalG.color = 0xff000000;
+		var elementSize = ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
+		globalG.fillRect(comboSelectedX, comboSelectedY, comboSelectedW, (comboSelectedTexts.length + 1) * elementSize);
+		beginLayout(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
+		inputEnabled = true;
+		for (i in 0...comboSelectedTexts.length) {
+			var t = comboSelectedTexts[i];
+			if (button(t)) {
+				comboSelectedHandle.position = i;
+				break;
+			}
+		}
+		text(comboSelectedLabel);
+		if (inputReleased && !comboFirst) {
+			comboSelectedHandle = null;
+			comboFirst = true;
+		}
+		else comboFirst = false;
+		inputEnabled = comboSelectedHandle == null;
+		endLayout(false);
 	}
 
 	function drawString(g: kha.graphics2.Graphics, text: String,
@@ -717,31 +804,31 @@ class Zui {
 	}
 
 	function getReleased(): Bool { // Input selection
-		return inputReleased && getHover() && getInitialHover();
+		return inputEnabled && inputReleased && getHover() && getInitialHover();
 	}
 
 	function getPushed(): Bool {
-		return inputDown && getHover() && getInitialHover();
+		return inputEnabled && inputDown && getHover() && getInitialHover();
 	}
 	
 	function getStarted(): Bool {
-		return inputStarted && getHover();
+		return inputEnabled && inputStarted && getHover();
 	}
 
 	function getInitialHover(): Bool {
-		return
+		return inputEnabled &&
 			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
         	inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + ELEMENT_H());
 	}
 
 	function getHover(): Bool {
-		return
+		return inputEnabled &&
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
         	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
 	}
 
 	function getInputInRect(x: Float, y: Float, w: Float, h: Float, scale = 1.0): Bool {
-		return
+		return inputEnabled &&
 			inputX >= x * scale && inputX < (x + w) * scale &&
 			inputY >= y * scale && inputY < (y + h) * scale;
 	}

@@ -83,4 +83,46 @@ class Ext {
 		ui.text("", Right, col);
 		return col;
 	}
+
+	public static function fileBrowser(ui: Zui, handle: Handle): String {
+		#if kha_krom
+		var cmd = 'ls ';
+		if (handle.text == "") {
+			var save = Krom.savePath() + "/os.txt";
+			Krom.sysCommand('uname > ' + '"' + save + '"');
+			var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
+			if (str.indexOf("Linux") >= 0 || str.indexOf("Darwin") >= 0) {
+				handle.text = "/";
+				// handle.text = "~";
+			}
+			else { // WindowsNT
+				// %HOMEDRIVE% + %HomePath%
+				handle.text = "C:\\Users";
+				cmd = 'dir ';
+			}
+		}
+
+		var save = Krom.savePath() + "/dir.txt";
+		Krom.sysCommand(cmd + handle.text + ' > ' + '"' + save + '"');
+		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
+		var files = str.split("\n");
+		
+		#else
+		
+		var files:Array<String> = [];
+		
+		#end
+
+		if (ui.button("..", Align.Left)) {
+			handle.text += "/..";
+		}
+
+		for (f in files) {
+			if (f != "" && ui.button(f, Align.Left)) {
+				handle.text += '/' + f;
+			}
+		}
+		
+		return handle.text;
+	}
 }
