@@ -4,20 +4,19 @@ class Nodes {
 
 	public var nodeDrag:TNode = null;
 	public var nodeSelected:TNode = null;
+	public var panX = 0.0;
+	public var panY = 0.0;
 	var linkDrag:TNodeLink = null;
 	var snapFromId = -1;
 	var snapToId = -1;
 	var snapSocket = 0;
 	var snapX = 0.0;
 	var snapY = 0.0;
-	public var panX = 0.0;
-	public var panY = 0.0;
 	var SCALE = 1.0;
 	var handle = new Zui.Handle();
 
 	public function new() {}
 
-	inline function NODE_W() { return 140; }
 	function NODE_H(node:TNode):Int {
 		var buttonsH = 0;
 		for (but in node.buttons) {
@@ -26,11 +25,11 @@ class Nodes {
 		}
 		return 40 + node.inputs.length * 20 + node.outputs.length * 20 + buttonsH;
 	}
+	inline function NODE_W() { return 140; }
 	inline function NODE_X(node:TNode) { return node.x + panX; }
 	inline function NODE_Y(node:TNode) { return node.y + panY; }
-
-	inline function p(f:Float):Int { return Std.int(f * SCALE); }
 	inline function SOCKET_Y(pos:Int):Int { return 40 + pos * 20; }
+	inline function p(f:Float):Int { return Std.int(f * SCALE); }
 
 	function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -295,6 +294,7 @@ class Nodes {
 				var texts = getEnumTexts();
 				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, "Asset");
 				soc.default_value = mapEnum(texts[but.default_value]);
+				ny += 10; // Fix align?
 			}
 		}
 

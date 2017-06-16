@@ -16,13 +16,8 @@ typedef ZuiOptions = {
 @:allow(zui.Nodes)
 @:allow(zui.Canvas)
 class Zui {
-	var t:zui.Themes.TTheme;
-	var SCALE: Float;
-
 	public var isScrolling = false; // Use to limit other activities
 	public var isTyping = false;
-
-	static var elementsBaked = false;
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -52,6 +47,8 @@ class Zui {
 	var globalG: kha.graphics2.Graphics; // Drawing
 	public var g: kha.graphics2.Graphics;
 
+	var t:zui.Themes.TTheme;
+	var SCALE: Float;
 	var ops: ZuiOptions;
 	var fontSize: Int;
 	var fontSmallSize: Int;
@@ -97,6 +94,9 @@ class Zui {
 	var comboSelectedY: Int;
 	var comboSelectedW: Int;
 
+	static var elementsBaked = false;
+	static var checkSelectImage: kha.Image = null;
+
 	public function new(ops: ZuiOptions) {
 		if (ops.theme == null) ops.theme = Themes.dark;
 		t = ops.theme;
@@ -134,7 +134,6 @@ class Zui {
 		scrollAlign = 0;
 	}
 
-	static var checkSelectImage: kha.Image = null;
 	function bakeElements() {
 		elementsBaked = true;
 		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, ops.khaWindowId);
@@ -544,7 +543,7 @@ class Zui {
 		return handle.position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = ""): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false): Int {
 		if (!isVisible()) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (comboSelectedHandle == null) {
@@ -553,7 +552,7 @@ class Zui {
 				comboSelectedTexts = texts;
 				comboSelectedLabel = label;
 				comboSelectedX = Std.int(_x + _windowX);
-				comboSelectedY = Std.int(_y + _windowY + BUTTON_H());
+				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H() + ELEMENT_SEPARATOR_SIZE());
 				comboSelectedW = Std.int(_w);
 			}
 		}
@@ -569,10 +568,17 @@ class Zui {
 		}
 
 		var x = _x + _w - arrowOffsetX - 8;
-		var y = _y + arrowOffsetY + 2;
+		var y = _y + arrowOffsetY + 3;
 		g.fillTriangle(x, y, x + ARROW_W(), y, x + ARROW_W() / 2, y + ARROW_H() / 2);
 
 		g.color = t.TEXT_COL; // Value
+
+		if (showLabel && label != "") {
+			_x -= 15;
+			drawStringSmall(g, label, 0, 0, Right);
+			_x += 15;
+		}
+		
 		drawStringSmall(g, texts[handle.position]);
 
 		// g.color = t.DEFAULT_LABEL_COL; // Label
@@ -703,7 +709,7 @@ class Zui {
 
 	static var comboFirst = true;
 	function drawCombo() {
-		globalG.color = 0xff000000;
+		globalG.color = 0xff222222;
 		var elementSize = ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
 		globalG.fillRect(comboSelectedX, comboSelectedY, comboSelectedW, (comboSelectedTexts.length + 1) * elementSize);
 		beginLayout(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
