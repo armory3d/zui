@@ -84,22 +84,20 @@ class Ext {
 		return col;
 	}
 
+	static function initPath(handle: Handle, systemId: String) {
+		handle.text = systemId == "Windows" ? "C:\\Users" : "/";
+		// %HOMEDRIVE% + %HomePath%
+		// ~
+	}
+
 	public static function fileBrowser(ui: Zui, handle: Handle): String {
 		#if kha_krom
-		var cmd = 'ls ';
+
+		var cmd = "ls ";
 		if (handle.text == "") {
-			var save = Krom.savePath() + "/os.txt";
-			Krom.sysCommand('uname > ' + '"' + save + '"');
-			var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
-			if (str.indexOf("Linux") >= 0 || str.indexOf("Darwin") >= 0) {
-				handle.text = "/";
-				// handle.text = "~";
-			}
-			else { // WindowsNT
-				// %HOMEDRIVE% + %HomePath%
-				handle.text = "C:\\Users";
-				cmd = 'dir ';
-			}
+			var systemId = kha.System.systemId;
+			initPath(handle, systemId);
+			if (systemId == "Windows") cmd = "dir ";
 		}
 
 		var save = Krom.savePath() + "/dir.txt";
@@ -107,18 +105,36 @@ class Ext {
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
 		var files = str.split("\n");
 		
+		#elseif kha_kore
+
+		if (handle.text == "") initPath(handle, kha.System.systemId);
+		var files = sys.FileSystem.readDirectory(handle.text);
+
+		#elseif kha_webgl
+
+		var files:Array<String> = [];
+		if (untyped process.versions['electron'] != null) {
+			if (handle.text == "") {
+				var pp = untyped process.platform;
+				var systemId = pp == "win32" ? "Windows" : (pp == "darwin" ? "OSX" : "Linux");
+				initPath(handle, systemId);
+			}
+			files = untyped require('fs').readdirSync(handle.text);
+		}
+
 		#else
 		
 		var files:Array<String> = [];
 		
 		#end
 
-		if (ui.button("..", Align.Left)) {
-			handle.text += "/..";
+		var nested = handle.text.indexOf("/", 1) != -1 || handle.text.indexOf("\\", 2) != -1;
+		if (nested && ui.button("..", Align.Left)) {
+			handle.text = handle.text.substring(0, handle.text.lastIndexOf("/"));
 		}
 
 		for (f in files) {
-			if (f != "" && ui.button(f, Align.Left)) {
+			if (f != "" && f.charAt(0) != "." && ui.button(f, Align.Left)) {
 				handle.text += '/' + f;
 			}
 		}

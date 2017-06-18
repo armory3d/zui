@@ -60,16 +60,16 @@ typedef TElement = {
 	var id: Int;
 	var type: ElementType;
 	var name: String;
-	var event: String;
 	var x: Float;
 	var y: Float;
 	var width: Int;
 	var height: Int;
-	var text: String;
-	var asset: String;
-	var color: Int;
-	var anchor: Int;
-	var children: Array<TElement>;
+	@:optional var text: String;
+	@:optional var event: String;
+	@:optional var color: Int;
+	@:optional var asset: String;
+	@:optional var anchor: Int;
+	@:optional var children: Array<TElement>;
 	@:optional var image: kha.Image;
 }
 
