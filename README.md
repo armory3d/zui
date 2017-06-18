@@ -32,22 +32,22 @@ Portable immediate mode UI library designed for tooling and game debug. Built wi
 
 ## Elements
 ``` hx
-panel(id: Handle, text: String, accent = 1): Bool;
-image(image: Image): Void;
-text(text: String, align = Left, bg = 0): Void;
-textInput(id: Handle, text: String, label = ""): String;
-button(text: String, align = Center): Bool;
-check(id: Handle, text: String): Bool;
-radio(groupId: Handle, pos: Int, text: String): Bool;
-inlineRadio(id: Handle, texts: Array<String>): Int;
-combo(id: Handle, texts: Array<String>, label = ""): Int;
-slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
+function panel(id: Handle, text: String, accent = 1): Bool;
+function image(image: Image): Void;
+function text(text: String, align = Left, bg = 0): Void;
+function textInput(id: Handle, text: String, label = ""): String;
+function button(text: String, align = Center): Bool;
+function check(id: Handle, text: String): Bool;
+function radio(groupId: Handle, pos: Int, text: String): Bool;
+function inlineRadio(id: Handle, texts: Array<String>): Int;
+function combo(id: Handle, texts: Array<String>, label = ""): Int;
+function slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
 
 // Formating
-row(ratios: Array<Float>);
-separator();
-indent();
-unindent();
+function row(ratios: Array<Float>);
+function separator();
+function indent();
+function unindent();
 ```
 
 Id.hx - simple macros to generate handles
@@ -57,10 +57,10 @@ var state = ui.check(Id.handle(), "Check Box");
 
 Ext.hx - prebuilt elements:
 ``` hx
-list(...);
-panelList(...);
-colorPicker(...);
-fileBrowser(...); // See examples
+function list(...);
+function panelList(...);
+function colorPicker(...);
+function fileBrowser(...); // See examples
 ```
 
 Nodes.hx - drawing node systems
@@ -118,6 +118,22 @@ zui.end();
 g2.begin();
 ..
 g2.end();
+```
+
+**Using Id.handle() in a for loop**
+```hx
+// Id.handle() works at compile time
+// Call .nest() to get unique handle per interation
+for (i in 0...3) Id.handle().nest(i);
+// Or use new zui.Handle() directly
+```
+
+**Set initial Id.handle() state**
+```hx
+var h1 = Id.handle({selected: true});
+var h2 = Id.handle({position: 0});
+var h3 = Id.handle({value: 1.0});
+var h4 = Id.handle({text: "Text"});
 ```
 
 ## Custom integration
