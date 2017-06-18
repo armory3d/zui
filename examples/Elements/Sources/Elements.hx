@@ -1,7 +1,6 @@
 package;
 import kha.Framebuffer;
 import kha.Assets;
-
 import zui.*;
 
 class Elements {
@@ -42,6 +41,7 @@ class Elements {
 				ui.radio(hradio, 1, "Radio 2");
 				ui.radio(hradio, 2, "Radio 3");
 				ui.inlineRadio(Id.handle(), ["High", "Medium", "Low"]);
+				ui.combo(Id.handle(), ["Item 1", "Item 2", "Item 3"], "Combo", true);
 				if (ui.panel(Id.handle({selected: false}), "Nested Panel")) {
 					ui.indent();
 					ui.text("Row");
@@ -61,7 +61,15 @@ class Elements {
 			}
 		}
 
-		if (ui.window(Id.handle(), 400, 10, 240, 200, true)) {
+		if (ui.window(Id.handle(), 270, 10, 240, 250, true)) {
+			if (ui.panel(Id.handle({selected: true}), "File Browser")) {
+				var h = Id.handle();
+				ui.text(h.text);
+				Ext.fileBrowser(ui, h);
+			}
+		}
+
+		if (ui.window(Id.handle(), 540, 10, 240, 200, true)) {
 			if (ui.panel(Id.handle({selected: true}), "Panel")) {
 				ui.indent();
 				ui.button("A");
