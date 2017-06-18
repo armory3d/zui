@@ -1,6 +1,6 @@
 # zui
 
-Portable user interface library designed for tooling and game debug. Built with Haxe and Kha.
+Portable immediate mode UI library designed for tooling and game debug. Built with Haxe and Kha.
 
 ![](img/zui.jpg)
 
@@ -74,7 +74,7 @@ Canvas.draw(...); // See examples
 ```
 
 ## Examples
-Check out examples/ folder. To run specific example, simply drop it's folder into [KodeStudio](https://github.com/KTXSoftware/KodeStudio/releases) and hit run.
+Check out [examples/](https://github.com/armory3d/zui/tree/master/examples) folder. To run specific example, simply drop it's folder into [KodeStudio](https://github.com/KTXSoftware/KodeStudio/releases) and hit run. If you are having trouble compiling, clone latest [Kha](https://github.com/Kode/Kha) repository into your example folder (alongside the `khafile.js`). This will let KodeStudio pick up the most recent Kha.
 
 ## Theming
 Themes can be defined using TTheme typedef. Check zui.Themes class for example. Set ZuiOptions.theme when creating new Zui instance to overwrite default theme.
