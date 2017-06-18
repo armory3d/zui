@@ -82,6 +82,7 @@ class Zui {
 	var windowEnded = true;
 	var scrollingHandle: Handle = null; // Window or slider being scrolled
 	public var scrollEnabled = true;
+	var changed = false;
 
 	var textSelectedHandle: Handle = null;
 	var textSelectedCurrentText: String;
@@ -93,6 +94,8 @@ class Zui {
 	var comboSelectedX: Int;
 	var comboSelectedY: Int;
 	var comboSelectedW: Int;
+	var submitComboHandle: Handle = null;
+	var comboToSubmit = 0;
 
 	static var elementsBaked = false;
 	static var checkSelectImage: kha.Image = null;
@@ -386,10 +389,12 @@ class Zui {
 		if (!isVisible()) { endElement(); return handle.text; }
 		if (submitTextHandle == handle) { // Submit edited text
 			handle.text = textToSubmit;
+			handle.changed = true;
 			textToSubmit = "";
 			submitTextHandle = null;
 			textSelectedCurrentText = "";
 		}
+		else handle.changed = false;
 
 		var hover = getHover();
 		g.color = hover ? t.TEXT_INPUT_BG_COL_HOVER : t.TEXT_INPUT_BG_COL; // Text bg
@@ -502,7 +507,11 @@ class Zui {
 
 	public function check(handle: Handle, text: String): Bool {
 		if (!isVisible()) { endElement(); return handle.selected; }
-		if (getReleased()) handle.selected = !handle.selected;
+		if (getReleased()) {
+			handle.selected = !handle.selected;
+			handle.changed = true;
+		}
+		else handle.changed = false;
 
 		var hover = getHover();
 		drawCheck(handle.selected, hover); // Check
@@ -517,7 +526,11 @@ class Zui {
 
 	public function radio(handle: Handle, position: Int, text: String): Bool {
 		if (!isVisible()) { endElement(); return handle.position == position; }
-		if (getReleased()) handle.position = position;
+		if (getReleased()) {
+			handle.position = position;
+			handle.changed = true;
+		}
+		else handle.changed = false;
 
 		var hover = getHover();
 		drawRadio(handle.position == position, hover); // Radio
@@ -534,7 +547,9 @@ class Zui {
 		if (!isVisible()) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (++handle.position >= texts.length) handle.position = 0;
+			handle.changed = true;
 		}
+		else handle.changed = false;
 
 		var hover = getHover();
 		drawInlineRadio(texts[handle.position], hover); // Radio
@@ -556,6 +571,12 @@ class Zui {
 				comboSelectedW = Std.int(_w);
 			}
 		}
+		if (handle == submitComboHandle) {
+			handle.position = comboToSubmit;
+			submitComboHandle = null;
+			handle.changed = true;
+		}
+		else handle.changed = false;
 
 		var hover = getHover();
 		if (hover) { // Bg
@@ -581,9 +602,6 @@ class Zui {
 		
 		drawStringSmall(g, texts[handle.position]);
 
-		// g.color = t.DEFAULT_LABEL_COL; // Label
-		// drawStringSmall(g, label, 0, 0, Right);
-
 		endElement();
 		return handle.position;
 	}
@@ -604,7 +622,9 @@ class Zui {
 			handle.value = Std.int(value * precision) / precision;
 			if (handle.value < from) handle.value = from; // Stay in bounds
 			else if (handle.value > to) handle.value = to;
+			handle.changed = true;
 		}
+		else handle.changed = false;
 		
 		var hover = getHover();
 		drawSlider(handle.value, from, to, filled, hover); // Slider
@@ -652,8 +672,6 @@ class Zui {
 		drawRect(g, t.FILL_CHECK_BG, x, y, CHECK_W(), CHECK_H(), 2); // Bg
 
 		if (selected) { // Check
-			//g.color = t.CHECK_SELECT_COL;
-			//g.fillRect(x + checkSelectOffsetX, y + checkSelectOffsetY, CHECK_SELECT_W(), CHECK_SELECT_H());
 			g.color = kha.Color.White;
 			g.drawImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY);
 		}
@@ -680,13 +698,6 @@ class Zui {
 			g.color = t.RADIO_COL;
 			g.drawRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 		}
-		// var x = _x + arrowOffsetX; // Arrows
-		// var y = _y + arrowOffsetY;
-		// g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
-		// g.fillTriangle(x, y, x, y + ARROW_H(), x - ARROW_W() / 2, y + ARROW_H() / 2);
-		// var x = _x + _w - arrowOffsetX - 4;
-		// g.fillTriangle(x, y, x, y + ARROW_H(), x + ARROW_W() / 2, y + ARROW_H() / 2);
-
 		g.color = hover ? t.TEXT_COL_HOVER : t.TEXT_COL; // Text
 		drawStringSmall(g, text, titleOffsetX, 0, Align.Center);
 	}
@@ -709,15 +720,18 @@ class Zui {
 
 	static var comboFirst = true;
 	function drawCombo() {
+		var _g = g;
 		globalG.color = 0xff222222;
 		var elementSize = ELEMENT_H() + ELEMENT_SEPARATOR_SIZE();
+		globalG.begin(false);
 		globalG.fillRect(comboSelectedX, comboSelectedY, comboSelectedW, (comboSelectedTexts.length + 1) * elementSize);
 		beginLayout(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
 		inputEnabled = true;
 		for (i in 0...comboSelectedTexts.length) {
 			var t = comboSelectedTexts[i];
 			if (button(t)) {
-				comboSelectedHandle.position = i;
+				comboToSubmit = i;
+				submitComboHandle = comboSelectedHandle;
 				break;
 			}
 		}
@@ -729,6 +743,8 @@ class Zui {
 		else comboFirst = false;
 		inputEnabled = comboSelectedHandle == null;
 		endLayout(false);
+		globalG.end();
+		g = _g; // Restore
 	}
 
 	function drawString(g: kha.graphics2.Graphics, text: String,
@@ -884,9 +900,7 @@ class Zui {
         this.key = code;
     }
 
-    function onKeyUp(code: Int) {
-    	
-    }
+    function onKeyUp(code: Int) {}
 
     function onKeyPress(char: String) {
     	isKeyDown = true;
@@ -948,6 +962,7 @@ class Handle {
 	public var dragEnabled = false;
 	public var dragX = 0;
 	public var dragY = 0;
+	public var changed = false;
 	var children: Array<Handle>;
 
 	public function new(ops: HandleOptions = null) {
