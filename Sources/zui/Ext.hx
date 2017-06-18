@@ -119,7 +119,12 @@ class Ext {
 				var systemId = pp == "win32" ? "Windows" : (pp == "darwin" ? "OSX" : "Linux");
 				initPath(handle, systemId);
 			}
-			files = untyped require('fs').readdirSync(handle.text);
+			try {
+				files = untyped require('fs').readdirSync(handle.text);
+			}
+			catch(e:Dynamic) {
+				// Non-directory item selected
+			}
 		}
 
 		#else
