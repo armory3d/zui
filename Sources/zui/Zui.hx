@@ -428,6 +428,8 @@ class Zui {
 						cursorX--;
 					}
 				}
+				else if (key == kha.input.KeyCode.Return) { // Deselect
+ -					deselectText(); // One-line text for now
 				else if (key == kha.input.KeyCode.CapsLock) {
 					// dummy check to prevent previous character from being entered accidentally
 					// terrible hack... should improve
