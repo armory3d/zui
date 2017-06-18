@@ -434,11 +434,18 @@ class Zui {
 					}
 				}
 				else if (key == kha.input.KeyCode.Return) { // Deselect
-					deselectText(); // One-line text for now
+ 					deselectText(); // One-line text for now
 				}
-				else if (char != "") {
-					text = text.substr(0, cursorX) + char + text.substr(cursorX);
-					cursorX++;
+				else if (key == kha.input.KeyCode.CapsLock) {
+					// dummy check to prevent previous character from being entered accidentally
+					// terrible hack... should improve
+				}
+				else if (char != null) {
+					if ((char != "") && char.charCodeAt(0) >= 32 || char.charCodeAt(0) < 127 || char.charCodeAt(0) >= 128)
+					{
+						text = text.substr(0, cursorX) + char + text.substr(cursorX);
+						cursorX++;
+					}
 				}
 			}
 
