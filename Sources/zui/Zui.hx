@@ -436,9 +436,13 @@ class Zui {
 				else if (key == kha.input.KeyCode.Return) { // Deselect
 					deselectText(); // One-line text for now
 				}
-				else if (char != "") {
-					text = text.substr(0, cursorX) + char + text.substr(cursorX);
-					cursorX++;
+				else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
+					if (char != null && char != "") {
+						if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
+							text = text.substr(0, cursorX) + char + text.substr(cursorX);
+							cursorX++;
+						}
+					}
 				}
 			}
 
