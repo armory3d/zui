@@ -33,7 +33,7 @@ class Zui {
 	var inputDown: Bool;
 	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
-	var key: Int;
+	var key: kha.input.KeyCode;
 	var char: String;
 
 	var cursorX = 0; // Text input
@@ -899,12 +899,12 @@ class Zui {
 		this.inputY = inputY;
 	}
 
-	function onKeyDown(code: Int) {
+	function onKeyDown(code: kha.input.KeyCode) {
         isKeyDown = true;
         this.key = code;
     }
 
-    function onKeyUp(code: Int) {}
+    function onKeyUp(code: kha.input.KeyCode) {}
 
     function onKeyPress(char: String) {
     	isKeyDown = true;
