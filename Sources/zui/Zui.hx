@@ -18,6 +18,7 @@ typedef ZuiOptions = {
 class Zui {
 	public var isScrolling = false; // Use to limit other activities
 	public var isTyping = false;
+	public var changed = false; // Global elements change check
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -82,7 +83,6 @@ class Zui {
 	var windowEnded = true;
 	var scrollingHandle: Handle = null; // Window or slider being scrolled
 	public var scrollEnabled = true;
-	var changed = false;
 
 	var textSelectedHandle: Handle = null;
 	var textSelectedCurrentText: String;
@@ -389,7 +389,7 @@ class Zui {
 		if (!isVisible()) { endElement(); return handle.text; }
 		if (submitTextHandle == handle) { // Submit edited text
 			handle.text = textToSubmit;
-			handle.changed = true;
+			handle.changed = changed = true;
 			textToSubmit = "";
 			submitTextHandle = null;
 			textSelectedCurrentText = "";
@@ -513,7 +513,7 @@ class Zui {
 		if (!isVisible()) { endElement(); return handle.selected; }
 		if (getReleased()) {
 			handle.selected = !handle.selected;
-			handle.changed = true;
+			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
@@ -532,7 +532,7 @@ class Zui {
 		if (!isVisible()) { endElement(); return handle.position == position; }
 		if (getReleased()) {
 			handle.position = position;
-			handle.changed = true;
+			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
@@ -551,7 +551,7 @@ class Zui {
 		if (!isVisible()) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (++handle.position >= texts.length) handle.position = 0;
-			handle.changed = true;
+			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
@@ -578,7 +578,7 @@ class Zui {
 		if (handle == submitComboHandle) {
 			handle.position = comboToSubmit;
 			submitComboHandle = null;
-			handle.changed = true;
+			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
@@ -626,7 +626,7 @@ class Zui {
 			handle.value = Std.int(value * precision) / precision;
 			if (handle.value < from) handle.value = from; // Stay in bounds
 			else if (handle.value > to) handle.value = to;
-			handle.changed = true;
+			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 		

@@ -14,6 +14,7 @@ class Nodes {
 	var snapY = 0.0;
 	var SCALE = 1.0;
 	var handle = new Zui.Handle();
+	var lastNodesCount = 0;
 	static var elementsBaked = false;
 	static var socketImage: kha.Image = null;
 
@@ -73,6 +74,9 @@ class Nodes {
 
 	public function nodeCanvas(ui: Zui, canvas: TNodeCanvas) {
 		if (!elementsBaked) bakeElements(ui);
+		if (lastNodesCount > canvas.nodes.length) ui.changed = true;
+		lastNodesCount = canvas.nodes.length;
+
 		SCALE = ui.ops.scaleFactor;
 		var wx = ui._windowX;
 		var wy = ui._windowY;
@@ -191,15 +195,18 @@ class Nodes {
 					}
 					linkDrag.to_id = snapToId;
 					linkDrag.to_socket = snapSocket;
+					ui.changed = true;
 				}
 				// Connect to output
 				else if (snapFromId != -1) {
 					linkDrag.from_id = snapFromId;
 					linkDrag.from_socket = snapSocket;
+					ui.changed = true;
 				}
 				// Remove dragged link
 				else if (linkDrag != null) {
 					canvas.links.remove(linkDrag);
+					ui.changed = true;
 				}
 				snapToId = snapFromId = -1;
 				linkDrag = null;
@@ -341,6 +348,18 @@ class Nodes {
 		// g.drawLine(p(x1) - 1.0, p(y1), p(x2) - 1.0, p(y2), 1.0);
 		// g.drawLine(p(x1), p(y1) + 1.0, p(x2), p(y2) + 1.0, 1.0);
 		// g.drawLine(p(x1), p(y1) - 1.0, p(x2), p(y2) - 1.0, 1.0);
+	}
+
+	public function removeNode(n: TNode, canvas: TNodeCanvas) {
+		var i = 0;      
+		while (i < canvas.links.length) {
+			var l = canvas.links[i];
+			if (l.from_id == n.id || l.to_id == n.id) {
+				canvas.links.splice(i, 1);
+			}
+			else i++;
+		}
+		canvas.nodes.remove(n);
 	}
 }
 
