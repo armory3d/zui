@@ -14,6 +14,8 @@ class Nodes {
 	var snapY = 0.0;
 	var SCALE = 1.0;
 	var handle = new Zui.Handle();
+	static var elementsBaked = false;
+	static var socketImage: kha.Image = null;
 
 	public function new() {}
 
@@ -57,7 +59,20 @@ class Nodes {
 		return id;
 	}
 
+	function bakeElements(ui: Zui) {
+		ui.g.end();
+		elementsBaked = true;
+		socketImage = kha.Image.createRenderTarget(20, 20);
+		var g = socketImage.g2;
+		g.begin(true, 0x00000000);
+		g.color = 0xffffffff;
+		kha.graphics2.GraphicsExtension.fillCircle(g, 10, 10, 10);
+		g.end();
+		ui.g.begin(false);
+	}
+
 	public function nodeCanvas(ui: Zui, canvas: TNodeCanvas) {
+		if (!elementsBaked) bakeElements(ui);
 		SCALE = ui.ops.scaleFactor;
 		var wx = ui._windowX;
 		var wy = ui._windowY;
@@ -239,7 +254,8 @@ class Nodes {
 		for (out in node.outputs) {
 			ny += lineh;
 			g.color = out.color;
-			kha.graphics2.GraphicsExtension.fillCircle(g, nx + w, ny, 5);
+			// kha.graphics2.GraphicsExtension.fillCircle(g, nx + w, ny, 5);
+			g.drawScaledImage(socketImage, nx + w - 5, ny - 5, 10, 10);
 			var strw = ui.ops.font.width(ui.fontSize, out.name);
 			g.color = 0xffe7e7e7;
 			g.drawString(out.name, nx + w - strw - 12, ny - 7);
@@ -302,7 +318,8 @@ class Nodes {
 		for (inp in node.inputs) {
 			ny += lineh;
 			g.color = inp.color;
-			kha.graphics2.GraphicsExtension.fillCircle(g, nx, ny, 5);
+			// kha.graphics2.GraphicsExtension.fillCircle(g, nx, ny, 5);
+			g.drawScaledImage(socketImage, nx - 5, ny - 5, 10, 10);
 			g.color = 0xffe7e7e7;
 			g.drawString(inp.name, nx + 12, ny - 7);
 		}
@@ -310,10 +327,20 @@ class Nodes {
 
 	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float) {
 		var g = ui.g;
-		var curve = Math.min(Math.abs(y2 - y1) / 6.0, 40.0);
-		g.color = 0xffadadad;
+		g.color = 0xccadadad;
+		// var curve = Math.min(Math.abs(y2 - y1) / 6.0, 40.0);
 		// kha.graphics2.GraphicsExtension.drawCubicBezier(g, [x1, x1 + curve, x2 - curve, x2], [y1, y1 + curve, y2 - curve, y2], 20, 2.0);
-		g.drawLine(p(x1), p(y1), p(x2), p(y2), 2.0);
+		g.drawLine(p(x1), p(y1), p(x2), p(y2), 1.0);
+		g.color = 0x99adadad;
+		g.drawLine(p(x1) + 0.5, p(y1), p(x2) + 0.5, p(y2), 1.0);
+		g.drawLine(p(x1) - 0.5, p(y1), p(x2) - 0.5, p(y2), 1.0);
+		g.drawLine(p(x1), p(y1) + 0.5, p(x2), p(y2) + 0.5, 1.0);
+		g.drawLine(p(x1), p(y1) - 0.5, p(x2), p(y2) - 0.5, 1.0);
+		// g.color = 0x66adadad;
+		// g.drawLine(p(x1) + 1.0, p(y1), p(x2) + 1.0, p(y2), 1.0);
+		// g.drawLine(p(x1) - 1.0, p(y1), p(x2) - 1.0, p(y2), 1.0);
+		// g.drawLine(p(x1), p(y1) + 1.0, p(x2), p(y2) + 1.0, 1.0);
+		// g.drawLine(p(x1), p(y1) - 1.0, p(x2), p(y2) - 1.0, 1.0);
 	}
 }
 
