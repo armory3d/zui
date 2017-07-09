@@ -844,13 +844,13 @@ class Zui {
 	function getInitialHover(): Bool {
 		return inputEnabled &&
 			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
-        	inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + ELEMENT_H());
+			inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + ELEMENT_H());
 	}
 
 	function getHover(): Bool {
 		return inputEnabled &&
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
-        	inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
+			inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
 	}
 
 	function getInputInRect(x: Float, y: Float, w: Float, h: Float, scale = 1.0): Bool {
@@ -859,32 +859,32 @@ class Zui {
 			inputY >= y * scale && inputY < (y + h) * scale;
 	}
 
-    public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
-    	inputStarted = true;
-    	button == 0 ? inputDown = true : inputDownR = true;
-    	setInitialInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
-    }
+	public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
+		inputStarted = true;
+		button == 0 ? inputDown = true : inputDownR = true;
+		setInitialInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
+	}
 
-    public function onMouseUp(button: Int, x: Int, y: Int) {
-    	if (isScrolling) {
-    		isScrolling = false;
-    		if (scrollingHandle != null) scrollingHandle.scrolling = false;
-    	}
-    	else { // To prevent action when scrolling is active
-    		inputReleased = true;
-    	}
-    	button == 0 ? inputDown = false : inputDownR = false;
-    	setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
-    	deselectText();
-    }
+	public function onMouseUp(button: Int, x: Int, y: Int) {
+		if (isScrolling) {
+			isScrolling = false;
+			if (scrollingHandle != null) scrollingHandle.scrolling = false;
+		}
+		else { // To prevent action when scrolling is active
+			inputReleased = true;
+		}
+		button == 0 ? inputDown = false : inputDownR = false;
+		setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
+		deselectText();
+	}
 
-    public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
-    	setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
-    }
+	public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
+		setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
+	}
 
-    public function onMouseWheel(delta: Int) {
-    	inputWheelDelta = delta;
-    }
+	public function onMouseWheel(delta: Int) {
+		inputWheelDelta = delta;
+	}
 	
 	function setInitialInputPosition(inputX: Int, inputY: Int) {
 		setInputPosition(inputX, inputY);
@@ -892,7 +892,7 @@ class Zui {
 		this.inputInitialY = inputY;
 	}
 
-    function setInputPosition(inputX: Int, inputY: Int) {
+	function setInputPosition(inputX: Int, inputY: Int) {
 		inputDX += inputX - this.inputX;
 		inputDY += inputY - this.inputY;
 		this.inputX = inputX;
@@ -900,16 +900,16 @@ class Zui {
 	}
 
 	function onKeyDown(code: kha.input.KeyCode) {
-        isKeyDown = true;
-        this.key = code;
-    }
+		isKeyDown = true;
+		this.key = code;
+	}
 
-    function onKeyUp(code: kha.input.KeyCode) {}
+	function onKeyUp(code: kha.input.KeyCode) {}
 
-    function onKeyPress(char: String) {
-    	isKeyDown = true;
-    	this.char = char;
-    }
+	function onKeyPress(char: String) {
+		isKeyDown = true;
+		this.char = char;
+	}
 	
 	inline function ELEMENT_W() { return t._ELEMENT_W * SCALE; }
 	inline function ELEMENT_H() { return t._ELEMENT_H * SCALE; }
