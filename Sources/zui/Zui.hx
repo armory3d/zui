@@ -97,7 +97,7 @@ class Zui {
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
 
-	static var elementsBaked = false;
+	var elementsBaked = false;
 	static var checkSelectImage: kha.Image = null;
 
 	public function new(ops: ZuiOptions) {
@@ -108,12 +108,11 @@ class Zui {
 		if (ops.scaleTexture == null) ops.scaleTexture = 1.0;
 		if (ops.autoNotifyInput == null) ops.autoNotifyInput = true;
 		this.ops = ops;
-		setScaleFactor(ops.scaleFactor);
 
 		if (ops.autoNotifyInput) registerInput();
 	}
 	
-	public function setScaleFactor(scaleFactor: Float) {
+	function bakeElements(scaleFactor: Float) {
 		SCALE = ops.scaleFactor = scaleFactor * ops.scaleTexture;
 		fontSize = Std.int(t._FONT_SIZE * ops.scaleFactor);
 		fontSmallSize = Std.int(t._FONT_SMALL_SIZE * ops.scaleFactor);
@@ -135,17 +134,18 @@ class Zui {
 		radioSelectOffsetY = (RADIO_H() - RADIO_SELECT_H()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
 		scrollAlign = 0;
-	}
 
-	function bakeElements() {
 		elementsBaked = true;
-		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, ops.khaWindowId);
-		var g = checkSelectImage.g2;
-		g.begin(true, 0x00000000);
-		g.color = t.CHECK_SELECT_COL;
-		g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), 2);//LINE_STRENGTH());
-		g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), 2);//LINE_STRENGTH());
-		g.end();
+
+		if (checkSelectImage == null) {
+			checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_W()), Std.int(CHECK_SELECT_H()), null, NoDepthAndStencil, 1, ops.khaWindowId);
+			var g = checkSelectImage.g2;
+			g.begin(true, 0x00000000);
+			g.color = t.CHECK_SELECT_COL;
+			g.drawLine(0, 0, CHECK_SELECT_W(), CHECK_SELECT_H(), 2);//LINE_STRENGTH());
+			g.drawLine(CHECK_SELECT_W(), 0, 0, CHECK_SELECT_H(), 2);//LINE_STRENGTH());
+			g.end();
+		}
 	}
 
 	public function remove() { // Clean up
@@ -167,7 +167,7 @@ class Zui {
 	}
 
 	public function begin(g: kha.graphics2.Graphics) { // Begin UI drawing
-		if (!elementsBaked) bakeElements();
+		if (!elementsBaked) bakeElements(ops.scaleFactor);
 		SCALE = ops.scaleFactor;
 		globalG = g;
 		_x = 0; // Reset cursor
