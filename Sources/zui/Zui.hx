@@ -192,6 +192,7 @@ class Zui {
 	}
 
 	public function beginLayout(g: kha.graphics2.Graphics, x: Int, y: Int, w: Int) {
+		if (!elementsBaked) bakeElements(ops.scaleFactor);
 		currentWindow = null;
 		this.g = g;
 		SCALE = 1.0;
