@@ -21,18 +21,19 @@ class Nodes {
 
 	public function new() {}
 
+	static inline var LINE_H = 22;
 	function NODE_H(node:TNode):Int {
 		var buttonsH = 0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 140;//buttonsH += 80;
-			else buttonsH += 20;
+			if (but.type == 'RGBA') buttonsH += 141;//buttonsH += 80;
+			else buttonsH += LINE_H;
 		}
-		return 40 + node.inputs.length * 20 + node.outputs.length * 20 + buttonsH;
+		return LINE_H * 2 + node.inputs.length * LINE_H + node.outputs.length * LINE_H + buttonsH;
 	}
 	inline function NODE_W() { return 140; }
 	inline function NODE_X(node:TNode) { return node.x + panX; }
 	inline function NODE_Y(node:TNode) { return node.y + panY; }
-	inline function SOCKET_Y(pos:Int):Int { return 40 + pos * 20; }
+	inline function SOCKET_Y(pos:Int):Int { return LINE_H * 2 + pos * LINE_H; }
 	inline function p(f:Float):Int { return Std.int(f * SCALE); }
 
 	function getNode(nodes: Array<TNode>, id: Int): TNode {
@@ -105,13 +106,13 @@ class Nodes {
 					var inps = node.inputs;
 					var outs = node.outputs;
 					var nodeh = NODE_H(node);
-					if (ui.getInputInRect(wx + NODE_X(node) - 10, wy + NODE_Y(node) - 10, NODE_W() + 20, nodeh + 20)) {
+					if (ui.getInputInRect(wx + NODE_X(node) - LINE_H / 2, wy + NODE_Y(node) - LINE_H / 2, NODE_W() + LINE_H, nodeh + LINE_H)) {
 						// Snap to output
 						if (from == null && node.id != to.id) {
 							for (i in 0...outs.length) {
 								var sx = wx + NODE_X(node) + NODE_W();
 								var sy = wy + NODE_Y(node) + SOCKET_Y(i);
-								if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
+								if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
 									snapX = sx;
 									snapY = sy;
 									snapFromId = node.id;
@@ -125,7 +126,7 @@ class Nodes {
 							for (i in 0...inps.length) {
 								var sx = wx + NODE_X(node) ;
 								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
-								if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
+								if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
 									snapX = sx;
 									snapY = sy;
 									snapToId = node.id;
@@ -146,16 +147,16 @@ class Nodes {
 
 			// Drag node
 			var nodeh = NODE_H(node);
-			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - 10, wy + NODE_Y(node), NODE_W() + 20, 20)) {
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H / 2, wy + NODE_Y(node), NODE_W() + LINE_H, LINE_H)) {
 				nodeDrag = node;
 				nodeSelected = nodeDrag;
 			}
-			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - 10, wy + NODE_Y(node) - 10, NODE_W() + 20, nodeh + 20)) {
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H / 2, wy + NODE_Y(node) - LINE_H / 2, NODE_W() + LINE_H, nodeh + LINE_H)) {
 				// Check sockets
 				for (i in 0...outs.length) {
 					var sx = wx + NODE_X(node) + NODE_W();
 					var sy = wy + NODE_Y(node) + SOCKET_Y(i);
-					if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
+					if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
 						// New link from output
 						var l = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
 						canvas.links.push(l);
@@ -167,7 +168,7 @@ class Nodes {
 					for (i in 0...inps.length) {
 						var sx = wx + NODE_X(node);
 						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
-						if (ui.getInputInRect(sx - 10, sy - 10, 20, 20)) {
+						if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
 								if (l.to_id == node.id && l.to_socket == i) {
@@ -238,7 +239,7 @@ class Nodes {
 		var nx = p(NODE_X(node));
 		var ny = p(NODE_Y(node));
 		var text = node.name;
-		var lineh = p(20);
+		var lineh = p(LINE_H);
 
 		// Outline
 		g.color = node == nodeSelected ? 0xffaaaaaa : 0xff202020;
