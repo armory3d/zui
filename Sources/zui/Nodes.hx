@@ -267,8 +267,12 @@ class Nodes {
 			g.color = out.color;
 			// kha.graphics2.GraphicsExtension.fillCircle(g, nx + w, ny, 5);
 			g.drawScaledImage(socketImage, nx + w - 5, ny - 5, 10, 10);
+		}
+		ny -= lineh * node.outputs.length;
+		g.color = 0xffe7e7e7;
+		for (out in node.outputs) {
+			ny += lineh;
 			var strw = ui.ops.font.width(ui.fontSize, out.name);
-			g.color = 0xffe7e7e7;
 			g.drawString(out.name, nx + w - strw - 12, ny - 7);
 		}
 
@@ -322,9 +326,12 @@ class Nodes {
 		for (inp in node.inputs) {
 			ny += lineh;
 			g.color = inp.color;
-			// kha.graphics2.GraphicsExtension.fillCircle(g, nx, ny, 5);
 			g.drawScaledImage(socketImage, nx - 5, ny - 5, 10, 10);
-			g.color = 0xffe7e7e7;
+		}
+		ny -= lineh * node.inputs.length;
+		g.color = 0xffe7e7e7;
+		for (inp in node.inputs) {
+			ny += lineh;
 			g.drawString(inp.name, nx + 12, ny - 7);
 		}
 	}
