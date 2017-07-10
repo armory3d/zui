@@ -67,8 +67,10 @@ class Nodes {
 		socketImage = kha.Image.createRenderTarget(20, 20);
 		var g = socketImage.g2;
 		g.begin(true, 0x00000000);
-		g.color = 0xffffffff;
+		g.color = 0xff000000;
 		kha.graphics2.GraphicsExtension.fillCircle(g, 10, 10, 10);
+		g.color = 0xffffffff;
+		kha.graphics2.GraphicsExtension.fillCircle(g, 10, 10, 8);
 		g.end();
 		ui.g.begin(false);
 	}
