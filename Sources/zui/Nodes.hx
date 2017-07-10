@@ -1,5 +1,6 @@
 package zui;
 
+@:access(zui.Zui)
 class Nodes {
 
 	public var nodeDrag:TNode = null;
@@ -23,7 +24,7 @@ class Nodes {
 	function NODE_H(node:TNode):Int {
 		var buttonsH = 0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 80;
+			if (but.type == 'RGBA') buttonsH += 140;//buttonsH += 80;
 			else buttonsH += 20;
 		}
 		return 40 + node.inputs.length * 20 + node.outputs.length * 20 + buttonsH;
@@ -273,22 +274,15 @@ class Nodes {
 		for (but in node.buttons) {
 
 			if (but.type == 'RGBA') {
-				var val = node.outputs[but.output].default_value;
-
 				ny += lineh; // 18 + 2 separator
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				val[0] = ui.slider(nhandle.nest(0, {value: val[0]}), "R", 0.0, 1.0, true);
-
-				ny += lineh;
-				val[1] = ui.slider(nhandle.nest(1, {value: val[1]}), "G", 0.0, 1.0, true);
-			
-				ny += lineh;
-				val[2] = ui.slider(nhandle.nest(2, {value: val[2]}), "B", 0.0, 1.0, true);
-
-				ny += lineh;
-				ui.text("", Right, kha.Color.fromFloats(val[0], val[1], val[2], val[3]));
+				
+				var val = node.outputs[but.output].default_value;
+				nhandle.r = val[0]; nhandle.g = val[1]; nhandle.b = val[2];
+				Ext.colorWheel(ui, nhandle, false);
+				val[0] = nhandle.r; val[1] = nhandle.g; val[2] = nhandle.b;
 			}
 			else if (but.type == 'VALUE') {
 				ny += lineh;

@@ -2,6 +2,7 @@ package zui;
 
 import zui.Zui;
 
+@:access(zui.Zui)
 class Ext {
 
 	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>,
@@ -72,7 +73,7 @@ class Ext {
 			addCb("untitled");
 		}
 	}
-	
+
 	public static function colorPicker(ui: Zui, handle: Handle, alpha = false): Int {
 		var r = ui.slider(handle.nest(0, {value: handle.color.R}), "R", 0, 1, true);
 		var g = ui.slider(handle.nest(1, {value: handle.color.G}), "G", 0, 1, true);
@@ -145,5 +146,100 @@ class Ext {
 		}
 		
 		return handle.text;
+	}
+
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null): kha.Color {
+		if (w == null) w = ui._w;
+		rgbToHsv(handle.r, handle.g, handle.b, ar);
+		var chue = ar[0];
+		var csat = ar[1];
+		var cval = ar[2];
+		// Wheel
+		var px = ui._x;
+		var py = ui._y;
+		ui.image(ui.ops.color_wheel, kha.Color.fromFloats(cval, cval, cval));
+		// Picker
+		var ph = ui._y - py;
+		var ox = px + w / 2;
+		var oy = py + ph / 2;
+		
+		var cw = w * 0.7;
+		var cwh = cw / 2;
+		var cx = ox;
+		var cy = oy + csat * cwh; // Sat is distance from center
+		// Rotate around origin by hue
+		var theta = chue * (Math.PI * 2.0);
+		var cx2 = Math.cos(theta) * (cx - ox) - Math.sin(theta) * (cy - oy) + ox;
+		var cy2 = Math.sin(theta) * (cx - ox) + Math.cos(theta) * (cy - oy) + oy;
+		cx = cx2;
+		cy = cy2;
+
+		ui.g.color = 0xff000000;
+		ui.g.fillRect(cx - 3, cy - 3, 6, 6);
+		ui.g.color = 0xffffffff;
+		ui.g.fillRect(cx - 2, cy - 2, 4, 4);
+		// Val slider
+		cval = ui.slider(handle.nest(0, {value: 1.0}), "Value", 0.0, 1.0, true);
+		// Mouse picking
+		var gx = ox + ui._windowX;
+		var gy = oy + ui._windowY;
+		if (ui.inputDown && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) {
+			csat = Math.min(dist(gx, gy, ui.inputX, ui.inputY), cwh) / cwh;
+			var angle = Math.atan2(ui.inputX - gx, ui.inputY - gy);
+			if (angle < 0) angle = Math.PI + (Math.PI - Math.abs(angle));
+			angle = Math.PI * 2 - angle;
+			chue = angle / (Math.PI * 2);
+			handle.changed = ui.changed = true;
+		}
+		// Save as rgb
+		hsvToRgb(chue, csat, cval, ar);
+		handle.r = ar[0];
+		handle.g = ar[1];
+		handle.b = ar[2];
+		handle.color = kha.Color.fromFloats(handle.r, handle.g, handle.b);
+		ui.text("", Right, handle.color);
+		return handle.color;
+	}
+
+	static inline function dist(x1: Float, y1: Float, x2: Float, y2: Float): Float {
+		var vx = x1 - x2;
+		var vy = y1 - y2;
+		return Math.sqrt(vx * vx + vy * vy);
+	}
+	static inline function fract(f: Float): Float { return f - Std.int(f); }
+	static inline function mix(x: Float, y: Float, a: Float): Float { return x * (1.0 - a) + y * a; }
+	static inline function clamp(x: Float, minVal: Float, maxVal: Float): Float { return Math.min(Math.max(x, minVal), maxVal); }
+	static inline function step(edge: Float, x: Float):Float { return x < edge ? 0.0 : 1.0; }
+	static inline var kx = 1.0;
+	static inline var ky = 2.0 / 3.0;
+	static inline var kz = 1.0 / 3.0;
+	static inline var kw = 3.0;
+	static var ar = [0.0, 0.0, 0.0];
+	static function hsvToRgb(cR: Float, cG: Float, cB: Float, out: Array<Float>) {
+		var px = Math.abs(fract(cR + kx) * 6.0 - kw);
+		var py = Math.abs(fract(cR + ky) * 6.0 - kw);
+		var pz = Math.abs(fract(cR + kz) * 6.0 - kw);
+		out[0] = cB * mix(kx, clamp(px - kx, 0.0, 1.0), cG);
+		out[1] = cB * mix(kx, clamp(py - kx, 0.0, 1.0), cG);
+		out[2] = cB * mix(kx, clamp(pz - kx, 0.0, 1.0), cG);
+	}
+	static inline var Kx = 0.0;
+	static inline var Ky = -1.0 / 3.0;
+	static inline var Kz = 2.0 / 3.0;
+	static inline var Kw = -1.0;
+	static inline var e = 1.0e-10;
+	static function rgbToHsv(cR: Float, cG: Float, cB: Float, out: Array<Float>) {
+		var px = mix(cB, cG, step(cB, cG));
+		var py = mix(cG, cB, step(cB, cG));
+		var pz = mix(Kw, Kx, step(cB, cG));
+		var pw = mix(Kz, Ky, step(cB, cG));
+		var qx = mix(px, cR, step(px, cR));
+		var qy = mix(py, py, step(px, cR));
+		var qz = mix(pw, pz, step(px, cR));
+		var qw = mix(cR, px, step(px, cR));
+		var d = qx - Math.min(qw, qy);
+		out[0] = Math.abs(qz + (qw - qy) / (6.0 * d + e));
+		out[1] = d / (qx + e);
+		out[2] = qx;
 	}
 }

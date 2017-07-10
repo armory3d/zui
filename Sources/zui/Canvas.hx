@@ -1,5 +1,6 @@
 package zui;
 
+@:access(zui.Zui)
 class Canvas {
 
 	static var events:Array<String> = [];

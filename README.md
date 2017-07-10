@@ -57,10 +57,11 @@ var state = ui.check(Id.handle(), "Check Box");
 
 Ext.hx - prebuilt elements:
 ``` hx
-function list(...);
+function list(...); // See examples
 function panelList(...);
 function colorPicker(...);
-function fileBrowser(...); // See examples
+function colorWheel(...); 
+function fileBrowser(...);
 ```
 
 Nodes.hx - drawing node systems
