@@ -78,6 +78,7 @@ typedef TAsset = {
 	var name:String;
 	var file:String;
 	var image:kha.Image;
+	@:optional var id: Int;
 }
 
 @:enum abstract ElementType(Int) from Int {
