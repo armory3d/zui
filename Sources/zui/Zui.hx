@@ -732,10 +732,7 @@ class Zui {
 		beginLayout(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
 		inputEnabled = true;
 		for (i in 0...comboSelectedTexts.length) {
-			var t = comboSelectedTexts[i];
-			g.font = ops.font;
-			g.fontSize = fontSmallSize;
-			if (button(t, Align.Left)) {
+			if (button(comboSelectedTexts[i], Align.Left)) {
 				comboToSubmit = i;
 				submitComboHandle = comboSelectedHandle;
 				break;
