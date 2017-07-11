@@ -355,7 +355,8 @@ class Nodes {
 	}
 
 	public function removeNode(n: TNode, canvas: TNodeCanvas) {
-		var i = 0;      
+		if (n == null) return;
+		var i = 0;
 		while (i < canvas.links.length) {
 			var l = canvas.links[i];
 			if (l.from_id == n.id || l.to_id == n.id) {
