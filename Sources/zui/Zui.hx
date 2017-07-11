@@ -733,7 +733,9 @@ class Zui {
 		inputEnabled = true;
 		for (i in 0...comboSelectedTexts.length) {
 			var t = comboSelectedTexts[i];
-			if (button(t)) {
+			g.font = ops.font;
+			g.fontSize = fontSmallSize;
+			if (button(t, Align.Left)) {
 				comboToSubmit = i;
 				submitComboHandle = comboSelectedHandle;
 				break;
@@ -761,6 +763,9 @@ class Zui {
 		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
 		else if (align == Right) xOffset = _w - ops.font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
 
+		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
+		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
+
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
@@ -774,6 +779,9 @@ class Zui {
 		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSmallSize, text) / 2;
 		else if (align == Right) xOffset = _w - ops.font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
 
+		var maxChars = Std.int(_w / Std.int(fontSmallSize / 2)); // Guess width for now
+		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
+		
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
 
