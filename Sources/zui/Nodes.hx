@@ -326,7 +326,9 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				var soc = node.outputs[but.output];
-				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", 0.0, 1.0, true);
+				var min = but.min != null ? but.min : 0.0;
+				var max = but.max != null ? but.max : 1.0;
+				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", min, max, true);
 			}
 			else if (but.type == 'STRING') {
 				ny += lineh;
@@ -436,4 +438,6 @@ typedef TNodeButton = {
 	var type: String;
 	var output: Int;
 	@:optional var default_value: Dynamic;
+	@:optional var min: Null<Float>;
+	@:optional var max: Null<Float>;
 }
