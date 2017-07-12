@@ -148,7 +148,7 @@ class Ext {
 		return handle.text;
 	}
 
-	static var colorWheelEditing = false;
+	static var wheelSelectedHande: Handle = null;
 	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.r, handle.g, handle.b, ar);
@@ -184,9 +184,9 @@ class Ext {
 		// Mouse picking
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
-		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) colorWheelEditing = true;
-		if (ui.inputReleased) colorWheelEditing = false;
-		if (ui.inputDown && colorWheelEditing) {
+		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) wheelSelectedHande = handle;
+		if (ui.inputReleased) wheelSelectedHande = null;
+		if (ui.inputDown && wheelSelectedHande == handle) {
 			csat = Math.min(dist(gx, gy, ui.inputX, ui.inputY), cwh) / cwh;
 			var angle = Math.atan2(ui.inputX - gx, ui.inputY - gy);
 			if (angle < 0) angle = Math.PI + (Math.PI - Math.abs(angle));
