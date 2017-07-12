@@ -27,7 +27,7 @@ class Zui {
 	var inputInitialY: Float;
 	var inputDX: Float; // Delta
 	var inputDY: Float;
-	var inputWheelDelta: Int;
+	var inputWheelDelta = 0;
 	var inputStarted: Bool; // Buttons
 	var inputReleased: Bool;
 	var inputDown: Bool;

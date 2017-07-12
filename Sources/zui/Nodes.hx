@@ -5,15 +5,18 @@ class Nodes {
 
 	public var nodeDrag:TNode = null;
 	public var nodeSelected:TNode = null;
-	public var panX = 0.0;
-	public var panY = 0.0;
+	var panX = 0.0;
+	var panY = 0.0;
+	public var zoom = 1.0;
+	public var uiw = 0;
+	public var uih = 0;
+	public var SCALE = 1.0;
 	var linkDrag:TNodeLink = null;
 	var snapFromId = -1;
 	var snapToId = -1;
 	var snapSocket = 0;
 	var snapX = 0.0;
 	var snapY = 0.0;
-	var SCALE = 1.0;
 	var handle = new Zui.Handle();
 	var lastNodesCount = 0;
 	static var elementsBaked = false;
@@ -21,20 +24,22 @@ class Nodes {
 
 	public function new() {}
 
-	static inline var LINE_H = 22;
-	function NODE_H(node:TNode):Int {
-		var buttonsH = 0;
+	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE + zoomPan; }
+	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE + zoomPan; }
+	inline function LINE_H(): Int { return Std.int(22 * SCALE); }
+	function NODE_H(node:TNode): Int {
+		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 141;//buttonsH += 80;
-			else buttonsH += LINE_H;
+			if (but.type == 'RGBA') buttonsH += 132 * SCALE;//buttonsH += 80;
+			else buttonsH += LINE_H();
 		}
-		return LINE_H * 2 + node.inputs.length * LINE_H + node.outputs.length * LINE_H + buttonsH;
+		var h = LINE_H() * 2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + buttonsH;
+		return Std.int(h);
 	}
-	inline function NODE_W() { return 140; }
-	inline function NODE_X(node:TNode) { return node.x + panX; }
-	inline function NODE_Y(node:TNode) { return node.y + panY; }
-	inline function SOCKET_Y(pos:Int):Int { return LINE_H * 2 + pos * LINE_H; }
-	inline function p(f:Float):Int { return Std.int(f * SCALE); }
+	inline function NODE_W(): Int { return Std.int(140 * SCALE); }
+	inline function NODE_X(node:TNode) { return node.x * SCALE + PAN_X(); }
+	inline function NODE_Y(node:TNode) { return node.y * SCALE + PAN_Y(); }
+	inline function SOCKET_Y(pos:Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
 
 	function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -81,12 +86,26 @@ class Nodes {
 		if (lastNodesCount > canvas.nodes.length) ui.changed = true;
 		lastNodesCount = canvas.nodes.length;
 
-		SCALE = ui.ops.scaleFactor;
 		var wx = ui._windowX;
 		var wy = ui._windowY;
 
 		// Pan cavas
-		if (ui.inputDownR) { panX += ui.inputDX; panY += ui.inputDY; }
+		if (ui.inputDownR) {
+			panX += ui.inputDX / SCALE;
+			panY += ui.inputDY / SCALE;
+		}
+
+		// Zoom canvas
+		if (ui.inputWheelDelta != 0) {
+			var old = zoom;
+			zoom += ui.inputWheelDelta / 10;
+			if (zoom < 0.4) zoom = 0.4;
+			else if (zoom > 1.0) zoom = 1.0;
+			zoom = Math.round(zoom * 10) / 10;
+			uiw = ui._w;
+			uih = ui._h;
+		}
+		SCALE = ui.ops.scaleFactor * zoom;
 
 		for (link in canvas.links) {
 			var from = getNode(canvas.nodes, link.from_id);
@@ -106,13 +125,19 @@ class Nodes {
 					var inps = node.inputs;
 					var outs = node.outputs;
 					var nodeh = NODE_H(node);
-					if (ui.getInputInRect(wx + NODE_X(node) - LINE_H / 2, wy + NODE_Y(node) - LINE_H / 2, NODE_W() + LINE_H, nodeh + LINE_H)) {
+					var rx = wx + NODE_X(node) - LINE_H() / 2;
+					var ry = wy + NODE_Y(node) - LINE_H() / 2;
+					var rw = NODE_W() + LINE_H();
+					var rh = nodeh + LINE_H();
+					if (ui.getInputInRect(rx, ry, rw, rh)) {
 						// Snap to output
 						if (from == null && node.id != to.id) {
 							for (i in 0...outs.length) {
 								var sx = wx + NODE_X(node) + NODE_W();
 								var sy = wy + NODE_Y(node) + SOCKET_Y(i);
-								if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
+								var rx = sx - LINE_H() / 2;
+								var ry = sy - LINE_H() / 2;
+								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
 									snapX = sx;
 									snapY = sy;
 									snapFromId = node.id;
@@ -126,7 +151,9 @@ class Nodes {
 							for (i in 0...inps.length) {
 								var sx = wx + NODE_X(node) ;
 								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
-								if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
+								var rx = sx - LINE_H() / 2;
+								var ry = sy - LINE_H() / 2;
+								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
 									snapX = sx;
 									snapY = sy;
 									snapToId = node.id;
@@ -147,16 +174,16 @@ class Nodes {
 
 			// Drag node
 			var nodeh = NODE_H(node);
-			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H / 2, wy + NODE_Y(node), NODE_W() + LINE_H, LINE_H)) {
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
 				nodeDrag = node;
 				nodeSelected = nodeDrag;
 			}
-			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H / 2, wy + NODE_Y(node) - LINE_H / 2, NODE_W() + LINE_H, nodeh + LINE_H)) {
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node) - LINE_H() / 2, NODE_W() + LINE_H(), nodeh + LINE_H())) {
 				// Check sockets
 				for (i in 0...outs.length) {
 					var sx = wx + NODE_X(node) + NODE_W();
 					var sy = wy + NODE_Y(node) + SOCKET_Y(i);
-					if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
+					if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 						// New link from output
 						var l = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
 						canvas.links.push(l);
@@ -168,7 +195,7 @@ class Nodes {
 					for (i in 0...inps.length) {
 						var sx = wx + NODE_X(node);
 						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
-						if (ui.getInputInRect(sx - LINE_H / 2, sy - LINE_H / 2, LINE_H, LINE_H)) {
+						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
 								if (l.to_id == node.id && l.to_socket == i) {
@@ -218,8 +245,8 @@ class Nodes {
 			}
 			if (nodeDrag == node) {
 				// handle.redraws = 2;
-				node.x += Std.int(ui.inputDX);
-				node.y += Std.int(ui.inputDY);
+				node.x += Std.int(ui.inputDX / SCALE);
+				node.y += Std.int(ui.inputDY / SCALE);
 			}
 
 			drawNode(ui, node);
@@ -233,13 +260,13 @@ class Nodes {
 	public function drawNode(ui: Zui, node: TNode) {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
-		var w = p(NODE_W());
+		var w = NODE_W();
 		var g = ui.g;
-		var h = p(NODE_H(node));
-		var nx = p(NODE_X(node));
-		var ny = p(NODE_Y(node));
+		var h = NODE_H(node);
+		var nx = NODE_X(node);
+		var ny = NODE_Y(node);
 		var text = node.name;
-		var lineh = p(LINE_H);
+		var lineh = LINE_H();
 
 		// Outline
 		g.color = node == nodeSelected ? 0xffaaaaaa : 0xff202020;
@@ -249,17 +276,17 @@ class Nodes {
 		g.color = node.color;
 		g.fillRect(nx, ny, w, lineh);
 
+		// Body
+		g.color = 0xff303030;
+		g.fillRect(nx, ny + lineh, w, h - lineh);
+
 		// Title
 		g.color = 0xffe7e7e7;
 		g.font = ui.ops.font;
-		g.fontSize = ui.fontSize;
+		g.fontSize = zoom > 0.5 ? ui.fontSize : Std.int(ui.fontSize * 0.7);
 		var textw = g.font.width(g.fontSize, text);
-		g.drawString(text, nx + w / 2 - textw / 2, ny + 3);
-
-		// Body
+		g.drawString(text, nx + w / 2 - textw / 2, ny + 3 * SCALE);
 		ny += lineh;
-		g.color = 0xff303030;
-		g.fillRect(nx, ny, w, h - lineh);
 
 		// Outputs
 		for (out in node.outputs) {
@@ -341,17 +368,17 @@ class Nodes {
 		g.color = 0xccadadad;
 		// var curve = Math.min(Math.abs(y2 - y1) / 6.0, 40.0);
 		// kha.graphics2.GraphicsExtension.drawCubicBezier(g, [x1, x1 + curve, x2 - curve, x2], [y1, y1 + curve, y2 - curve, y2], 20, 2.0);
-		g.drawLine(p(x1), p(y1), p(x2), p(y2), 1.0);
+		g.drawLine(x1, y1, x2, y2, 1.0);
 		g.color = 0x99adadad;
-		g.drawLine(p(x1) + 0.5, p(y1), p(x2) + 0.5, p(y2), 1.0);
-		g.drawLine(p(x1) - 0.5, p(y1), p(x2) - 0.5, p(y2), 1.0);
-		g.drawLine(p(x1), p(y1) + 0.5, p(x2), p(y2) + 0.5, 1.0);
-		g.drawLine(p(x1), p(y1) - 0.5, p(x2), p(y2) - 0.5, 1.0);
+		g.drawLine(x1 + 0.5, y1, x2 + 0.5, y2, 1.0);
+		g.drawLine(x1 - 0.5, y1, x2 - 0.5, y2, 1.0);
+		g.drawLine(x1, y1 + 0.5, x2, y2 + 0.5, 1.0);
+		g.drawLine(x1, y1 - 0.5, x2, y2 - 0.5, 1.0);
 		// g.color = 0x66adadad;
-		// g.drawLine(p(x1) + 1.0, p(y1), p(x2) + 1.0, p(y2), 1.0);
-		// g.drawLine(p(x1) - 1.0, p(y1), p(x2) - 1.0, p(y2), 1.0);
-		// g.drawLine(p(x1), p(y1) + 1.0, p(x2), p(y2) + 1.0, 1.0);
-		// g.drawLine(p(x1), p(y1) - 1.0, p(x2), p(y2) - 1.0, 1.0);
+		// g.drawLine(x1 + 1.0, y1, x2 + 1.0, y2, 1.0);
+		// g.drawLine(x1 - 1.0, y1, x2 - 1.0, y2, 1.0);
+		// g.drawLine(x1, y1 + 1.0, x2, y2 + 1.0, 1.0);
+		// g.drawLine(x1, y1 - 1.0, x2, y2 - 1.0, 1.0);
 	}
 
 	public function removeNode(n: TNode, canvas: TNodeCanvas) {
