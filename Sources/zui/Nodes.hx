@@ -40,6 +40,7 @@ class Nodes {
 	inline function NODE_X(node:TNode) { return node.x * SCALE + PAN_X(); }
 	inline function NODE_Y(node:TNode) { return node.y * SCALE + PAN_Y(); }
 	inline function SOCKET_Y(pos:Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
+	inline function p(f: Float): Float { return f * SCALE; }
 
 	function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -283,8 +284,9 @@ class Nodes {
 		// Title
 		g.color = 0xffe7e7e7;
 		g.font = ui.ops.font;
-		g.fontSize = zoom > 0.5 ? ui.fontSize : Std.int(ui.fontSize * 0.7);
-		var textw = g.font.width(g.fontSize, text);
+		var fontSize = zoom > 0.5 ? ui.fontSize : Std.int(ui.fontSize * 0.7);
+		g.fontSize = fontSize;
+		var textw = g.font.width(fontSize, text);
 		g.drawString(text, nx + w / 2 - textw / 2, ny + 3 * SCALE);
 		ny += lineh;
 
@@ -299,8 +301,8 @@ class Nodes {
 		g.color = 0xffe7e7e7;
 		for (out in node.outputs) {
 			ny += lineh;
-			var strw = ui.ops.font.width(ui.fontSize, out.name);
-			g.drawString(out.name, nx + w - strw - 12, ny - 7);
+			var strw = ui.ops.font.width(fontSize, out.name);
+			g.drawString(out.name, nx + w - strw - p(12), ny - p(7));
 		}
 
 		// Buttons
@@ -359,7 +361,7 @@ class Nodes {
 		g.color = 0xffe7e7e7;
 		for (inp in node.inputs) {
 			ny += lineh;
-			g.drawString(inp.name, nx + 12, ny - 7);
+			g.drawString(inp.name, nx + p(12), ny - p(7));
 		}
 	}
 
