@@ -346,7 +346,7 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				var soc = node.outputs[but.output];
-				var texts = getEnumTexts();
+				var texts = but.data != null ? but.data : getEnumTexts();
 				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, "Asset");
 				soc.default_value = mapEnum(texts[but.default_value]);
 				ny += 10; // Fix align?
@@ -438,6 +438,7 @@ typedef TNodeButton = {
 	var type: String;
 	var output: Int;
 	@:optional var default_value: Dynamic;
+	@:optional var data: Array<String>;
 	@:optional var min: Null<Float>;
 	@:optional var max: Null<Float>;
 }
