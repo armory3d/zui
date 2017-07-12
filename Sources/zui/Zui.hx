@@ -175,10 +175,10 @@ class Zui {
 		_h = 0;
 	}
 
-	public function end() { // End drawing
+	public function end(last = true) { // End drawing
 		if (!windowEnded) endWindow();
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
-		endInput();
+		if (last) endInput();
 	}
 
 	function endInput() {
