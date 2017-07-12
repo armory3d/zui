@@ -753,6 +753,9 @@ class Zui {
 	function drawString(g: kha.graphics2.Graphics, text: String,
 						xOffset: Null<Float> = null, yOffset: Float = 0,
 						align:Align = Left) {
+		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
+		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
+		
 		if (xOffset == null) xOffset = t._DEFAULT_TEXT_OFFSET_X;
 		xOffset *= SCALE;
 		g.font = ops.font;
@@ -760,24 +763,21 @@ class Zui {
 		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
 		else if (align == Right) xOffset = _w - ops.font.width(fontSize, text) - DEFAULT_TEXT_OFFSET_X();
 
-		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
-		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
-
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
 	function drawStringSmall(g: kha.graphics2.Graphics, text: String,
 							 xOffset: Null<Float> = null, yOffset: Float = 0,
 							 align:Align = Left) {
+		var maxChars = Std.int(_w / Std.int(fontSmallSize / 2)); // Guess width for now
+		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
+
 		if (xOffset == null) xOffset = t._DEFAULT_TEXT_OFFSET_X;
 		xOffset *= SCALE;
 		g.font = ops.font;
 		g.fontSize = fontSmallSize;
 		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSmallSize, text) / 2;
 		else if (align == Right) xOffset = _w - ops.font.width(fontSmallSize, text) - DEFAULT_TEXT_OFFSET_X();
-
-		var maxChars = Std.int(_w / Std.int(fontSmallSize / 2)); // Guess width for now
-		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
 		
 		g.drawString(text, _x + xOffset, _y + fontSmallOffsetY + yOffset);
 	}
