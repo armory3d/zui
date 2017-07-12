@@ -363,17 +363,21 @@ class Zui {
 		return handle.selected;
 	}
 	
-	public function image(image: kha.Image, tint = 0xffffffff) {
+	public function image(image: kha.Image, tint = 0xffffffff): State {
 		var w = _w - buttonOffsetY * 2;
 		var x = _x + buttonOffsetY;
 		var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
 		if (!scroll) { w -= SCROLL_W(); x += SCROLL_W() / 2; }
 		var ratio = w / image.width;
 		var h = image.height * ratio;
-		if (!isVisible(h)) { endElement(h); return; }
+		if (!isVisible(h)) { endElement(h); return State.Idle; }
+		var started = getStarted(h);
+		var down = getPushed(h);
+		var released = getReleased(h);
 		g.color = tint;
 		g.drawScaledImage(image, x, _y, w, h);
 		endElement(h);
+		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
 
 	public function text(text: String, align:Align = Left, bg = 0x00000000) {
@@ -837,28 +841,30 @@ class Zui {
 		return (_y + elemH > 0 && _y < currentWindow.texture.height);
 	}
 
-	function getReleased(): Bool { // Input selection
-		return inputEnabled && inputReleased && getHover() && getInitialHover();
+	function getReleased(elemH = -1.0): Bool { // Input selection
+		return inputEnabled && inputReleased && getHover(elemH) && getInitialHover(elemH);
 	}
 
-	function getPushed(): Bool {
-		return inputEnabled && inputDown && getHover() && getInitialHover();
+	function getPushed(elemH = -1.0): Bool {
+		return inputEnabled && inputDown && getHover(elemH) && getInitialHover(elemH);
 	}
 	
-	function getStarted(): Bool {
-		return inputEnabled && inputStarted && getHover();
+	function getStarted(elemH = -1.0): Bool {
+		return inputEnabled && inputStarted && getHover(elemH);
 	}
 
-	function getInitialHover(): Bool {
+	function getInitialHover(elemH = -1.0): Bool {
+		if (elemH == -1.0) elemH = ELEMENT_H();
 		return inputEnabled &&
 			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
-			inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + ELEMENT_H());
+			inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + elemH);
 	}
 
-	function getHover(): Bool {
+	function getHover(elemH = -1.0): Bool {
+		if (elemH == -1.0) elemH = ELEMENT_H();
 		return inputEnabled &&
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
-			inputY >= _windowY + _y && inputY < (_windowY + _y + ELEMENT_H());
+			inputY >= _windowY + _y && inputY < (_windowY + _y + elemH);
 	}
 
 	function getInputInRect(x: Float, y: Float, w: Float, h: Float, scale = 1.0): Bool {
@@ -1010,4 +1016,11 @@ class Handle {
 	var Left = 0;
 	var Center = 1;
 	var Right = 2;
+}
+
+@:enum abstract State(Int) from Int {
+	var Idle = 0;
+	var Started = 1;
+	var Down = 2;
+	var Released = 3;
 }
