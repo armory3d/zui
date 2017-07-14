@@ -158,6 +158,8 @@ class Ext {
 		// Wheel
 		var px = ui._x;
 		var py = ui._y;
+		var scroll = ui.currentWindow != null ? ui.currentWindow.scrollEnabled : false;
+		if (!scroll) { w -= ui.SCROLL_W(); px += ui.SCROLL_W() / 2; }
 		ui.image(ui.ops.color_wheel, kha.Color.fromFloats(cval, cval, cval));
 		// Picker
 		var ph = ui._y - py;

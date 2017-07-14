@@ -617,7 +617,7 @@ class Zui {
 		return handle.position;
 	}
 
-	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true): Float {
+	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true, align: Align = Right): Float {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
 		if (getStarted()) {
 			handle.scrolling = true;
@@ -641,11 +641,11 @@ class Zui {
 		drawSlider(handle.value, from, to, filled, hover); // Slider
 
 		g.color = t.DEFAULT_LABEL_COL;// Text
-		drawStringSmall(g, text, 0, 0, Right);
+		drawStringSmall(g, text, null, 0, align);
 
 		if (displayValue) {
 			g.color = t.TEXT_COL; // Value
-			drawStringSmall(g, handle.value + "");
+			drawStringSmall(g, handle.value + "", null, 0, align == Left ? Right : Left);
 		}
 
 		endElement();

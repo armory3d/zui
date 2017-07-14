@@ -114,7 +114,7 @@ class Nodes {
 			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W();
 			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + SOCKET_Y(link.from_socket);
 			var toX = to == null ? ui.inputX : wx + NODE_X(to);
-			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length);
+			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length + to.buttons.length);
 
 			// Snap to nearest socket
 			if (linkDrag == link) {
@@ -151,7 +151,7 @@ class Nodes {
 						else if (to == null && node.id != from.id) {
 							for (i in 0...inps.length) {
 								var sx = wx + NODE_X(node) ;
-								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
+								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length + node.buttons.length);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
 								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
@@ -195,7 +195,7 @@ class Nodes {
 				if (linkDrag == null) {
 					for (i in 0...inps.length) {
 						var sx = wx + NODE_X(node);
-						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length);
+						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length + node.buttons.length);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
@@ -250,7 +250,7 @@ class Nodes {
 				node.y += Std.int(ui.inputDY / SCALE);
 			}
 
-			drawNode(ui, node);
+			drawNode(ui, node, canvas);
 		}
 	}
 
@@ -258,7 +258,7 @@ class Nodes {
 	public static var getEnumTexts:Void->Array<String> = null;
 	public static var mapEnum:String->String = null;
 	
-	public function drawNode(ui: Zui, node: TNode) {
+	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
 		var w = NODE_W();
@@ -307,6 +307,7 @@ class Nodes {
 
 		// Buttons
 		var nhandle = handle.nest(node.id);
+		ny -= lineh / 3; // Fix align
 		for (but in node.buttons) {
 
 			if (but.type == 'RGBA') {
@@ -328,7 +329,13 @@ class Nodes {
 				var soc = node.outputs[but.output];
 				var min = but.min != null ? but.min : 0.0;
 				var max = but.max != null ? but.max : 1.0;
-				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", min, max, true);
+				var labelCol = ui.t.DEFAULT_LABEL_COL;
+				var textOff = ui.t._DEFAULT_TEXT_OFFSET_X;
+				ui.t.DEFAULT_LABEL_COL = 0xffffffff;
+				ui.t._DEFAULT_TEXT_OFFSET_X = 6;
+				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
+				ui.t.DEFAULT_LABEL_COL = labelCol;
+				ui.t._DEFAULT_TEXT_OFFSET_X = textOff;
 			}
 			else if (but.type == 'STRING') {
 				ny += lineh;
@@ -338,7 +345,7 @@ class Nodes {
 				// TODO: Handle both color and alpha, .output to array?
 				var soc = node.outputs[but.output];
 				soc.default_value = but.default_value = ui.textInput(nhandle.nest(0, {text: soc.default_value}), "");
-				ny += 10; // Fix align?
+				// ny += 10; // Fix align?
 			}
 			else if (but.type == 'ENUM') {
 				ny += lineh;
@@ -349,22 +356,52 @@ class Nodes {
 				var texts = but.data != null ? but.data : getEnumTexts();
 				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, "Asset");
 				soc.default_value = mapEnum(texts[but.default_value]);
-				ny += 10; // Fix align?
+				// ny += 10; // Fix align?
+			}
+			else if (but.type == 'BOOL') {
+				ny += lineh;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				ui.check(nhandle.nest(0, {value: but.default_value}), but.name);
 			}
 		}
+		ny += lineh / 3; // Fix align
 
 		// Inputs
-		for (inp in node.inputs) {
+		for (i in 0...node.inputs.length) {
+			var inp = node.inputs[i];
 			ny += lineh;
 			g.color = inp.color;
 			g.drawScaledImage(socketImage, nx - 5, ny - 5, 10, 10);
+			var isLinked = false;
+			for (l in canvas.links) if (l.to_id == node.id && l.to_socket == i) { isLinked = true; break; }
+			if (!isLinked && inp.type == 'VALUE') {
+				ui._x = nx + 6;
+				ui._y = ny - 9;
+				ui._w = w - 6;
+				var soc = inp;
+				var min = soc.min != null ? soc.min : 0.0;
+				var max = soc.max != null ? soc.max : 1.0;
+				var labelCol = ui.t.DEFAULT_LABEL_COL;
+				var textOff = ui.t._DEFAULT_TEXT_OFFSET_X;
+				ui.t.DEFAULT_LABEL_COL = 0xffffffff;
+				ui.t._DEFAULT_TEXT_OFFSET_X = 6;
+				soc.default_value = ui.slider(nhandle.nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
+				ui.t.DEFAULT_LABEL_COL = labelCol;
+				ui.t._DEFAULT_TEXT_OFFSET_X = textOff;
+			}
+			else {
+				g.color = 0xffe7e7e7;
+				g.drawString(inp.name, nx + p(12), ny - p(7));
+			}
 		}
-		ny -= lineh * node.inputs.length;
-		g.color = 0xffe7e7e7;
-		for (inp in node.inputs) {
-			ny += lineh;
-			g.drawString(inp.name, nx + p(12), ny - p(7));
-		}
+		// ny -= lineh * node.inputs.length;
+		// g.color = 0xffe7e7e7;
+		// for (inp in node.inputs) {
+			// ny += lineh;
+			// g.drawString(inp.name, nx + p(12), ny - p(7));
+		// }
 	}
 
 	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float) {
@@ -421,8 +458,10 @@ typedef TNodeSocket = {
 	var node_id: Int;
 	var name: String;
 	var type: String;
-	var default_value: Dynamic;
 	var color: Int;
+	var default_value: Dynamic;
+	@:optional var min: Null<Float>;
+	@:optional var max: Null<Float>;
 }
 
 typedef TNodeLink = {
