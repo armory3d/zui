@@ -166,7 +166,8 @@ class Nodes {
 					}
 				}
 			}
-			drawLink(ui, fromX - wx, fromY - wy, toX - wx, toY - wy);
+			var selected = nodeSelected != null && (link.from_id == nodeSelected.id || link.to_id == nodeSelected.id);
+			drawLink(ui, fromX - wx, fromY - wy, toX - wx, toY - wy, selected);
 		}
 
 		for (node in canvas.nodes) {
@@ -404,13 +405,13 @@ class Nodes {
 		// }
 	}
 
-	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float) {
+	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false) {
 		var g = ui.g;
-		g.color = 0xccadadad;
+		g.color = highlight ? 0xccadadad : 0xcc777777;
 		// var curve = Math.min(Math.abs(y2 - y1) / 6.0, 40.0);
 		// kha.graphics2.GraphicsExtension.drawCubicBezier(g, [x1, x1 + curve, x2 - curve, x2], [y1, y1 + curve, y2 - curve, y2], 20, 2.0);
 		g.drawLine(x1, y1, x2, y2, 1.0);
-		g.color = 0x99adadad;
+		g.color = highlight ? 0x99adadad : 0x99777777;
 		g.drawLine(x1 + 0.5, y1, x2 + 0.5, y2, 1.0);
 		g.drawLine(x1 - 0.5, y1, x2 - 0.5, y2, 1.0);
 		g.drawLine(x1, y1 + 0.5, x2, y2 + 0.5, 1.0);
