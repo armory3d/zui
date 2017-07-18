@@ -5,8 +5,8 @@ class Nodes {
 
 	public var nodeDrag:TNode = null;
 	public var nodeSelected:TNode = null;
-	var panX = 0.0;
-	var panY = 0.0;
+	public var panX = 0.0;
+	public var panY = 0.0;
 	public var zoom = 1.0;
 	public var uiw = 0;
 	public var uih = 0;
