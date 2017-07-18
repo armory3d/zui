@@ -207,6 +207,10 @@ class Zui {
 		if (last) endInput();
 	}
 
+	function inputChanged(): Bool {
+		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputReleased || inputDown || inputDownR || isKeyDown;
+	}
+
 	// Returns true if redraw is needed
 	public function window(handle: Handle, x: Int, y: Int, w: Int, h: Int, drag = false): Bool {
 		w = Std.int(w);// * ops.scaleFactor);
@@ -226,15 +230,17 @@ class Zui {
 		_windowW = w;
 		_windowH = h;
 
-		if (getInputInRect(_windowX, _windowY, _windowW, _windowH)) handle.redraws = 2; // Redraw
+		if (getInputInRect(_windowX, _windowY, _windowW, _windowH) && inputChanged()) {
+			handle.redraws = 2; // Redraw
+		}
+
+		if (handle.redraws == 0 && !isScrolling && !isTyping) return false;
 
 		_x = 0;
 		_y = handle.scrollOffset;
 		if (handle.layout == Horizontal) w = Std.int(ELEMENT_W());
 		_w = !handle.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
-
-		if (handle.redraws == 0 && !isScrolling && !isTyping) return false;
 
 		if (t.FILL_WINDOW_BG) {
 			g.begin(true, t.WINDOW_BG_COL);
