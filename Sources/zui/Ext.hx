@@ -95,13 +95,14 @@ class Ext {
 		#if kha_krom
 
 		var cmd = "ls ";
+		var systemId = kha.System.systemId;
 		if (handle.text == "") {
-			var systemId = kha.System.systemId;
 			initPath(handle, systemId);
 			if (systemId == "Windows") cmd = "dir ";
 		}
 
-		var save = Krom.savePath() + "/dir.txt";
+		var save = systemId == "Linux" ? "/tmp" : Krom.savePath();
+		save += "/dir.txt";
 		Krom.sysCommand(cmd + handle.text + ' > ' + '"' + save + '"');
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
 		var files = str.split("\n");
