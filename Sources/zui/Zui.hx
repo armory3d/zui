@@ -88,6 +88,7 @@ class Zui {
 	var submitTextHandle: Handle = null;
 	var textToSubmit = "";
 	var comboSelectedHandle: Handle = null;
+	var comboSelectedWindow: Handle = null;
 	var comboSelectedTexts: Array<String>;
 	var comboSelectedLabel: String;
 	var comboSelectedX: Int;
@@ -581,6 +582,7 @@ class Zui {
 			if (comboSelectedHandle == null) {
 				inputEnabled = false;
 				comboSelectedHandle = handle;
+				comboSelectedWindow = currentWindow;
 				comboSelectedTexts = texts;
 				comboSelectedLabel = label;
 				comboSelectedX = Std.int(_x + _windowX);
@@ -748,6 +750,7 @@ class Zui {
 			if (button(comboSelectedTexts[i], Align.Left)) {
 				comboToSubmit = i;
 				submitComboHandle = comboSelectedHandle;
+				if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
 				break;
 			}
 		}

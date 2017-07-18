@@ -182,7 +182,7 @@ class Ext {
 		ui.g.color = 0xffffffff;
 		ui.g.fillRect(cx - 2, cy - 2, 4, 4);
 		// Val slider
-		cval = ui.slider(handle.nest(0, {value: 1.0}), "Value", 0.0, 1.0, true);
+		cval = ui.slider(handle.nest(0, {value: 0.8}), "Value", 0.0, 1.0, true);
 		// Mouse picking
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
