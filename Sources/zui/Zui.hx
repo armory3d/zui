@@ -919,14 +919,14 @@ class Zui {
 		this.inputY = inputY;
 	}
 
-	function onKeyDown(code: kha.input.KeyCode) {
+	public function onKeyDown(code: kha.input.KeyCode) {
 		isKeyDown = true;
 		this.key = code;
 	}
 
-	function onKeyUp(code: kha.input.KeyCode) {}
+	public function onKeyUp(code: kha.input.KeyCode) {}
 
-	function onKeyPress(char: String) {
+	public function onKeyPress(char: String) {
 		isKeyDown = true;
 		this.char = char;
 	}
