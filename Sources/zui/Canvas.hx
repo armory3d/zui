@@ -35,7 +35,11 @@ class Canvas {
 			}
 		case Image:
 			var image = getAsset(canvas, element.asset);
-			if (image != null) ui.image(image);
+			if (image != null) {
+				ui.imageScrollAlign = false;
+				ui.image(image);
+				ui.imageScrollAlign = true;
+			}
 		}
 
 		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);

@@ -68,6 +68,7 @@ class Zui {
 	var radioSelectOffsetX: Float;
 	var radioSelectOffsetY: Float;
 	var scrollAlign: Float;
+	var imageScrollAlign = true;
 
 	var _x: Float; // Cursor(stack) position
 	var _y: Float;
@@ -374,11 +375,13 @@ class Zui {
 	public function image(image: kha.Image, tint = 0xffffffff): State {
 		var w = _w - buttonOffsetY * 2;
 		var x = _x + buttonOffsetY;
-		var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
-		if (!scroll) { 
-			var r = curRatio == -1 ? 1.0 : ratios[curRatio];
-			w -= SCROLL_W() * r;
-			x += SCROLL_W() * r / 2;
+		if (imageScrollAlign) {
+			var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
+			if (!scroll) { 
+				var r = curRatio == -1 ? 1.0 : ratios[curRatio];
+				w -= SCROLL_W() * r;
+				x += SCROLL_W() * r / 2;
+			}
 		}
 
 		var ratio = w / image.width;
