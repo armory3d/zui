@@ -623,12 +623,12 @@ class Zui {
 
 		if (showLabel && label != "") {
 			if (align == Left) _x -= 15;
-			drawStringSmall(g, label, null, null, align == Left ? Right : Left);
+			drawStringSmall(g, label, null, 0, align == Left ? Right : Left);
 			if (align == Left) _x += 15;
 		}
 		
 		if (align == Right) _x -= 15;
-		drawStringSmall(g, texts[handle.position], null, null, align);
+		drawStringSmall(g, texts[handle.position], null, 0, align);
 		if (align == Right) _x += 15;
 
 		endElement();
