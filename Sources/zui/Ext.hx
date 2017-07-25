@@ -150,7 +150,7 @@ class Ext {
 	}
 
 	static var wheelSelectedHande: Handle = null;
-	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null): kha.Color {
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, rowAlign = false): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.r, handle.g, handle.b, ar);
 		var chue = ar[0];
@@ -183,7 +183,8 @@ class Ext {
 		ui.g.color = 0xffffffff;
 		ui.g.fillRect(cx - 2, cy - 2, 4, 4);
 		// Val slider
-		cval = ui.slider(handle.nest(0, {value: 0.8}), "Value", 0.0, 1.0, true);
+		if (rowAlign) ui.row([1/2, 1/2]);
+		cval = ui.slider(handle.nest(0, {value: 1.0}), "Value", 0.0, 1.0, true);
 		// Mouse picking
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;

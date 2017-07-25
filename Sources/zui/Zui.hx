@@ -89,6 +89,7 @@ class Zui {
 	var textToSubmit = "";
 	var comboSelectedHandle: Handle = null;
 	var comboSelectedWindow: Handle = null;
+	var comboSelectedAlign: Align;
 	var comboSelectedTexts: Array<String>;
 	var comboSelectedLabel: String;
 	var comboSelectedX: Int;
@@ -576,13 +577,14 @@ class Zui {
 		return handle.position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align: Align = Left): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (comboSelectedHandle == null) {
 				inputEnabled = false;
 				comboSelectedHandle = handle;
 				comboSelectedWindow = currentWindow;
+				comboSelectedAlign = align;
 				comboSelectedTexts = texts;
 				comboSelectedLabel = label;
 				comboSelectedX = Std.int(_x + _windowX);
@@ -614,12 +616,14 @@ class Zui {
 		g.color = t.TEXT_COL; // Value
 
 		if (showLabel && label != "") {
-			_x -= 15;
-			drawStringSmall(g, label, 0, 0, Right);
-			_x += 15;
+			if (align == Left) _x -= 15;
+			drawStringSmall(g, label, null, null, align == Left ? Right : Left);
+			if (align == Left) _x += 15;
 		}
 		
-		drawStringSmall(g, texts[handle.position]);
+		if (align == Right) _x -= 15;
+		drawStringSmall(g, texts[handle.position], null, null, align);
+		if (align == Right) _x += 15;
 
 		endElement();
 		return handle.position;
@@ -747,7 +751,7 @@ class Zui {
 		beginLayout(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
 		inputEnabled = true;
 		for (i in 0...comboSelectedTexts.length) {
-			if (button(comboSelectedTexts[i], Align.Left)) {
+			if (button(comboSelectedTexts[i], comboSelectedAlign)) {
 				comboToSubmit = i;
 				submitComboHandle = comboSelectedHandle;
 				if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
