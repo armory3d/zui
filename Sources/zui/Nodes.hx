@@ -47,10 +47,10 @@ class Nodes {
 		return null;
 	}
 
+	var nodeId = -1;
 	public function getNodeId(nodes: Array<TNode>): Int {
-		var id = 0;
-		for (n in nodes) if (n.id >= id) id = n.id + 1;
-		return id;
+		if (nodeId == -1) for (n in nodes) if (id < n.id) id = n.id;
+		return ++nodeId;
 	}
 
 	function getLinkId(links: Array<TNodeLink>): Int {

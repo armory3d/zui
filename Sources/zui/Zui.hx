@@ -375,7 +375,12 @@ class Zui {
 		var w = _w - buttonOffsetY * 2;
 		var x = _x + buttonOffsetY;
 		var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
-		if (!scroll) { w -= SCROLL_W(); x += SCROLL_W() / 2; }
+		if (!scroll) { 
+			var r = curRatio == -1 ? 1.0 : ratios[curRatio];
+			w -= SCROLL_W() * r;
+			x += SCROLL_W() * r / 2;
+		}
+
 		var ratio = w / image.width;
 		var h = image.height * ratio;
 		if (!isVisible(h)) { endElement(h); return State.Idle; }
@@ -384,6 +389,7 @@ class Zui {
 		var released = getReleased(h);
 		g.color = tint;
 		g.drawScaledImage(image, x, _y, w, h);
+		
 		endElement(h);
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
@@ -929,6 +935,7 @@ class Zui {
 	public function onKeyDown(code: kha.input.KeyCode) {
 		isKeyDown = true;
 		this.key = code;
+		if (code == kha.input.KeyCode.Space) this.char = " ";
 	}
 
 	public function onKeyUp(code: kha.input.KeyCode) {}

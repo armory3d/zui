@@ -17,11 +17,6 @@ class Canvas {
 		return events;
 	}
 
-	static function getAsset(canvas: TCanvas, asset:String): kha.Image {
-		for (a in canvas.assets) if (a.name == asset) return a.image;
-		return null;
-	}
-
 	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement) {
 
 		ui._x = canvas.x + element.x;
@@ -39,11 +34,22 @@ class Canvas {
 				events.push(element.event);
 			}
 		case Image:
-			if (element.image == null) element.image = getAsset(canvas, element.asset);
-			if (element.image != null) ui.image(element.image);
+			var image = getAsset(canvas, element.asset);
+			if (image != null) ui.image(image);
 		}
 
 		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+	}
+
+	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
+		for (a in canvas.assets) if (a.name == asset) return a.image;
+		return null;
+	}
+
+	static var elemId = -1;
+	public static function getElementId(canvas: TCanvas): Int {
+		if (elemId == -1) for (e in canvas.elements) if (elemId < e.id) elemId = e.id;
+		return ++elemId;
 	}
 }
 
@@ -68,16 +74,15 @@ typedef TElement = {
 	@:optional var text: String;
 	@:optional var event: String;
 	@:optional var color: Int;
-	@:optional var asset: String;
 	@:optional var anchor: Int;
 	@:optional var children: Array<TElement>;
-	@:optional var image: kha.Image;
+	@:optional var asset: String;
 }
 
 typedef TAsset = {
 	var name:String;
 	var file:String;
-	var image:kha.Image;
+	@:optional var image: kha.Image;
 	@:optional var id: Int;
 }
 
