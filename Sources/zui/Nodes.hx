@@ -49,7 +49,7 @@ class Nodes {
 
 	var nodeId = -1;
 	public function getNodeId(nodes: Array<TNode>): Int {
-		if (nodeId == -1) for (n in nodes) if (id < n.id) id = n.id;
+		if (nodeId == -1) for (n in nodes) if (nodeId < n.id) nodeId = n.id;
 		return ++nodeId;
 	}
 
