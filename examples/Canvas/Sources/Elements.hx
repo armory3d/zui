@@ -30,7 +30,7 @@ class Elements {
 				name: "Text",
 				x: 0,
 				y: 0,
-				width: 100,
+				width: 200,
 				height: 50,
 				text: "Label"
 			},
