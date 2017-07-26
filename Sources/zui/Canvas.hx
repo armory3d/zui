@@ -3,6 +3,7 @@ package zui;
 @:access(zui.Zui)
 class Canvas {
 
+	public static var assetMap = new Map<Int, kha.Image>();
 	static var events:Array<String> = [];
 
 	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics):Array<String> {
@@ -47,7 +48,7 @@ class Canvas {
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
-		for (a in canvas.assets) if (a.name == asset) return a.image;
+		for (a in canvas.assets) if (a.name == asset) return assetMap.get(a.id);
 		return null;
 	}
 
@@ -55,6 +56,12 @@ class Canvas {
 	public static function getElementId(canvas: TCanvas): Int {
 		if (elemId == -1) for (e in canvas.elements) if (elemId < e.id) elemId = e.id;
 		return ++elemId;
+	}
+
+	static var assetId = -1;
+	public static function getAssetId(canvas: TCanvas): Int {
+		if (assetId == -1) for (a in canvas.assets) if (assetId < a.id) assetId = a.id;
+		return ++assetId;
 	}
 }
 
@@ -85,10 +92,9 @@ typedef TElement = {
 }
 
 typedef TAsset = {
+	var id: Int;
 	var name:String;
 	var file:String;
-	@:optional var image: kha.Image;
-	@:optional var id: Int;
 }
 
 @:enum abstract ElementType(Int) from Int {
