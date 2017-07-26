@@ -37,7 +37,8 @@ class Canvas {
 			var image = getAsset(canvas, element.asset);
 			if (image != null) {
 				ui.imageScrollAlign = false;
-				ui.image(image);
+				var tint = element.color != null ? element.color : 0xffffffff;
+				ui.image(image, tint, element.height);
 				ui.imageScrollAlign = true;
 			}
 		}

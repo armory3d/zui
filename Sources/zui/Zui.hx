@@ -372,7 +372,7 @@ class Zui {
 		return handle.selected;
 	}
 	
-	public function image(image: kha.Image, tint = 0xffffffff): State {
+	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null): State {
 		var w = _w - buttonOffsetY * 2;
 		var x = _x + buttonOffsetY;
 		if (imageScrollAlign) {
@@ -384,8 +384,10 @@ class Zui {
 			}
 		}
 
-		var ratio = w / image.width;
-		var h = image.height * ratio;
+		if (h == null) {
+			var ratio = w / image.width;
+			h = image.height * ratio;
+		}
 		if (!isVisible(h)) { endElement(h); return State.Idle; }
 		var started = getStarted(h);
 		var down = getPushed(h);
