@@ -32,14 +32,18 @@ class Canvas {
 			ui.fontSmallSize = size;
 		case Button:
 			if (ui.button(element.text)) {
-				events.push(element.event);
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
 			}
 		case Image:
 			var image = getAsset(canvas, element.asset);
 			if (image != null) {
 				ui.imageScrollAlign = false;
 				var tint = element.color != null ? element.color : 0xffffffff;
-				ui.image(image, tint, element.height);
+				if (ui.image(image, tint, element.height) == zui.Zui.State.Released) {
+					var e = element.event;
+					if (e != null && e != "") events.push(e);
+				}
 				ui.imageScrollAlign = true;
 			}
 		}
