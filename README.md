@@ -33,8 +33,8 @@ Portable immediate mode UI library designed for tooling and game debug. Built wi
 ## Elements
 ``` hx
 function panel(id: Handle, text: String, accent = 1): Bool;
-function image(image: Image): Void;
-function text(text: String, align = Left, bg = 0): Void;
+function image(image: Image): State;
+function text(text: String, align = Left, bg = 0);
 function textInput(id: Handle, label = ""): String;
 function button(text: String, align = Center): Bool;
 function check(id: Handle, text: String): Bool;
@@ -42,6 +42,7 @@ function radio(groupId: Handle, pos: Int, text: String): Bool;
 function inlineRadio(id: Handle, texts: Array<String>): Int;
 function combo(id: Handle, texts: Array<String>, label = ""): Int;
 function slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
+function tooltip(text: String);
 
 // Formating
 function row(ratios: Array<Float>);

@@ -35,6 +35,8 @@ class Elements {
 				ui.text("Text");
 				ui.textInput(Id.handle({text: "Hello"}), "Input");
 				ui.button("Button");
+				if (ui.isHovered) ui.tooltip("Tooltip Bubble!");
+				
 				ui.check(Id.handle(), "Check Box");
 				var hradio = Id.handle();
 				ui.radio(hradio, 0, "Radio 1");
@@ -54,6 +56,7 @@ class Elements {
 					ui.unindent();
 				}
 				ui.slider(Id.handle({value: 0.2}), "Slider", 0, 1);
+				if (ui.isHovered) ui.tooltip("Slider tooltip");
 				ui.slider(Id.handle({value: 0.4}), "Slider 2", 0, 1.2, true);
 				Ext.colorPicker(ui, Id.handle());
 				ui.separator();

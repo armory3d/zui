@@ -17,6 +17,10 @@ typedef ZuiOptions = {
 class Zui {
 	public var isScrolling = false; // Use to limit other activities
 	public var isTyping = false;
+	public var isStarted = false; // Current element state
+	public var isPushed = false;
+	public var isHovered = false;
+	public var isReleased = false;
 	public var changed = false; // Global elements change check
 
 	public var inputRegistered = false;
@@ -98,6 +102,11 @@ class Zui {
 	var comboSelectedW: Int;
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
+	var tooltipText = "";
+	var tooltipX = 0.0;
+	var tooltipY = 0.0;
+	var tooltipShown = false;
+	var tooltipTime = 0.0;
 
 	var elementsBaked = false;
 	static var checkSelectImage: kha.Image = null;
@@ -244,6 +253,7 @@ class Zui {
 		if (handle.layout == Horizontal) w = Std.int(ELEMENT_W());
 		_w = !handle.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
+		tooltipText = "";
 
 		if (t.FILL_WINDOW_BG) {
 			g.begin(true, t.WINDOW_BG_COL);
@@ -344,6 +354,17 @@ class Zui {
 		globalG.color = t.WINDOW_TINT_COL;
 		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 		globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
+		
+		if (tooltipText != "") {
+			if (!tooltipShown) { 
+				tooltipShown = true;
+				tooltipX = inputX;
+				tooltipTime = kha.Scheduler.time();
+			}
+			if (kha.Scheduler.time() - tooltipTime > t.TOOLTIP_DELAY) drawTooltip();
+		}
+		else tooltipShown = false;
+		
 		globalG.end();
 	}
 
@@ -517,7 +538,7 @@ class Zui {
 
 	public function button(text: String, align:Align = Center): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return false; }
-		var wasPressed = getReleased();
+		var released = getReleased();
 		var pushed = getPushed();
 		var hover = getHover();
 
@@ -532,7 +553,7 @@ class Zui {
 
 		endElement();
 
-		return wasPressed;
+		return released;
 	}
 
 	public function check(handle: Handle, text: String): Bool {
@@ -682,6 +703,11 @@ class Zui {
 		_y += 2;
 	}
 
+	public function tooltip(text: String) {
+		tooltipText = text;
+		tooltipY = _y + _windowY;
+	}
+
 	function drawArrow(selected: Bool, hover: Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
@@ -781,6 +807,17 @@ class Zui {
 		g = _g; // Restore
 	}
 
+	function drawTooltip() {
+		globalG.color = 0xffefefef;
+		var tooltipW = ops.font.width(fontSize, tooltipText);
+		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipW - 20);
+		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * 0.7);
+		globalG.font = ops.font;
+		globalG.fontSize = fontSize;
+		globalG.color = 0xff111111;
+		globalG.drawString(tooltipText, tooltipX + 5, tooltipY + 1);
+	}
+
 	function drawString(g: kha.graphics2.Graphics, text: String,
 						xOffset: Null<Float> = null, yOffset: Float = 0,
 						align:Align = Left) {
@@ -866,15 +903,18 @@ class Zui {
 	}
 
 	function getReleased(elemH = -1.0): Bool { // Input selection
-		return inputEnabled && inputReleased && getHover(elemH) && getInitialHover(elemH);
+		isReleased = inputEnabled && inputReleased && getHover(elemH) && getInitialHover(elemH);
+		return isReleased;
 	}
 
 	function getPushed(elemH = -1.0): Bool {
-		return inputEnabled && inputDown && getHover(elemH) && getInitialHover(elemH);
+		isPushed = inputEnabled && inputDown && getHover(elemH) && getInitialHover(elemH);
+		return isPushed;
 	}
 	
 	function getStarted(elemH = -1.0): Bool {
-		return inputEnabled && inputStarted && getHover(elemH);
+		isStarted = inputEnabled && inputStarted && getHover(elemH);
+		return isStarted;
 	}
 
 	function getInitialHover(elemH = -1.0): Bool {
@@ -886,9 +926,10 @@ class Zui {
 
 	function getHover(elemH = -1.0): Bool {
 		if (elemH == -1.0) elemH = ELEMENT_H();
-		return inputEnabled &&
+		isHovered = inputEnabled &&
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
 			inputY >= _windowY + _y && inputY < (_windowY + _y + elemH);
+		return isHovered;
 	}
 
 	function getInputInRect(x: Float, y: Float, w: Float, h: Float, scale = 1.0): Bool {
