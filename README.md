@@ -32,6 +32,7 @@ Portable immediate mode UI library designed for tooling and game debug. Built wi
 
 ## Elements
 ``` hx
+function tab(id: Handle, text: String): Bool;
 function panel(id: Handle, text: String, accent = 1): Bool;
 function image(image: Image): State;
 function text(text: String, align = Left, bg = 0);

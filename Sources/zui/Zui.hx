@@ -87,6 +87,7 @@ class Zui {
 	var windowEnded = true;
 	var scrollingHandle: Handle = null; // Window or slider being scrolled
 	public var scrollEnabled = true;
+	var windowHeader = 0.0;
 
 	var textSelectedHandle: Handle = null;
 	var textSelectedCurrentText: String;
@@ -107,6 +108,9 @@ class Zui {
 	var tooltipY = 0.0;
 	var tooltipShown = false;
 	var tooltipTime = 0.0;
+	var tabNames: Array<String> = null; // Number of tab calls since window begin
+	var tabHandle: Handle = null;
+	var tabScroll = 0.0;
 
 	var elementsBaked = false;
 	static var checkSelectImage: kha.Image = null;
@@ -241,6 +245,7 @@ class Zui {
 		_windowY = y + handle.dragY;
 		_windowW = w;
 		_windowH = h;
+		windowHeader = 0;
 
 		if (getInputInRect(_windowX, _windowY, _windowW, _windowH) && inputChanged()) {
 			handle.redraws = 2; // Redraw
@@ -254,6 +259,7 @@ class Zui {
 		_w = !handle.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
 		tooltipText = "";
+		tabNames = null;
 
 		if (t.FILL_WINDOW_BG) {
 			g.begin(true, t.WINDOW_BG_COL);
@@ -278,6 +284,7 @@ class Zui {
 				handle.dragY += Std.int(inputDY);
 			}
 			_y += 15; // Header offset 
+			windowHeader += 15;
 		}
 
 		return true;
@@ -286,6 +293,8 @@ class Zui {
 	public function endWindow() {
 		var handle = currentWindow;
 		if (handle.redraws > 0 || isScrolling || isTyping) {
+
+			if (tabNames != null) drawTabs();
 
 			if (handle.dragEnabled) { // Draggable header
 				g.color = t.SEPARATOR_COL;
@@ -299,6 +308,7 @@ class Zui {
 			}
 			else { // Draw window scrollbar if necessary
 				handle.scrollEnabled = true;
+				if (tabScroll < 0) { handle.scrollOffset = tabScroll; tabScroll = 0; } // Restore tab
 				var amountToScroll = fullHeight - _windowH;
 				var amountScrolled = -handle.scrollOffset;
 				var ratio = amountScrolled / amountToScroll;
@@ -370,6 +380,68 @@ class Zui {
 
 	function scroll(delta: Float, fullHeight: Float) {
 		currentWindow.scrollOffset -= delta;
+	}
+
+	var restoreX = -1.0;
+	var restoreY = -1.0;
+	public function tab(handle: Handle, text: String): Bool {
+		if (tabNames == null) { // First tab
+			tabNames = [];
+			tabHandle = handle;
+			windowHeader += buttonOffsetY + BUTTON_H();
+			restoreX = inputX; // Mouse in tab header, disable clicks for tab content
+			restoreY = inputY;
+			if (getInputInRect(_windowX, _windowY, _windowW, windowHeader)) { 
+				inputX = inputY = -1;
+			}
+		}
+		tabNames.push(text);
+		var selected = handle.position == tabNames.length - 1;
+		if (selected) endElement();
+		return selected;
+	}
+
+	function drawTabs() {
+		inputX = restoreX;
+		inputY = restoreY;
+		if (currentWindow == null) return;
+		var tabX = 0.0;
+		var origy = _y;
+		_y = currentWindow.dragEnabled ? 15 : 0;
+
+		g.color = t.WINDOW_BG_COL; // Underline tab buttons
+		g.fillRect(buttonOffsetY, _y, _windowW - buttonOffsetY * 2, buttonOffsetY + BUTTON_H());
+		g.color = t.TEXT_INPUT_BG_COL;
+		g.fillRect(buttonOffsetY, _y + buttonOffsetY + BUTTON_H(), _windowW - buttonOffsetY * 2, LINE_STRENGTH());
+		
+		for (i in 0...tabNames.length) {
+			_x = tabX;
+			_w = Std.int(ops.font.width(fontSmallSize, tabNames[i]) + buttonOffsetY * 2);
+			var released = getReleased();
+			var pushed = getPushed();
+			var hover = getHover();
+			if (released) {
+				var h = tabHandle.nest(tabHandle.position); // Restore tab scroll
+				h.scrollOffset = currentWindow.scrollOffset;
+				h = tabHandle.nest(i);
+				tabScroll = h.scrollOffset;
+				tabHandle.position = i; // Set new tab
+				currentWindow.redraws = 3;
+			}
+			var selected = tabHandle.position == i;
+
+			g.color = pushed ? t.TEXT_INPUT_BG_COL_HOVER : //
+					  hover ? t.TEXT_INPUT_BG_COL_HOVER : //
+					  t.TEXT_INPUT_BG_COL; //
+			tabX += _w + 5;
+			drawRect(g, selected, _x + buttonOffsetY, _y + buttonOffsetY, _w, BUTTON_H());
+			g.color = t.BUTTON_TEXT_COL;
+			drawStringSmall(g, tabNames[i], DEFAULT_TEXT_OFFSET_X(), 0, Align.Left);
+		}
+
+		_x = 0; // Restore positions
+		_y = origy;
+		_w = Std.int(!currentWindow.scrollEnabled ? _windowW : _windowW - SCROLL_W());
 	}
 
 	public function panel(handle: Handle, text: String, accent = 0): Bool {
