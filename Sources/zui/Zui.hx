@@ -466,7 +466,7 @@ class Zui {
 	}
 	
 	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null): State {
-		var w = _w - buttonOffsetY * 2;
+		var w = Math.min(image.width, _w - buttonOffsetY * 2);
 		var x = _x + buttonOffsetY;
 		if (imageScrollAlign) {
 			var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
