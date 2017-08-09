@@ -106,3 +106,16 @@ typedef TAsset = {
 	var Image = 1;
 	var Button = 2;
 }
+
+@:enum abstract AnchorType(Int) from Int {
+	var None = 0;
+	var TopLeft = 1;
+	var Top = 2;
+	var TopRight = 3;
+	var Left = 4;
+	var Center = 5;
+	var Right = 6;
+	var BottomLeft = 7;
+	var Bottom = 8;
+	var BottomRight = 9;
+}

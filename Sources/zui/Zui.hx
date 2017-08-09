@@ -409,14 +409,14 @@ class Zui {
 		var origy = _y;
 		_y = currentWindow.dragEnabled ? 15 : 0;
 
-		g.color = t.WINDOW_BG_COL; // Underline tab buttons
-		g.fillRect(buttonOffsetY, _y, _windowW - buttonOffsetY * 2, buttonOffsetY + BUTTON_H());
+		g.color = 0xff000000;//t.WINDOW_BG_COL; // Underline tab buttons
+		g.fillRect(0, _y, _windowW, buttonOffsetY + BUTTON_H());
 		g.color = t.TEXT_INPUT_BG_COL;
 		g.fillRect(buttonOffsetY, _y + buttonOffsetY + BUTTON_H(), _windowW - buttonOffsetY * 2, LINE_STRENGTH());
 		
 		for (i in 0...tabNames.length) {
 			_x = tabX;
-			_w = Std.int(ops.font.width(fontSmallSize, tabNames[i]) + buttonOffsetY * 2);
+			_w = Std.int(ops.font.width(fontSmallSize, tabNames[i]) + buttonOffsetY * 2 + 10);
 			var released = getReleased();
 			var pushed = getPushed();
 			var hover = getHover();
@@ -434,9 +434,14 @@ class Zui {
 					  hover ? t.TEXT_INPUT_BG_COL_HOVER : //
 					  t.TEXT_INPUT_BG_COL; //
 			tabX += _w + 5;
-			drawRect(g, selected, _x + buttonOffsetY, _y + buttonOffsetY, _w, BUTTON_H());
+			drawRect(g, !selected, _x + buttonOffsetY, _y + buttonOffsetY, _w, BUTTON_H());
 			g.color = t.BUTTON_TEXT_COL;
-			drawStringSmall(g, tabNames[i], DEFAULT_TEXT_OFFSET_X(), 0, Align.Left);
+			drawString(g, tabNames[i], DEFAULT_TEXT_OFFSET_X(), 0, Align.Left);
+
+			if (selected) { // Hide underline for active tab
+				g.color = t.WINDOW_BG_COL;
+				g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY + BUTTON_H(), _w - 1, LINE_STRENGTH());
+			}
 		}
 
 		_x = 0; // Restore positions
@@ -517,7 +522,7 @@ class Zui {
 
 		var hover = getHover();
 		g.color = hover ? t.TEXT_INPUT_BG_COL_HOVER : t.TEXT_INPUT_BG_COL; // Text bg
-		drawRect(g, t.FILL_TEXT_INPUT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H(), 2);
+		drawRect(g, t.FILL_TEXT_INPUT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
 		if (textSelectedHandle != handle && getReleased()) { // Passive
 			isTyping = true;
@@ -801,7 +806,7 @@ class Zui {
 		var y = _y + checkOffsetY;
 
 		g.color = hover ? t.CHECK_COL_HOVER : t.CHECK_COL;
-		drawRect(g, t.FILL_CHECK_BG, x, y, CHECK_W(), CHECK_H(), 2); // Bg
+		drawRect(g, t.FILL_CHECK_BG, x, y, CHECK_W(), CHECK_H()); // Bg
 
 		if (selected) { // Check
 			g.color = kha.Color.White;
@@ -840,7 +845,7 @@ class Zui {
 		var w = _w - buttonOffsetY * 2;
 
 		g.color = hover ? t.CHECK_COL_HOVER : t.CHECK_COL;
-		drawRect(g, t.FILL_SLIDER_BG, x, y, w, BUTTON_H(), 2); // Bg
+		drawRect(g, t.FILL_SLIDER_BG, x, y, w, BUTTON_H()); // Bg
 		
 		g.color = hover ? t.SLIDER_COL_HOVER : t.SLIDER_COL;
 		var offset = (value - from) / (to - from);
@@ -964,8 +969,9 @@ class Zui {
 		_w += TAB_W();
 	}
 	
-	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 1.0) {
-		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, LINE_STRENGTH());
+	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
+		if (strength == 0.0) strength = LINE_STRENGTH();
+		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, strength);
 	}
 
 	function isVisible(elemH: Float): Bool {
