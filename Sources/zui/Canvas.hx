@@ -6,7 +6,16 @@ class Canvas {
 	public static var assetMap = new Map<Int, kha.Image>();
 	static var events:Array<String> = [];
 
-	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics):Array<String> {
+	public static var screenW = -1;
+	public static var screenH = -1;
+
+	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
+		
+		if (screenW == -1) {
+			screenW = kha.System.windowWidth();
+			screenH = kha.System.windowHeight();
+		}
+
 		events = [];
 
 		ui.begin(g);
@@ -23,6 +32,32 @@ class Canvas {
 		ui._x = canvas.x + element.x;
 		ui._y = canvas.y + element.y;
 		ui._w = element.width;
+
+		var cw = canvas.width;
+		var ch = canvas.height;
+
+		switch (element.anchor) {
+		case Top:
+			ui._x -= (cw - screenW) / 2;
+		case TopRight:
+			ui._x -= cw - screenW;
+		case CenterLeft:
+			ui._y -= (ch - screenH) / 2;
+		case Center:
+			ui._x -= (cw - screenW) / 2;
+			ui._y -= (ch - screenH) / 2;
+		case CenterRight:
+			ui._x -= cw - screenW;
+			ui._y -= (ch - screenH) / 2;
+		case BottomLeft:
+			ui._y -= ch - screenH;
+		case Bottom:
+			ui._x -= (cw - screenW) / 2;
+			ui._y -= ch - screenH;
+		case BottomRight:
+			ui._x -= cw - screenW;
+			ui._y -= ch - screenH;
+		}
 
 		switch (element.type) {
 		case Text:
@@ -89,8 +124,8 @@ typedef TElement = {
 	var height: Int;
 	@:optional var text: String;
 	@:optional var event: String;
-	@:optional var color: Int;
-	@:optional var anchor: Int;
+	@:optional var color: Null<Int>;
+	@:optional var anchor: Null<Int>;
 	@:optional var children: Array<TElement>;
 	@:optional var asset: String;
 }
@@ -107,15 +142,14 @@ typedef TAsset = {
 	var Button = 2;
 }
 
-@:enum abstract AnchorType(Int) from Int {
-	var None = 0;
-	var TopLeft = 1;
-	var Top = 2;
-	var TopRight = 3;
-	var Left = 4;
-	var Center = 5;
-	var Right = 6;
-	var BottomLeft = 7;
-	var Bottom = 8;
-	var BottomRight = 9;
+@:enum abstract Anchor(Int) from Int {
+	var TopLeft = 0;
+	var Top = 1;
+	var TopRight = 2;
+	var CenterLeft = 3;
+	var Center = 4;
+	var CenterRight = 5;
+	var BottomLeft = 6;
+	var Bottom = 7;
+	var BottomRight = 8;
 }
