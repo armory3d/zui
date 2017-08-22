@@ -449,7 +449,7 @@ class Zui {
 		_w = Std.int(!currentWindow.scrollEnabled ? _windowW : _windowW - SCROLL_W());
 	}
 
-	public function panel(handle: Handle, text: String, accent = 0): Bool {
+	public function panel(handle: Handle, text: String, accent = 0, isTree = false): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
 		if (getReleased()) handle.selected = !handle.selected;
 		var hover = getHover();
@@ -459,7 +459,7 @@ class Zui {
 			g.fillRect(_x, _y, _w, ELEMENT_H());
 		}
 
-		drawArrow(handle.selected, hover);
+		isTree ? drawTree(handle.selected, hover) : drawArrow(handle.selected, hover);
 
 		g.color = hover ? t.PANEL_TEXT_COL_HOVER : t.PANEL_TEXT_COL; // Title
 		g.opacity = 1.0;
@@ -800,6 +800,20 @@ class Zui {
 			g.fillTriangle(x, y,
 						   x, y + ARROW_H(),
 						   x + ARROW_W(), y + ARROW_H() / 2);
+		}
+	}
+
+	function drawTree(selected: Bool, hover: Bool) {
+		var SIGN_W = 7;
+		var x = _x + arrowOffsetX + 1;
+		var y = _y + arrowOffsetY + 1;
+		g.color = hover ? t.ARROW_COL_HOVER : t.ARROW_COL;
+		if (selected) {
+			g.fillRect(x, y + SIGN_W / 2 - 1, SIGN_W, SIGN_W / 8);
+		}
+		else {
+			g.fillRect(x, y + SIGN_W / 2 - 1, SIGN_W, SIGN_W / 8);
+			g.fillRect(x + SIGN_W / 2 - 1, y, SIGN_W / 8, SIGN_W);
 		}
 	}
 
