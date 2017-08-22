@@ -10,6 +10,7 @@ class Ext {
 								removeCb: Int->Void = null,
 								getNameCb: Int->String = null,
 								setNameCb: Int->String->Void = null,
+								getLabelCb: Int->String = null,
 								itemDrawCb: Handle->Int->Void = null,
 								showRadio = false,
 								editable = true,
@@ -20,6 +21,7 @@ class Ext {
 		if (removeCb == null) removeCb = function(i: Int) { ar.splice(i, 1); };
 		if (getNameCb == null) getNameCb = function(i: Int) { return ar[i]; };
 		if (setNameCb == null) setNameCb = function(i: Int, name: String) { ar[i] = name; };
+		if (getLabelCb == null) getLabelCb = function(i: Int) return '';
 
 		var i = 0;
 		while (i < ar.length) {
@@ -32,7 +34,8 @@ class Ext {
 			else ui.row([0.8, 0.2]);
 
 			var itemHandle = handle.nest(i);
-			editable ? setNameCb(i, ui.textInput(itemHandle, getNameCb(i))) : ui.text(getNameCb(i));
+			itemHandle.text = getNameCb(i);
+			editable ? setNameCb(i, ui.textInput(itemHandle, getLabelCb(i))) : ui.text(getNameCb(i));
 			if (ui.button("X")) removeCb(i);
 			else i++;
 
@@ -106,7 +109,7 @@ class Ext {
 		Krom.sysCommand(cmd + handle.text + ' > ' + '"' + save + '"');
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
 		var files = str.split("\n");
-		
+
 		#elseif kha_kore
 
 		if (handle.text == "") initPath(handle, kha.System.systemId);
@@ -130,9 +133,9 @@ class Ext {
 		}
 
 		#else
-		
+
 		var files:Array<String> = [];
-		
+
 		#end
 
 		var nested = handle.text.indexOf("/", 1) != -1 || handle.text.indexOf("\\", 2) != -1;
@@ -145,7 +148,7 @@ class Ext {
 				handle.text += '/' + f;
 			}
 		}
-		
+
 		return handle.text;
 	}
 
@@ -166,7 +169,7 @@ class Ext {
 		var ph = ui._y - py;
 		var ox = px + w / 2;
 		var oy = py + ph / 2;
-		
+
 		var cw = w * 0.7;
 		var cwh = cw / 2;
 		var cx = ox;
