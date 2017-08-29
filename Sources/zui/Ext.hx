@@ -2,27 +2,35 @@ package zui;
 
 import zui.Zui;
 
+typedef ListOpts = {
+	?addCb: String->Void,
+	?removeCb: Int->Void,
+	?getNameCb: Int->String,
+	?setNameCb: Int->String->Void,
+	?getLabelCb: Int->String,
+	?itemDrawCb: Handle->Int->Void,
+	?showRadio: Bool, // false
+	?editable: Bool, // true
+	?showAdd: Bool, // true
+	?addLabel: String // 'Add'
+}
+
 @:access(zui.Zui)
 class Ext {
-
-	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>,
-								addCb: String->Void = null,
-								removeCb: Int->Void = null,
-								getNameCb: Int->String = null,
-								setNameCb: Int->String->Void = null,
-								getLabelCb: Int->String = null,
-								itemDrawCb: Handle->Int->Void = null,
-								showRadio = false,
-								editable = true,
-								showAdd = true): Int {
+	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>, opts: ListOpts ): Int {
 		var selected = 0;
 
-		if (addCb == null) addCb = function(name: String) { ar.push(name); };
-		if (removeCb == null) removeCb = function(i: Int) { ar.splice(i, 1); };
-		if (getNameCb == null) getNameCb = function(i: Int) { return ar[i]; };
-		if (setNameCb == null) setNameCb = function(i: Int, name: String) { ar[i] = name; };
-		if (getLabelCb == null) getLabelCb = function(i: Int) return '';
-
+		var addCb = opts.addCb != null ? opts.addCb : function(name: String) ar.push(name);
+		var removeCb = opts.removeCb != null ? opts.removeCb : function(i: Int) ar.splice(i, 1);
+		var getNameCb = opts.getNameCb != null ? opts.getNameCb : function(i: Int) return ar[i];
+		var setNameCb = opts.setNameCb != null ? opts.setNameCb : function(i: Int, name: String) ar[i] = name;
+		var getLabelCb = opts.getLabelCb != null ? opts.getLabelCb : function(i: Int) return '';
+		var itemDrawCb = opts.itemDrawCb;
+		var showRadio = opts.showRadio ? opts.showRadio : false;
+		var editable = opts.editable ? opts.editable : true;
+		var showAdd = opts.showAdd ? opts.showAdd : true;
+		var addLabel = opts.addLabel != null ? opts.addLabel : 'Add';
+		
 		var i = 0;
 		while (i < ar.length) {
 			if (showRadio) { // Prepend ratio button
@@ -41,7 +49,7 @@ class Ext {
 
 			if (itemDrawCb != null) itemDrawCb(itemHandle.nest(i), i - 1);
 		}
-		if (showAdd && ui.button("Add")) addCb("untitled");
+		if (showAdd && ui.button(opts.addLabel)) addCb("untitled");
 
 		return selected;
 	}
@@ -53,7 +61,8 @@ class Ext {
 									 setNameCb: Int->String->Void = null,
 									 itemDrawCb: Handle->Int->Void = null,
 									 editable = true,
-									 showAdd = true) {
+									 showAdd = true,
+									 addLabel: String = 'Add' ) {
 
 		if (addCb == null) addCb = function(name: String) { ar.push(name); };
 		if (removeCb == null) removeCb = function(i: Int) { ar.splice(i, 1); };
@@ -72,7 +81,7 @@ class Ext {
 
 			if (itemDrawCb != null && expanded) itemDrawCb(itemHandle.nest(i), i - 1);
 		}
-		if (showAdd && ui.button("Add")) {
+		if (showAdd && ui.button(addLabel)) {
 			addCb("untitled");
 		}
 	}
