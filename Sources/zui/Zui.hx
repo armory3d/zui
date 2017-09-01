@@ -904,7 +904,7 @@ class Zui {
 		globalG.color = 0xffefefef;
 		var tooltipW = ops.font.width(fontSize, tooltipText);
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipW - 20);
-		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * 0.7);
+		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * 0.9);
 		globalG.font = ops.font;
 		globalG.fontSize = fontSize;
 		globalG.color = 0xff111111;
