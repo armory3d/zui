@@ -355,7 +355,7 @@ class Nodes {
 				ui._w = w;
 				var soc = node.outputs[but.output];
 				var texts = but.data != null ? but.data : getEnumTexts();
-				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, "Asset");
+				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, but.name);
 				soc.default_value = mapEnum(texts[but.default_value]);
 				// ny += 10; // Fix align?
 			}
