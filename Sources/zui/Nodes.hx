@@ -245,7 +245,7 @@ class Nodes {
 				linkDrag = null;
 				nodeDrag = null;
 			}
-			if (nodeDrag == node) {
+			if (nodeDrag == node && !ui.inputDownR) {
 				// handle.redraws = 2;
 				node.x += Std.int(ui.inputDX / SCALE);
 				node.y += Std.int(ui.inputDY / SCALE);
