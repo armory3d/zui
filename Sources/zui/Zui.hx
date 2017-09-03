@@ -867,7 +867,6 @@ class Zui {
 		var offset = (value - from) / (to - from);
 		var barW = 8 * SCALE; // Unfilled bar
 		var sliderX = filled ? x : x + (w - barW) * offset;
-		sliderX = Math.min(sliderX, w);
 		var sliderW = filled ? w * offset : barW; 
 		sliderW = Math.min(sliderW, w);
 		g.fillRect(sliderX, y, sliderW, BUTTON_H());
