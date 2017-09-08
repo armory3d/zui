@@ -562,8 +562,11 @@ class Zui {
 					text = text.substr(0, cursorX) + text.substr(cursorX + 1);
 				} else if (key == kha.input.KeyCode.Return) { // Deselect
 					deselectText(); // One-line text for now
-				}
-				else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
+				} else if (key == kha.input.KeyCode.Home) {
+					cursorX = 0;
+				} else if (key == kha.input.KeyCode.End) {
+					cursorX = text.length;
+				} else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
 					if (char != null && char != "") {
 						if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 							text = text.substr(0, cursorX) + char + text.substr(cursorX);
