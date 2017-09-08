@@ -558,8 +558,9 @@ class Zui {
 						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
 						cursorX--;
 					}
-				}
-				else if (key == kha.input.KeyCode.Return) { // Deselect
+				} else if (key == kha.input.KeyCode.Delete) {
+					text = text.substr(0, cursorX) + text.substr(cursorX + 1);
+				} else if (key == kha.input.KeyCode.Return) { // Deselect
 					deselectText(); // One-line text for now
 				}
 				else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
