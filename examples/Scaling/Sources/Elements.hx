@@ -28,7 +28,7 @@ class Elements {
 		g.end();
 
 		ui.begin(g);
-		if (ui.window(Id.handle(), 10, 10, Std.int(240 * scale), 600, true)) {
+		if (ui.window(Id.handle(), 10, 10, 240, 600, true)) {
 			if (ui.panel(Id.handle({selected: true}), "Panel")) {
 				ui.indent();
 				ui.text("Text");
