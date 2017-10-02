@@ -17,9 +17,10 @@ typedef ListOpts = {
 
 @:access(zui.Zui)
 class Ext {
-	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>, opts: ListOpts ): Int {
+	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>, ?opts: ListOpts ): Int {
 		var selected = 0;
-
+		if (opts == null) opts = {};
+		
 		var addCb = opts.addCb != null ? opts.addCb : function(name: String) ar.push(name);
 		var removeCb = opts.removeCb != null ? opts.removeCb : function(i: Int) ar.splice(i, 1);
 		var getNameCb = opts.getNameCb != null ? opts.getNameCb : function(i: Int) return ar[i];
@@ -49,7 +50,7 @@ class Ext {
 
 			if (itemDrawCb != null) itemDrawCb(itemHandle.nest(i), i - 1);
 		}
-		if (showAdd && ui.button(opts.addLabel)) addCb("untitled");
+		if (showAdd && ui.button(addLabel)) addCb("untitled");
 
 		return selected;
 	}
