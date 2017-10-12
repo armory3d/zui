@@ -55,6 +55,7 @@ class Elements {
 					Ext.list(ui, Id.handle(), itemList);
 					ui.unindent();
 				}
+				ui.floatInput(Id.handle({text: "42.0"}), "Float Input");
 				ui.slider(Id.handle({value: 0.2}), "Slider", 0, 1);
 				if (ui.isHovered) ui.tooltip("Slider tooltip");
 				ui.slider(Id.handle({value: 0.4}), "Slider 2", 0, 1.2, true);
