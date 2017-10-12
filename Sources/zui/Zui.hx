@@ -511,7 +511,12 @@ class Zui {
 		endElement();
 	}
 
-	public function textInput(handle: Handle, label = "", align:Align = Left): String {
+	public function floatInput(handle: Handle, label = "", align:Align = Left): Float {
+		var text = textInput(handle, label, align, true);
+		return Std.parseFloat(text);
+	}
+
+	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat:Bool = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 		if (submitTextHandle == handle) { // Submit edited text
 			handle.text = textToSubmit;
@@ -589,6 +594,7 @@ class Zui {
 				g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 			}
 			
+			if (asFloat) text = formatFloatString(text);
 			textSelectedCurrentText = text;
 		}
 
@@ -605,6 +611,22 @@ class Zui {
 		endElement();
 
 		return handle.text;
+	}
+
+	inline function formatFloatString(text:String): String {
+		var f = Std.parseFloat(text);
+		if (f != f) f = 0; //NaN
+		var f_text = Std.string(f);
+
+		if (Std.parseInt(text) == f) f_text += ".0";
+		if (text.charAt(0) == "-") {
+			if (f_text.charAt(0) != "-") f_text = "-" + f_text; //keep - for -0.0
+			if (text.charAt(1) == "-") { //change -- to -
+				f_text = text.substring(1, text.length);
+				cursorX--;
+			}
+		}
+		return f_text;
 	}
 
 	function deselectText() {
