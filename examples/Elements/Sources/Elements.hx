@@ -35,7 +35,7 @@ class Elements {
 				ui.text("Text");
 				ui.textInput(Id.handle({text: "Hello"}), "Input");
 				ui.button("Button");
-				if (ui.isHovered) ui.tooltip("Tooltip Bubble!");
+				if (ui.isHovered) ui.tooltip("Tooltip Bubble!\nWith multi-line support!\nWoo!");
 				
 				ui.check(Id.handle(), "Check Box");
 				var hradio = Id.handle();
