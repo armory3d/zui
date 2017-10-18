@@ -42,6 +42,8 @@ class Zui {
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
+	var highlightStart = 0;
+	var highlightEnd = 0;
 
 	var ratios: Array<Float>; // Splitting rows
 	var curRatio = -1;
@@ -539,6 +541,7 @@ class Zui {
 			textSelectedCurrentText = handle.text;
 			cursorX = handle.text.length;
 			cursorY = 0;
+			setHighlight(0,cursorX); // Highlight all text when first selected
 
 			if (kha.input.Keyboard.get() != null) {
 				kha.input.Keyboard.get().show();
@@ -560,11 +563,11 @@ class Zui {
 				}
 				else if (key == kha.input.KeyCode.Backspace) { // Remove char
 					if (cursorX > 0) {
-						text = text.substr(0, cursorX - 1) + text.substr(cursorX);
+						text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
 						cursorX--;
 					}
 				} else if (key == kha.input.KeyCode.Delete) {
-					text = text.substr(0, cursorX) + text.substr(cursorX + 1);
+					text = text.substr(0, highlightStart) + text.substr(highlightEnd + 1);
 				} else if (key == kha.input.KeyCode.Return) { // Deselect
 					deselectText(); // One-line text for now
 				} else if (key == kha.input.KeyCode.Home) {
@@ -574,22 +577,31 @@ class Zui {
 				} else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
 					if (char != null && char != "") {
 						if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
-							text = text.substr(0, cursorX) + char + text.substr(cursorX);
+							text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 							cursorX++;
 						}
 					}
 				}
+				setHighlight(cursorX,cursorX); //TODO: Implement shift modifier key
+			}
+
+			var off = DEFAULT_TEXT_OFFSET_X();
+			var lineHeight = ELEMENT_H();
+			var cursorHeight = lineHeight - buttonOffsetY * 3.0;
+			//Draw highlight
+			if (highlightStart != highlightEnd) {
+				var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
+				var hlstrw = g.font.width(g.fontSize, hlstr);
+				var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
+				g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 			}
 
 			// Flash cursor
 			var time = kha.Scheduler.time();
 			if (time % (t.TEXT_CURSOR_FLASH_SPEED * 2.0) < t.TEXT_CURSOR_FLASH_SPEED) {
 				g.color = t.TEXT_CURSOR_COL; // Cursor
-				var cursorHeight = ELEMENT_H() - buttonOffsetY * 3.0;
-				var lineHeight = ELEMENT_H();
 				var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
 				var strw = g.font.width(g.fontSize, str);
-				var off = DEFAULT_TEXT_OFFSET_X();
 				var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 				g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 			}
@@ -611,6 +623,11 @@ class Zui {
 		endElement();
 
 		return handle.text;
+	}
+
+	inline function setHighlight(start:Int, end:Int) {
+		highlightStart = start < end ? start : end;
+		highlightEnd = start < end ? end : start;
 	}
 
 	inline function formatFloatString(text:String): String {
@@ -639,6 +656,7 @@ class Zui {
 		if (kha.input.Keyboard.get() != null) {
 			kha.input.Keyboard.get().hide();
 		}
+		setHighlight(0,0);
 	}
 
 	public function button(text: String, align:Align = Center): Bool {
