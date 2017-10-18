@@ -8,15 +8,6 @@ class Elements {
 	var ui: Zui;
 	var initialized = false;
 
-	public function new() {
-		Assets.loadEverything(loadingFinished);
-	}
-
-	function loadingFinished() {
-		initialized = true;
-		ui = new Zui({font: Assets.fonts.DroidSans});
-	}
-
 	var canvas:TCanvas = {
 		name: "Canvas",
 		x: 0,
@@ -32,7 +23,8 @@ class Elements {
 				y: 0,
 				width: 200,
 				height: 50,
-				text: "Label"
+				text: "Label",
+				color: 0xffff0000
 			},
 			{
 				id: 1,
@@ -43,9 +35,40 @@ class Elements {
 				width: 100,
 				height: 50,
 				text: "Button"
+			},
+			{
+				id: 2,
+				type: ElementType.Image,
+				name: "Image",
+				x: 300,
+				y: 100,
+				width: 140,
+				height: 140,
+				asset: "kode"
+			}
+		],
+		assets: [
+			{
+				id: 0,
+				name: "kode",
+				file: "kode.png"
 			}
 		]
 	};
+
+	public function new() {
+		Assets.loadEverything(loadingFinished);
+	}
+
+	function loadingFinished() {
+		initialized = true;
+		ui = new Zui({font: Assets.fonts.DroidSans});
+
+		// Map images referenced in canvas
+		for (a in canvas.assets) {
+			Canvas.assetMap.set(0, Reflect.field(kha.Assets.images, a.name));
+		}
+	}
 
 	public function render(framebuffer: Framebuffer): Void {
 		if (!initialized) return;
