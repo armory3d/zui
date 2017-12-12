@@ -61,12 +61,12 @@ class Canvas {
 
 		switch (element.type) {
 		case Text:
-			var size = ui.fontSmallSize;
+			var size = ui.fontSize;
 			var tcol = ui.t.TEXT_COL;
-			ui.fontSmallSize = element.height;
+			ui.fontSize = element.height;
 			ui.t.TEXT_COL = element.color;
 			ui.text(element.text);
-			ui.fontSmallSize = size;
+			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
 		case Button:
 			if (ui.button(element.text)) {

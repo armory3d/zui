@@ -279,7 +279,7 @@ class Nodes {
 		g.fillRect(nx, ny, w, lineh);
 
 		// Body
-		g.color = 0xff303030;
+		g.color = 0xff202020;
 		g.fillRect(nx, ny + lineh, w, h - lineh);
 
 		// Title
@@ -288,7 +288,7 @@ class Nodes {
 		var fontSize = zoom > 0.5 ? ui.fontSize : Std.int(ui.fontSize * 0.7);
 		g.fontSize = fontSize;
 		var textw = g.font.width(fontSize, text);
-		g.drawString(text, nx + w / 2 - textw / 2, ny + 3 * SCALE);
+		g.drawString(text, nx + w / 2 - textw / 2, ny + 4 * SCALE);
 		ny += lineh;
 
 		// Outputs
@@ -330,13 +330,13 @@ class Nodes {
 				var soc = node.outputs[but.output];
 				var min = but.min != null ? but.min : 0.0;
 				var max = but.max != null ? but.max : 1.0;
-				var labelCol = ui.t.DEFAULT_LABEL_COL;
-				var textOff = ui.t._DEFAULT_TEXT_OFFSET_X;
-				ui.t.DEFAULT_LABEL_COL = 0xffffffff;
-				ui.t._DEFAULT_TEXT_OFFSET_X = 6;
+				var labelCol = ui.t.LABEL_COL;
+				var textOff = ui.t.TEXT_OFFSET;
+				ui.t.LABEL_COL = 0xffffffff;
+				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
-				ui.t.DEFAULT_LABEL_COL = labelCol;
-				ui.t._DEFAULT_TEXT_OFFSET_X = textOff;
+				ui.t.LABEL_COL = labelCol;
+				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (but.type == 'STRING') {
 				ny += lineh;
@@ -384,13 +384,13 @@ class Nodes {
 				var soc = inp;
 				var min = soc.min != null ? soc.min : 0.0;
 				var max = soc.max != null ? soc.max : 1.0;
-				var labelCol = ui.t.DEFAULT_LABEL_COL;
-				var textOff = ui.t._DEFAULT_TEXT_OFFSET_X;
-				ui.t.DEFAULT_LABEL_COL = 0xffffffff;
-				ui.t._DEFAULT_TEXT_OFFSET_X = 6;
+				var labelCol = ui.t.LABEL_COL;
+				var textOff = ui.t.TEXT_OFFSET;
+				ui.t.LABEL_COL = 0xffffffff;
+				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
-				ui.t.DEFAULT_LABEL_COL = labelCol;
-				ui.t._DEFAULT_TEXT_OFFSET_X = textOff;
+				ui.t.LABEL_COL = labelCol;
+				ui.t.TEXT_OFFSET = textOff;
 			}
 			else {
 				g.color = 0xffe7e7e7;
