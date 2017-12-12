@@ -9,7 +9,7 @@ Portable immediate mode UI library designed for tooling and game debug. Built wi
 - Add `project.addLibrary('zui');` into *khafile.js*
 ``` hx
 	// In init()
-	var ui = new Zui({ font:Font, khaWindowId = 0, scaleFactor = 1.0 });
+	var ui = new Zui({ font: myFont, khaWindowId: 0, scaleFactor: 1.0 });
 
 	// In render()
 	public function render(frame:Framebuffer) {
