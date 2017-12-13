@@ -123,7 +123,7 @@ class Ext {
 		#elseif kha_kore
 
 		if (handle.text == "") initPath(handle, kha.System.systemId);
-		var files = sys.FileSystem.readDirectory(handle.text);
+		var files = sys.FileSystem.isDirectory(handle.text) ? sys.FileSystem.readDirectory(handle.text) : [];
 
 		#elseif kha_webgl
 
