@@ -115,6 +115,7 @@ class Ext {
 			cmd = "dir /b ";
 			sep = "\\";
 			handle.text = StringTools.replace(handle.text, "\\\\", "\\");
+			handle.text = StringTools.replace(handle.text, "\r", "");
 		}
 		if (handle.text == "") initPath(handle, systemId);
 
