@@ -104,19 +104,24 @@ class Ext {
 		// ~
 	}
 
+	static var lastPath = "";
 	public static function fileBrowser(ui: Zui, handle: Handle): String {
 		#if kha_krom
 
 		var cmd = "ls ";
+		var sep = "/";
 		var systemId = kha.System.systemId;
-		if (handle.text == "") {
-			initPath(handle, systemId);
-			if (systemId == "Windows") cmd = "dir ";
+		if (systemId == "Windows") {
+			cmd = "dir /b ";
+			sep = "\\";
+			handle.text = StringTools.replace(handle.text, "\\\\", "\\");
 		}
+		if (handle.text == "") initPath(handle, systemId);
 
 		var save = systemId == "Linux" ? "/tmp" : Krom.savePath();
-		save += "/dir.txt";
-		Krom.sysCommand(cmd + handle.text + ' > ' + '"' + save + '"');
+		save += "\\dir.txt";
+		if (handle.text != lastPath) Krom.sysCommand(cmd + handle.text + ' > ' + '"' + save + '"');
+		lastPath = handle.text;
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
 		var files = str.split("\n");
 
@@ -150,12 +155,13 @@ class Ext {
 
 		var nested = handle.text.indexOf("/", 1) != -1 || handle.text.indexOf("\\", 2) != -1;
 		if (nested && ui.button("..", Align.Left)) {
-			handle.text = handle.text.substring(0, handle.text.lastIndexOf("/"));
+			handle.text = handle.text.substring(0, handle.text.lastIndexOf(sep));
+			if (handle.text.length == 2 && handle.text.charAt(1) == ":") handle.text += sep;
 		}
 
 		for (f in files) {
 			if (f != "" && f.charAt(0) != "." && ui.button(f, Align.Left)) {
-				handle.text += '/' + f;
+				handle.text += sep + f;
 			}
 		}
 
