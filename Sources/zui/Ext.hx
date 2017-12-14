@@ -106,10 +106,11 @@ class Ext {
 
 	static var lastPath = "";
 	public static function fileBrowser(ui: Zui, handle: Handle): String {
+		var sep = "/";
+		
 		#if kha_krom
 
 		var cmd = "ls ";
-		var sep = "/";
 		var systemId = kha.System.systemId;
 		if (systemId == "Windows") {
 			cmd = "dir /b ";
