@@ -105,7 +105,7 @@ class Ext {
 	}
 
 	static var lastPath = "";
-	public static function fileBrowser(ui: Zui, handle: Handle): String {
+	public static function fileBrowser(ui: Zui, handle: Handle, foldersOnly = false): String {
 		var sep = "/";
 		
 		#if kha_krom
@@ -114,6 +114,7 @@ class Ext {
 		var systemId = kha.System.systemId;
 		if (systemId == "Windows") {
 			cmd = "dir /b ";
+			if (foldersOnly) cmd += "/ad ";
 			sep = "\\";
 			handle.text = StringTools.replace(handle.text, "\\\\", "\\");
 			handle.text = StringTools.replace(handle.text, "\r", "");
@@ -122,7 +123,7 @@ class Ext {
 
 		var save = systemId == "Linux" ? "/tmp" : Krom.savePath();
 		save += "\\dir.txt";
-		if (handle.text != lastPath) Krom.sysCommand(cmd + handle.text + ' > ' + '"' + save + '"');
+		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + ' > ' + '"' + save + '"');
 		lastPath = handle.text;
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
 		var files = str.split("\n");
