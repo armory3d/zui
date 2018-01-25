@@ -498,6 +498,7 @@ class Zui {
 
 	public function text(text: String, align:Align = Left, bg = 0x00000000) {
 		if (!isVisible(ELEMENT_H())) { endElement(); return; }
+		getReleased();
 		if (bg != 0x0000000) {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());

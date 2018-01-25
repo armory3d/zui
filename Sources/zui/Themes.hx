@@ -35,7 +35,7 @@ class Themes {
 		TEXT_COL: 0xffcac9c7,
 		LABEL_COL: 0xffaaaaaa,
 		ARROW_COL: 0xffcac9c7,
-		SEPARATOR_COL: 0xff22211f,
+		SEPARATOR_COL: 0xff262626,
 	};
 }
 
