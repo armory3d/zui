@@ -122,7 +122,7 @@ class Ext {
 		if (handle.text == "") initPath(handle, systemId);
 
 		var save = systemId == "Linux" ? "/tmp" : Krom.savePath();
-		save += "\\dir.txt";
+		save += systemId == "Windows" ? "\\dir.txt" : "/dir.txt";
 		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + ' > ' + '"' + save + '"');
 		lastPath = handle.text;
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
