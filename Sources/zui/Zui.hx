@@ -514,7 +514,7 @@ class Zui {
 		return Std.parseFloat(text);
 	}
 
-	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat:Bool = false): String {
+	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 		if (submitTextHandle == handle) { // Submit edited text
 			handle.text = textToSubmit;
@@ -537,7 +537,7 @@ class Zui {
 			textSelectedCurrentText = handle.text;
 			cursorX = handle.text.length;
 			cursorY = 0;
-			setHighlight(0,cursorX); // Highlight all text when first selected
+			setHighlight(0, cursorX); // Highlight all text when first selected
 
 			if (kha.input.Keyboard.get() != null) {
 				kha.input.Keyboard.get().show();
@@ -559,18 +559,28 @@ class Zui {
 				}
 				else if (key == kha.input.KeyCode.Backspace) { // Remove char
 					if (cursorX > 0) {
-						text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
+						if (highlightStart != highlightEnd) {
+							text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
+						}
+						else {
+							text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
+						}
 						cursorX--;
 					}
-				} else if (key == kha.input.KeyCode.Delete) {
+				}
+				else if (key == kha.input.KeyCode.Delete) {
 					text = text.substr(0, highlightStart) + text.substr(highlightEnd + 1);
-				} else if (key == kha.input.KeyCode.Return) { // Deselect
+				}
+				else if (key == kha.input.KeyCode.Return) { // Deselect
 					deselectText(); // One-line text for now
-				} else if (key == kha.input.KeyCode.Home) {
+				}
+				else if (key == kha.input.KeyCode.Home) {
 					cursorX = 0;
-				} else if (key == kha.input.KeyCode.End) {
+				}
+				else if (key == kha.input.KeyCode.End) {
 					cursorX = text.length;
-				} else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
+				}
+				else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
 					if (char != null && char != "") {
 						if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 							text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
@@ -578,7 +588,7 @@ class Zui {
 						}
 					}
 				}
-				setHighlight(cursorX,cursorX); //TODO: Implement shift modifier key
+				setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 			}
 
 			var off = TEXT_OFFSET();
