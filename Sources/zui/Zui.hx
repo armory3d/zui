@@ -226,9 +226,6 @@ class Zui {
 
 	// Returns true if redraw is needed
 	public function window(handle: Handle, x: Int, y: Int, w: Int, h: Int, drag = false): Bool {
-		w = Std.int(w * ops.scaleFactor);
-		h = Std.int(h * ops.scaleFactor);
-
 		if (handle.texture == null || w != handle.texture.width || h != handle.texture.height) {
 			resize(handle, w, h, ops.khaWindowId);
 		}
