@@ -245,7 +245,9 @@ class Zui {
 			handle.redraws = 2; // Redraw
 		}
 
-		if (handle.redraws == 0 && !isScrolling && !isTyping) return false;
+		if (handle.redraws == 0 && !isScrolling && !isTyping) {
+			return false;
+		}
 
 		_x = 0;
 		_y = handle.scrollOffset;
@@ -302,7 +304,10 @@ class Zui {
 			}
 			else { // Draw window scrollbar if necessary
 				handle.scrollEnabled = true;
-				if (tabScroll < 0) { handle.scrollOffset = tabScroll; tabScroll = 0; } // Restore tab
+				if (tabScroll < 0) { // Restore tab
+					handle.scrollOffset = tabScroll;
+					tabScroll = 0;
+				}
 				var amountToScroll = fullHeight - _windowH;
 				var amountScrolled = -handle.scrollOffset;
 				var ratio = amountScrolled / amountToScroll;
@@ -314,8 +319,7 @@ class Zui {
 				var barY = totalScrollableArea * ratio;
 
 				if ((inputStarted) && // Start scrolling
-					getInputInRect(_windowX + _windowW - SCROLL_W(), barY + _windowY, SCROLL_W(), barH)) {
-
+					 getInputInRect(_windowX + _windowW - SCROLL_W(), barY + _windowY, SCROLL_W(), barH)) {
 					handle.scrolling = true;
 					scrollingHandle = handle;
 					isScrolling = true;
@@ -482,7 +486,10 @@ class Zui {
 			var ratio = w / image.width;
 			h = image.height * ratio;
 		}
-		if (!isVisible(h)) { endElement(h); return State.Idle; }
+		if (!isVisible(h)) {
+			endElement(h);
+			return State.Idle;
+		}
 		var started = getStarted(h);
 		var down = getPushed(h);
 		var released = getReleased(h);
@@ -511,107 +518,107 @@ class Zui {
 		return Std.parseFloat(text);
 	}
 
+	function startTextEdit(handle: Handle) {
+		isTyping = true;
+		submitTextHandle = textSelectedHandle;
+		textToSubmit = textSelectedCurrentText;
+		textSelectedHandle = handle;
+		textSelectedCurrentText = handle.text;
+		cursorX = handle.text.length;
+		cursorY = 0;
+		setHighlight(0, cursorX); // Highlight all text when first selected
+		if (kha.input.Keyboard.get() != null) {
+			kha.input.Keyboard.get().show();
+		}
+	}
+
+	function submitTextEdit() {
+		submitTextHandle.text = textToSubmit;
+		submitTextHandle.changed = changed = true;
+		submitTextHandle = null;
+		textToSubmit = "";
+		textSelectedCurrentText = "";
+	}
+
+	function updateTextEdit(align:Align = Left, asFloat: Bool) {
+		var text = textSelectedCurrentText;
+		if (isKeyDown) { // Process input
+			if (key == kha.input.KeyCode.Left) { // Move cursor
+				if (cursorX > 0) cursorX--;
+			}
+			else if (key == kha.input.KeyCode.Right) {
+				if (cursorX < text.length) cursorX++;
+			}
+			else if (key == kha.input.KeyCode.Backspace) { // Remove char
+				if (cursorX > 0) {
+					if (highlightStart != highlightEnd) {
+						text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
+					}
+					else {
+						text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
+					}
+					cursorX--;
+				}
+			}
+			else if (key == kha.input.KeyCode.Delete) {
+				text = text.substr(0, highlightStart) + text.substr(highlightEnd + 1);
+			}
+			else if (key == kha.input.KeyCode.Return) { // Deselect
+				deselectText(); // One-line text for now
+			}
+			else if (key == kha.input.KeyCode.Home) {
+				cursorX = 0;
+			}
+			else if (key == kha.input.KeyCode.End) {
+				cursorX = text.length;
+			}
+			else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
+				if (char != null && char != "") {
+					if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
+						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
+						cursorX++;
+					}
+				}
+			}
+			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
+		}
+
+		var off = TEXT_OFFSET();
+		var lineHeight = ELEMENT_H();
+		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
+		//Draw highlight
+		if (highlightStart != highlightEnd) {
+			var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
+			var hlstrw = g.font.width(g.fontSize, hlstr);
+			var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
+			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+		}
+
+		// Flash cursor
+		var time = kha.Scheduler.time();
+		if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
+			g.color = t.TEXT_COL; // Cursor
+			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
+			var strw = g.font.width(g.fontSize, str);
+			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
+			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
+		}
+		
+		if (asFloat) text = formatFloatString(text);
+		textSelectedCurrentText = text;
+	}
+
 	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
-		if (submitTextHandle == handle) { // Submit edited text
-			handle.text = textToSubmit;
-			handle.changed = changed = true;
-			textToSubmit = "";
-			submitTextHandle = null;
-			textSelectedCurrentText = "";
-		}
+		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 
 		var hover = getHover();
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
 		drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
-		if (textSelectedHandle != handle && getReleased()) { // Passive
-			isTyping = true;
-			submitTextHandle = textSelectedHandle;
-			textToSubmit = textSelectedCurrentText;
-			textSelectedHandle = handle;
-			textSelectedCurrentText = handle.text;
-			cursorX = handle.text.length;
-			cursorY = 0;
-			setHighlight(0, cursorX); // Highlight all text when first selected
-
-			if (kha.input.Keyboard.get() != null) {
-				kha.input.Keyboard.get().show();
-			}
-		}
-
-		if (textSelectedHandle == handle) { // Active
-			var text = textSelectedCurrentText;
-			if (isKeyDown) { // Process input
-				if (key == kha.input.KeyCode.Left) { // Move cursor
-					if (cursorX > 0) {
-						cursorX--;
-					}
-				}
-				else if (key == kha.input.KeyCode.Right) {
-					if (cursorX < text.length) {
-						cursorX++;
-					}
-				}
-				else if (key == kha.input.KeyCode.Backspace) { // Remove char
-					if (cursorX > 0) {
-						if (highlightStart != highlightEnd) {
-							text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
-						}
-						else {
-							text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
-						}
-						cursorX--;
-					}
-				}
-				else if (key == kha.input.KeyCode.Delete) {
-					text = text.substr(0, highlightStart) + text.substr(highlightEnd + 1);
-				}
-				else if (key == kha.input.KeyCode.Return) { // Deselect
-					deselectText(); // One-line text for now
-				}
-				else if (key == kha.input.KeyCode.Home) {
-					cursorX = 0;
-				}
-				else if (key == kha.input.KeyCode.End) {
-					cursorX = text.length;
-				}
-				else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
-					if (char != null && char != "") {
-						if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
-							text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
-							cursorX++;
-						}
-					}
-				}
-				setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
-			}
-
-			var off = TEXT_OFFSET();
-			var lineHeight = ELEMENT_H();
-			var cursorHeight = lineHeight - buttonOffsetY * 3.0;
-			//Draw highlight
-			if (highlightStart != highlightEnd) {
-				var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
-				var hlstrw = g.font.width(g.fontSize, hlstr);
-				var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
-				g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
-			}
-
-			// Flash cursor
-			var time = kha.Scheduler.time();
-			if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
-				g.color = t.TEXT_COL; // Cursor
-				var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
-				var strw = g.font.width(g.fontSize, str);
-				var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
-				g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
-			}
-			
-			if (asFloat) text = formatFloatString(text);
-			textSelectedCurrentText = text;
-		}
+		if (textSelectedHandle != handle && getReleased()) startTextEdit(handle);
+		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
 
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
@@ -806,16 +813,33 @@ class Zui {
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
-		
+
 		var hover = getHover();
 		drawSlider(handle.value, from, to, filled, hover); // Slider
 
+		// Text edit
+		var lalign = align == Left ? Right : Left;
+		if (getReleased()) { // Mouse did not move
+			handle.text = handle.value + "";
+			startTextEdit(handle);
+		}
+		if (textSelectedHandle == handle) {
+			updateTextEdit(lalign, false);
+		}
+		if (submitTextHandle == handle) {
+			submitTextEdit();
+			handle.value = Std.parseFloat(handle.text);
+		}
+		else handle.changed = false;
+		
 		g.color = t.LABEL_COL;// Text
 		drawString(g, text, null, 0, align);
 
 		if (displayValue) {
 			g.color = t.TEXT_COL; // Value
-			drawString(g, handle.value + "", null, 0, align == Left ? Right : Left);
+			textSelectedHandle != handle ? 
+				drawString(g, handle.value + "", null, 0, lalign) :
+				drawString(g, textSelectedCurrentText, null, 0, lalign);
 		}
 
 		endElement();
@@ -1074,13 +1098,18 @@ class Zui {
 	public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
 		inputStarted = true;
 		button == 0 ? inputDown = true : inputDownR = true;
-		setInitialInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
+		var sx = Std.int(x * ops.scaleTexture);
+		var sy = Std.int(y * ops.scaleTexture);
+		setInputPosition(sx, sy);
+		inputInitialX = sx;
+		inputInitialY = sy;
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
 		if (isScrolling) {
 			isScrolling = false;
 			if (scrollingHandle != null) scrollingHandle.scrolling = false;
+			if (x == inputInitialX && y == inputInitialY) inputReleased = true; // Mouse not moved
 		}
 		else { // To prevent action when scrolling is active
 			inputReleased = true;
@@ -1097,18 +1126,12 @@ class Zui {
 	public function onMouseWheel(delta: Int) {
 		inputWheelDelta = delta;
 	}
-	
-	function setInitialInputPosition(inputX: Int, inputY: Int) {
-		setInputPosition(inputX, inputY);
-		this.inputInitialX = inputX;
-		this.inputInitialY = inputY;
-	}
 
-	function setInputPosition(inputX: Int, inputY: Int) {
-		inputDX += inputX - this.inputX;
-		inputDY += inputY - this.inputY;
-		this.inputX = inputX;
-		this.inputY = inputY;
+	function setInputPosition(x: Int, y: Int) {
+		inputDX += x - inputX;
+		inputDY += y - inputY;
+		inputX = x;
+		inputY = y;
 	}
 
 	public function onKeyDown(code: kha.input.KeyCode) {
