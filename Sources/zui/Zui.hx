@@ -482,10 +482,14 @@ class Zui {
 			}
 		}
 
-		if (h == null) {
-			var ratio = w / image.width;
-			h = image.height * ratio;
-		}
+		// Image size
+		var ratio = h == null ?
+			w / image.width :
+			h / image.height;
+		h == null ?
+			h = image.height * ratio :
+			w = image.width * ratio;
+
 		if (!isVisible(h)) {
 			endElement(h);
 			return State.Idle;
