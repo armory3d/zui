@@ -37,7 +37,7 @@ class Zui {
 	var inputDown: Bool;
 	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
-	var key: kha.input.KeyCode;
+	var key: Null<kha.input.KeyCode> = null;
 	var char: String;
 
 	var cursorX = 0; // Text input
