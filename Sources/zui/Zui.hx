@@ -93,6 +93,7 @@ class Zui {
 	var textSelectedCurrentText: String;
 	var submitTextHandle: Handle = null;
 	var textToSubmit = "";
+	var tabPressed = false;
 	var comboSelectedHandle: Handle = null;
 	var comboSelectedWindow: Handle = null;
 	var comboSelectedAlign: Align;
@@ -528,6 +529,7 @@ class Zui {
 		textToSubmit = textSelectedCurrentText;
 		textSelectedHandle = handle;
 		textSelectedCurrentText = handle.text;
+		tabPressed = false;
 		cursorX = handle.text.length;
 		cursorY = 0;
 		setHighlight(0, cursorX); // Highlight all text when first selected
@@ -569,6 +571,11 @@ class Zui {
 			}
 			else if (key == kha.input.KeyCode.Return) { // Deselect
 				deselectText(); // One-line text for now
+			}
+			else if (key == kha.input.KeyCode.Tab) { // Next field
+				tabPressed = true;
+				deselectText();
+				key = null;
 			}
 			else if (key == kha.input.KeyCode.Home) {
 				cursorX = 0;
@@ -621,7 +628,8 @@ class Zui {
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
 		drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
-		if (textSelectedHandle != handle && getReleased()) startTextEdit(handle);
+		var startEdit = getReleased() || tabPressed;
+		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
 		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
 
 		if (label != "") {
@@ -670,7 +678,7 @@ class Zui {
 		if (kha.input.Keyboard.get() != null) {
 			kha.input.Keyboard.get().hide();
 		}
-		setHighlight(0,0);
+		setHighlight(0, 0);
 	}
 
 	public function button(text: String, align:Align = Center): Bool {
@@ -822,11 +830,12 @@ class Zui {
 		drawSlider(handle.value, from, to, filled, hover); // Slider
 
 		// Text edit
-		var lalign = align == Left ? Right : Left;
-		if (getReleased()) { // Mouse did not move
+		var startEdit = getReleased() || tabPressed;
+		if (startEdit) { // Mouse did not move
 			handle.text = handle.value + "";
 			startTextEdit(handle);
 		}
+		var lalign = align == Left ? Right : Left;
 		if (textSelectedHandle == handle) {
 			updateTextEdit(lalign, false);
 		}
