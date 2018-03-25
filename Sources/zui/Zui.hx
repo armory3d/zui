@@ -94,6 +94,7 @@ class Zui {
 	var submitTextHandle: Handle = null;
 	var textToSubmit = "";
 	var tabPressed = false;
+	var tabPressedHandle: Handle = null;
 	var comboSelectedHandle: Handle = null;
 	var comboSelectedWindow: Handle = null;
 	var comboSelectedAlign: Align;
@@ -193,6 +194,10 @@ class Zui {
 		if (!windowEnded) endWindow();
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
 		if (last) endInput();
+		if (tabPressedHandle != null) {
+			setHighlight(0, tabPressedHandle.text.length);
+			tabPressedHandle = null;
+		}
 	}
 
 	function endInput() {
@@ -530,6 +535,7 @@ class Zui {
 		textSelectedHandle = handle;
 		textSelectedCurrentText = handle.text;
 		tabPressed = false;
+		tabPressedHandle = handle;
 		cursorX = handle.text.length;
 		cursorY = 0;
 		setHighlight(0, cursorX); // Highlight all text when first selected
