@@ -213,7 +213,6 @@ class Zui {
 		if (!elementsBaked) bakeElements(ops.scaleFactor);
 		currentWindow = null;
 		this.g = g;
-		SCALE = 1.0;
 		_windowX = 0;
 		_windowY = 0;
 		_windowW = w;
@@ -420,7 +419,7 @@ class Zui {
 		
 		for (i in 0...tabNames.length) {
 			_x = tabX;
-			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 14);
+			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 14 * SCALE);
 			var released = getReleased();
 			var pushed = getPushed();
 			var hover = getHover();
@@ -1174,7 +1173,7 @@ class Zui {
 	inline function CHECK_SIZE() { return t.CHECK_SIZE * SCALE; }
 	inline function CHECK_SELECT_SIZE() { return t.CHECK_SELECT_SIZE * SCALE; }
 	inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE); }
-	inline function TEXT_OFFSET() { return t.TEXT_OFFSET * SCALE; }
+	inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
 	inline function TAB_W() { return Std.int(t.TAB_W * SCALE); }
 	inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE; }
 
