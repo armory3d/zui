@@ -627,8 +627,6 @@ class Zui {
 
 	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
-		if (submitTextHandle == handle) submitTextEdit();
-		else handle.changed = false;
 
 		var hover = getHover();
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
@@ -637,6 +635,8 @@ class Zui {
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
 		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
+		if (submitTextHandle == handle) submitTextEdit();
+		else handle.changed = false;
 
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
