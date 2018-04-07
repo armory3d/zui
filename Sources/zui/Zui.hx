@@ -503,7 +503,8 @@ class Zui {
 		var down = getPushed(h);
 		var released = getReleased(h);
 		g.color = tint;
-		g.drawScaledImage(image, x, _y, w, h);
+		var h_float:Float = h; // TODO: hashlink fix
+		g.drawScaledImage(image, x, _y, w, h_float);
 		
 		endElement(h);
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
