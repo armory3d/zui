@@ -71,7 +71,7 @@ class Zui {
 	var radioOffsetY: Float;
 	var radioSelectOffsetX: Float;
 	var radioSelectOffsetY: Float;
-	var scrollAlign: Float;
+	var scrollAlign: Float = 0.0;
 	var imageScrollAlign = true;
 
 	var _x: Float; // Cursor(stack) position
@@ -115,7 +115,7 @@ class Zui {
 	var tabScroll = 0.0;
 
 	var elementsBaked = false;
-	static var checkSelectImage: kha.Image = null;
+	var checkSelectImage: kha.Image = null;
 
 	public function new(ops: ZuiOptions) {
 		if (ops.theme == null) ops.theme = Themes.dark;
@@ -125,15 +125,10 @@ class Zui {
 		if (ops.scaleTexture == null) ops.scaleTexture = 1.0;
 		if (ops.autoNotifyInput == null) ops.autoNotifyInput = true;
 		this.ops = ops;
-
-		if (ops.autoNotifyInput) registerInput();
-	}
-	
-	function bakeElements(scaleFactor: Float) {
-		SCALE = ops.scaleFactor = scaleFactor * ops.scaleTexture;
+		
+		SCALE = ops.scaleFactor * ops.scaleTexture;
 		fontSize = Std.int(t.FONT_SIZE * ops.scaleFactor);
 		var fontHeight = ops.font.height(fontSize);
-
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
 		arrowOffsetY = (ELEMENT_H() - ARROW_SIZE()) / 2;
 		arrowOffsetX = arrowOffsetY;
@@ -147,19 +142,21 @@ class Zui {
 		radioOffsetX = radioOffsetY;
 		radioSelectOffsetY = (CHECK_SIZE() - CHECK_SELECT_SIZE()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
-		scrollAlign = 0;
 
-		elementsBaked = true;
-
+		if (ops.autoNotifyInput) registerInput();
+	}
+	
+	function bakeElements() {
 		if (checkSelectImage == null) {
 			checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_SIZE()), Std.int(CHECK_SELECT_SIZE()), null, NoDepthAndStencil, 1, ops.khaWindowId);
 			var g = checkSelectImage.g2;
 			g.begin(true, 0x00000000);
 			g.color = t.ACCENT_SELECT_COL;
-			g.drawLine(0, 0, CHECK_SELECT_SIZE(), CHECK_SELECT_SIZE(), 2);//LINE_STRENGTH());
-			g.drawLine(CHECK_SELECT_SIZE(), 0, 0, CHECK_SELECT_SIZE(), 2);//LINE_STRENGTH());
+			g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
+			g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
 			g.end();
 		}
+		elementsBaked = true;
 	}
 
 	public function remove() { // Clean up
@@ -181,8 +178,7 @@ class Zui {
 	}
 
 	public function begin(g: kha.graphics2.Graphics) { // Begin UI drawing
-		if (!elementsBaked) bakeElements(ops.scaleFactor);
-		SCALE = ops.scaleFactor;
+		if (!elementsBaked) bakeElements();
 		globalG = g;
 		_x = 0; // Reset cursor
 		_y = 0;
@@ -210,7 +206,7 @@ class Zui {
 	}
 
 	public function beginLayout(g: kha.graphics2.Graphics, x: Int, y: Int, w: Int) {
-		if (!elementsBaked) bakeElements(ops.scaleFactor);
+		if (!elementsBaked) bakeElements();
 		currentWindow = null;
 		this.g = g;
 		_windowX = 0;
