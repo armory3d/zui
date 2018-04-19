@@ -1211,7 +1211,7 @@ class Handle {
 	public var text = "";
 	public var texture: kha.Image = null;
 	public var redraws = 2;
-	public var alwaysUpdate = true;
+	public var alwaysUpdate = false;
 	public var scrolling = false;
 	public var scrollOffset = 0.0;
 	public var scrollEnabled = false;
