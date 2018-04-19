@@ -250,6 +250,10 @@ class Zui {
 			handle.redraws = 2; // Redraw
 		}
 
+		if (handle.redraws == 0 && handle.alwaysUpdate) {
+			handle.redraws = 2;
+		}
+
 		if (handle.redraws == 0 && !isScrolling && !isTyping) {
 			return false;
 		}
