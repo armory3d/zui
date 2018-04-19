@@ -22,6 +22,7 @@ class Zui {
 	public var isHovered = false;
 	public var isReleased = false;
 	public var changed = false; // Global elements change check
+	public var alwaysRedraw = false; // Hurts performance
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -242,11 +243,12 @@ class Zui {
 		_windowH = h;
 		windowHeader = 0;
 
-		if (getInputInRect(_windowX, _windowY, _windowW, _windowH) && inputChanged()) {
+		var inputChanged = getInputInRect(_windowX, _windowY, _windowW, _windowH) && inputChanged();
+		if (alwaysRedraw || isScrolling || isTyping || inputChanged) {
 			handle.redraws = 2; // Redraw
 		}
 
-		if (handle.redraws == 0 && !isScrolling && !isTyping) {
+		if (handle.redraws == 0) {
 			return false;
 		}
 
