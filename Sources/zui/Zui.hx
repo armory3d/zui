@@ -126,7 +126,12 @@ class Zui {
 		if (ops.scaleTexture == null) ops.scaleTexture = 1.0;
 		if (ops.autoNotifyInput == null) ops.autoNotifyInput = true;
 		this.ops = ops;
-		
+		setScale(ops.scaleFactor);
+		if (ops.autoNotifyInput) registerInput();
+	}
+
+	public function setScale(factor: Float) {
+		ops.scaleFactor = factor;
 		SCALE = ops.scaleFactor * ops.scaleTexture;
 		fontSize = Std.int(t.FONT_SIZE * ops.scaleFactor);
 		var fontHeight = ops.font.height(fontSize);
@@ -143,8 +148,11 @@ class Zui {
 		radioOffsetX = radioOffsetY;
 		radioSelectOffsetY = (CHECK_SIZE() - CHECK_SELECT_SIZE()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
-
-		if (ops.autoNotifyInput) registerInput();
+		if (checkSelectImage != null) {
+			checkSelectImage.unload();
+			checkSelectImage = null;
+		}
+		elementsBaked = false;
 	}
 	
 	function bakeElements() {
