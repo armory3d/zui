@@ -148,23 +148,21 @@ class Zui {
 		radioOffsetX = radioOffsetY;
 		radioSelectOffsetY = (CHECK_SIZE() - CHECK_SELECT_SIZE()) / 2;
 		radioSelectOffsetX = radioSelectOffsetY;
-		if (checkSelectImage != null) {
-			checkSelectImage.unload();
-			checkSelectImage = null;
-		}
 		elementsBaked = false;
 	}
 	
 	function bakeElements() {
-		if (checkSelectImage == null) {
-			checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_SIZE()), Std.int(CHECK_SELECT_SIZE()), null, NoDepthAndStencil, 1, ops.khaWindowId);
-			var g = checkSelectImage.g2;
-			g.begin(true, 0x00000000);
-			g.color = t.ACCENT_SELECT_COL;
-			g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
-			g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
-			g.end();
+		if (checkSelectImage != null) {
+			checkSelectImage.unload();
+			checkSelectImage = null;
 		}
+		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_SIZE()), Std.int(CHECK_SELECT_SIZE()), null, NoDepthAndStencil, 1, ops.khaWindowId);
+		var g = checkSelectImage.g2;
+		g.begin(true, 0x00000000);
+		g.color = t.ACCENT_SELECT_COL;
+		g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
+		g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
+		g.end();
 		elementsBaked = true;
 	}
 
