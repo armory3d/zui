@@ -478,10 +478,12 @@ class Zui {
 	}
 	
 	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null): State {
-		var w = Math.min(image.width, _w);
+		var iw = image.width * SCALE;
+		var ih = image.height * SCALE;
+		var w = Math.min(iw, _w);
 		var x = _x;
 		if (imageScrollAlign) {
-			w = Math.min(image.width, _w - buttonOffsetY * 2);
+			w = Math.min(iw, _w - buttonOffsetY * 2);
 			x += buttonOffsetY;
 			var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
 			if (!scroll) { 
@@ -493,11 +495,11 @@ class Zui {
 
 		// Image size
 		var ratio = h == null ?
-			w / image.width :
-			h / image.height;
+			w / iw :
+			h / ih;
 		h == null ?
-			h = image.height * ratio :
-			w = image.width * ratio;
+			h = ih * ratio :
+			w = iw * ratio;
 
 		if (!isVisible(h)) {
 			endElement(h);
@@ -1071,6 +1073,12 @@ class Zui {
 		_w += TAB_W();
 	}
 	
+	public function fill(x: Float, y: Float, w: Float, h: Float, color: kha.Color) {
+		g.color = color;
+		g.fillRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE);
+		g.color = 0xffffffff;
+	}
+
 	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
 		if (strength == 0.0) strength = LINE_STRENGTH();
 		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, strength);
