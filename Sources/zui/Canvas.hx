@@ -1,4 +1,5 @@
 package zui;
+import zui.Zui;
 
 @:access(zui.Zui)
 class Canvas {
@@ -84,6 +85,11 @@ class Canvas {
 				}
 				ui.imageScrollAlign = true;
 			}
+		case Combo:
+			if( ui.combo(Id.handle(),element.modifiers['texts'],element.text,element.modifiers['showLabel'],element.modifiers['align']) > -1){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
 		}
 
 		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
@@ -131,6 +137,7 @@ typedef TElement = {
 	@:optional var anchor: Null<Int>;
 	@:optional var children: Array<TElement>;
 	@:optional var asset: String;
+	@:optional var modifiers: haxe.DynamicAccess<Dynamic>;
 }
 
 typedef TAsset = {
@@ -143,6 +150,7 @@ typedef TAsset = {
 	var Text = 0;
 	var Image = 1;
 	var Button = 2;
+	var Combo = 3;
 }
 
 @:enum abstract Anchor(Int) from Int {

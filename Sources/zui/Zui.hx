@@ -1196,6 +1196,15 @@ class Zui {
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 	}
+	public inline static function clamp(value:Float, min:Float, max:Float):Float
+	{
+		if (value < min)
+			return min;
+		else if (value > max)
+			return max;
+		else
+			return value;
+	}
 }
 
 typedef HandleOptions = {
