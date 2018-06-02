@@ -1,4 +1,5 @@
 package zui;
+import zui.Zui;
 
 @:access(zui.Zui)
 class Canvas {
