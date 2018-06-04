@@ -846,6 +846,39 @@ class Zui {
 		return handle.position == position;
 	}
 
+	public function elementGroup(ui: Zui, element: zui.Canvas.TElement){
+		var elemarr:Array<zui.Canvas.TElement> =  element.modifiers['elements'];
+		var i = elemarr.length;
+		var e = null;
+		for(y in 1...Math.ceil(elemarr.length/3)){
+			if (i%3 == 2) ui.row([1/2,1/2]);
+			if (i%3 == 0 ) ui.row([1/3,1/3,1/3]);
+			var check = 1;
+			while (check != 0) {
+				var elem = elemarr[i];
+				if(elem.type == zui.Canvas.ElementType.Radio){
+					if (ui.radio(Id.handle().nest(elem.id), i, elem.name) && elem.modifiers['currentValue'] != i ){
+						elem.modifiers['currentValue'] = i;
+						e = element.event;
+					}
+				}
+				else if(elem.type == zui.Canvas.ElementType.Check){
+					if(ui.check(Id.handle().nest(elem.id), elem.text)){
+						e = elem.event;
+					}
+				}
+				else if(elem.type == zui.Canvas.ElementType.Button){
+					if (ui.button(element.text)) {
+						e = elem.event;
+					}
+				}
+				i--;
+				check = Math.floor(i%3);
+			}
+		}
+		return e;
+	}
+
 	public function inlineRadio(handle: Handle, texts: Array<String>): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
 		if (getReleased()) {

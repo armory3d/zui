@@ -136,6 +136,37 @@ class Canvas {
 			for (id in element.children) {
 				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
 			}
+		case Slider:
+			var sliderValue = ui.slider(Id.handle().nest(element.id),element.name,element.modifiers['from'], element.modifiers['to'],
+			element.modifiers['filled'],element.modifiers['precision'],element.modifiers['displayValue']);
+			if( sliderValue > element.modifiers['currentValue'] || sliderValue < element.modifiers['currentValue']){
+				element.modifiers['currentValue'] = sliderValue;
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case ElementGroup:
+			var e = ui.elementGroup(ui,element);
+			if (e != null && e != "") events.push(e);
+
+		case Check:
+			if(ui.check(Id.handle().nest(element.id), element.text)){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case Radio:
+			if(ui.radio(Id.handle().nest(element.id),element.modifiers['currentValue'],element.text)){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case InlineRadio:
+			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.modifiers['texts']);
+			if(inlineIndex == element.modifiers['currentValue']){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case RadioGroup:
+		case ButtonGroup:
+		case CheckGroup:
 		}
 
 		if (rotated) ui.g.popTransformation();
