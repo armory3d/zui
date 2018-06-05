@@ -292,7 +292,8 @@ class Ext {
 					}
 				}
 				else if(elem.type == ElementType.Check){
-					elem.modifiers['callback'](ui.check(Id.handle().nest(elem.id), elem.text), elem.text);
+					var checked = ui.check(Id.handle().nest(elem.id), elem.text);
+					if(elem.modifiers['callback']) elem.modifiers['callback'](checked, elem.text);
 				}
 				else if(elem.type == ElementType.Button){
 					if (ui.button(elem.text)) {
