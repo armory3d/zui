@@ -101,8 +101,7 @@ class Canvas {
 				if (e != null && e != "") events.push(e);
 			}
 		case ElementGroup:
-			var e = ui.elementGroup(ui,element);
-			if (e != null && e != "") events.push(e);
+			Ext.elementGroup(ui,element);
 
 		case Check:
 			if(ui.check(Id.handle().nest(element.id), element.text)){
@@ -123,6 +122,7 @@ class Canvas {
 		case RadioGroup:
 		case ButtonGroup:
 		case CheckGroup:
+		case Count:
 		}
 		
 		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
@@ -193,6 +193,36 @@ typedef TAsset = {
 	var InlineRadio = 10;
 	var ElementGroup =11;
 	var Count = 12;
+	public static function getType(name: String):Int{
+		switch(name){
+			case 'Text':
+				return 0;
+			case 'Image':
+				return 1;
+			case 'Button':
+				return 2;
+			case 'ButtonGroup':
+				return 3;
+			case 'Combo':
+				return 4;
+			case 'Slider':
+				return 5;
+			case 'Radio':
+				return 6;
+			case 'RadioGroup':
+				return 7;
+			case 'Check':
+				return 8;
+			case 'CheckGroup':
+				return 9;
+			case 'InlineRadio':
+				return 10;
+			case 'ElementGroup':
+				return 11;
+			default:
+				return -1;
+		}
+	}
 }
 
 @:enum abstract Anchor(Int) from Int {
