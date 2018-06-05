@@ -145,8 +145,7 @@ class Canvas {
 				if (e != null && e != "") events.push(e);
 			}
 		case ElementGroup:
-			var e = ui.elementGroup(ui,element);
-			if (e != null && e != "") events.push(e);
+			Ext.elementGroup(ui,element);
 
 		case Check:
 			if(ui.check(Id.handle().nest(element.id), element.text)){
@@ -167,6 +166,7 @@ class Canvas {
 		case RadioGroup:
 		case ButtonGroup:
 		case CheckGroup:
+		case Count:
 		}
 
 		if (rotated) ui.g.popTransformation();
