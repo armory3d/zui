@@ -1,5 +1,7 @@
 package zui;
 import zui.Zui;
+import haxe.ds.Either;
+
 
 @:access(zui.Zui)
 class Canvas {
@@ -12,7 +14,7 @@ class Canvas {
 	static var _ui: Zui;
 	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
-	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
+	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics, previewMode = false, coff=0, hwin:Handle=null): Array<String> {
 		
 		if (screenW == -1) {
 			screenW = kha.System.windowWidth();
@@ -24,6 +26,7 @@ class Canvas {
 		_ui = ui;
 		ui.begin(g);
 		ui.g = g;
+		if(previewMode)ui.window(hwin,coff,coff,screenW,screenH,true);
 
 		for (elem in canvas.elements) {
 			if (elem.parent == null) drawElement(ui, canvas, elem);
@@ -137,31 +140,35 @@ class Canvas {
 				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
 			}
 		case Slider:
-			var sliderValue = ui.slider(Id.handle().nest(element.id),element.name,element.modifiers['from'], element.modifiers['to'],
-			element.modifiers['filled'],element.modifiers['precision'],element.modifiers['displayValue']);
-			if( sliderValue > element.modifiers['currentValue'] || sliderValue < element.modifiers['currentValue']){
-				element.modifiers['currentValue'] = sliderValue;
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
+			var sliderValue = ui.slider(Id.handle().nest(element.id),element.name,element.subDefine.from, element.subDefine.to,
+			element.subDefine.filled,element.subDefine.precision,element.subDefine.displayValue);
+			if( sliderValue > element.subDefine.currentFValue || sliderValue < element.subDefine.currentFValue){
+				element.subDefine.currentFValue = sliderValue;
 			}
 		case ElementGroup:
 			Ext.elementGroup(ui,element);
 
 		case Check:
 			if(ui.check(Id.handle().nest(element.id), element.text)){
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
 			}
 		case Radio:
-			if(ui.radio(Id.handle().nest(element.id),element.modifiers['currentValue'],element.text)){
+			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
 		case InlineRadio:
-			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.modifiers['texts']);
-			if(inlineIndex == element.modifiers['currentValue']){
+			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.subDefine.texts);
+			if(inlineIndex == element.subDefine.currentValue){
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
+			}
+		case Panel:
+			if(ui.panel(Id.handle().nest(element.id,{selected: element.subDefine.selected}), element.text,element.subDefine.accent,element.subDefine.isTree)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+			}
+		case Tab:
+			if(ui.tab(Id.handle().nest(element.id), element.text)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
 			}
 		case RadioGroup:
 		case ButtonGroup:
@@ -204,7 +211,7 @@ typedef TCanvas = {
 	var width: Int;
 	var height: Int;
 	var elements: Array<TElement>;
-	@:optional var assets: Array<TAsset>;
+	@:optional var assets: Array<TAsset>; 
 }
 
 typedef TElement = {
@@ -225,12 +232,36 @@ typedef TElement = {
 	@:optional var asset: String;
 	@:optional var visible: Null<Bool>;
 }
+class TSubDefines {
+
+	public function new(){};
+	@:optional public var texts: Array<String>;
+	@:optional public var currentValue: Int;
+	@:optional public var currentFValue: Float;
+	@:optional public var from: Float;
+	@:optional public var to: Float;
+	@:optional public var filled: Bool;
+	@:optional public var displayValue: Bool;
+	@:optional public var precision: Int;
+	@:optional public var selected: Bool;
+	@:optional public var accent: Int;
+	@:optional public var isTree: Bool;
+	@:optional public var showLabel: Bool;
+	@:optional public var callback: TMessage-> Void;
+}
+@:struct  @:structInit class TMessage {
+	@:optional public var text: String;
+	@:optional public var position: Int;
+	@:optional public var isCheck: Bool;
+
+}
 
 typedef TAsset = {
 	var id: Int;
 	var name:String;
 	var file:String;
 }
+
 
 @:enum abstract ElementType(Int) from Int {
 	var Text = 0;

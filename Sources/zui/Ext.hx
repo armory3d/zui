@@ -276,7 +276,7 @@ class Ext {
 	 If the modifiers of the element has a callback it will be called on interaction with the element**/
 	public static function elementGroup(ui: Zui, elementGroup: TElement){
 		if(elementGroup.type != ElementType.ElementGroup) return;
-		var elements:Array<TElement> =  elementGroup.modifiers['elements'];
+		var elements:Array<TElement> =  elementGroup.children;
 		var i = elements.length;
 		var e = null;
 		for(y in 0...Math.ceil(elements.length/3)){
@@ -286,18 +286,18 @@ class Ext {
 			while (validIteration != 0) {
 				var elem = elements[i-1];
 				if(elem.type == ElementType.Radio){
-					if (ui.radio(Id.handle().nest(elementGroup.id), i, elem.name) && elem.modifiers['currentValue'] != i ){
-						elem.modifiers['currentValue'] = i;
-						elem.modifiers['callback'](elem.text,i);
+					if (ui.radio(Id.handle().nest(elementGroup.id), i, elem.name) && elem.subDefine.currentValue != i ){
+						elem.subDefine.currentValue = i;
+						elem.subDefine.callback({text: elem.text, position: i});
 					}
 				}
 				else if(elem.type == ElementType.Check){
 					var checked = ui.check(Id.handle().nest(elem.id), elem.text);
-					if(elem.modifiers['callback']) elem.modifiers['callback'](checked, elem.text);
+					if(Reflect.isFunction(elem.subDefine.callback)) elem.subDefine.callback({isCheck: checked, text: elem.text});
 				}
 				else if(elem.type == ElementType.Button){
 					if (ui.button(elem.text)) {
-						elem.modifiers['callback'](elem.text);
+						elem.subDefine.callback({text: elem.text});
 
 						
 					}
