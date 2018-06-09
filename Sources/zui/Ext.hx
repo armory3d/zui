@@ -1,6 +1,7 @@
 package zui;
 
 import zui.Zui;
+import zui.Canvas;
 
 typedef ListOpts = {
 	?addCb: String->Void,
@@ -271,4 +272,41 @@ class Ext {
 		out[1] = d / (qx + e);
 		out[2] = qx;
 	}
+	/** Usage: Draws a group of elements proportionaly.
+	 This simplifies the formating the visuals of multiple elements of the same type.
+	 If the modifiers of the element has a callback it will be called on interaction with the element**/
+	public static function elementGroup(ui: Zui, elementGroup: TElement){
+		if(elementGroup.type != ElementType.ElementGroup) return;
+		var elements:Array<TElement> =  elementGroup.modifiers['elements'];
+		var i = elements.length;
+		var e = null;
+		for(y in 0...Math.ceil(elements.length/3)){
+			if (i%3 == 2)ui.row([1/2,1/2]);
+			if (i%3 == 0 )ui.row([1/3,1/3,1/3]);
+			var validIteration = 1;// We want to draw the first element of each iteration; Each iteration is of max length of three
+			while (validIteration != 0) {
+				var elem = elements[i-1];
+				if(elem.type == ElementType.Radio){
+					if (ui.radio(Id.handle().nest(elementGroup.id), i, elem.name) && elem.modifiers['currentValue'] != i ){
+						elem.modifiers['currentValue'] = i;
+						elem.modifiers['callback'](elem.text,i);
+					}
+				}
+				else if(elem.type == ElementType.Check){
+					var checked = ui.check(Id.handle().nest(elem.id), elem.text);
+					if(elem.modifiers['callback']) elem.modifiers['callback'](checked, elem.text);
+				}
+				else if(elem.type == ElementType.Button){
+					if (ui.button(elem.text)) {
+						elem.modifiers['callback'](elem.text);
+
+						
+					}
+				}
+				i--;
+				validIteration = Math.floor(i%3);
+			}
+		}
+	}
 }
+

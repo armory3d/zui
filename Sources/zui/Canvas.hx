@@ -86,12 +86,45 @@ class Canvas {
 				ui.imageScrollAlign = true;
 			}
 		case Combo:
-			if( ui.combo(Id.handle(),element.modifiers['texts'],element.text,element.modifiers['showLabel'],element.modifiers['align']) > -1){
+			var comboIndex = ui.combo(Id.handle().nest(element.id),element.modifiers['texts'],element.text,element.modifiers['showLabel'],element.modifiers['align']);
+			if( comboIndex != element.modifiers['currentValue']){
+				element.modifiers['currentValue'] = comboIndex; 
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
-		}
+		case Slider:
+			var sliderValue = ui.slider(Id.handle().nest(element.id),element.name,element.modifiers['from'], element.modifiers['to'],
+			element.modifiers['filled'],element.modifiers['precision'],element.modifiers['displayValue']);
+			if( sliderValue > element.modifiers['currentValue'] || sliderValue < element.modifiers['currentValue']){
+				element.modifiers['currentValue'] = sliderValue;
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case ElementGroup:
+			Ext.elementGroup(ui,element);
 
+		case Check:
+			if(ui.check(Id.handle().nest(element.id), element.text)){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case Radio:
+			if(ui.radio(Id.handle().nest(element.id),element.modifiers['currentValue'],element.text)){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case InlineRadio:
+			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.modifiers['texts']);
+			if(inlineIndex == element.modifiers['currentValue']){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case RadioGroup:
+		case ButtonGroup:
+		case CheckGroup:
+		case Count:
+		}
+		
 		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
 	}
 
@@ -150,7 +183,46 @@ typedef TAsset = {
 	var Text = 0;
 	var Image = 1;
 	var Button = 2;
-	var Combo = 3;
+	var ButtonGroup = 3;
+	var Combo = 4;
+	var Slider = 5;
+	var Radio = 6;
+	var RadioGroup = 7;
+	var Check = 8;
+	var CheckGroup = 9;
+	var InlineRadio = 10;
+	var ElementGroup =11;
+	var Count = 12;
+	public static function getType(name: String):Int{
+		switch(name){
+			case 'Text':
+				return 0;
+			case 'Image':
+				return 1;
+			case 'Button':
+				return 2;
+			case 'ButtonGroup':
+				return 3;
+			case 'Combo':
+				return 4;
+			case 'Slider':
+				return 5;
+			case 'Radio':
+				return 6;
+			case 'RadioGroup':
+				return 7;
+			case 'Check':
+				return 8;
+			case 'CheckGroup':
+				return 9;
+			case 'InlineRadio':
+				return 10;
+			case 'ElementGroup':
+				return 11;
+			default:
+				return -1;
+		}
+	}
 }
 
 @:enum abstract Anchor(Int) from Int {
