@@ -1,6 +1,5 @@
 package zui;
 import zui.Zui;
-import haxe.ds.Either;
 
 
 @:access(zui.Zui)
@@ -23,9 +22,15 @@ class Canvas {
 
 		ui.begin(g);
 		ui.g = g;
-		if(previewMode)ui.window(hwin,coff,coff,screenW,screenH,true);
-
-		for (elem in canvas.elements) drawElement(ui, canvas, elem);
+		if(previewMode){
+			if(ui.window(hwin,coff,coff,screenW,screenH,true)){
+				for (elem in canvas.elements) drawElement(ui, canvas, elem);
+			}
+		}
+		else{
+			for (elem in canvas.elements) drawElement(ui, canvas, elem);
+		}
+		
 
 		ui.end();
 		return events;
@@ -74,8 +79,7 @@ class Canvas {
 			ui.t.TEXT_COL = tcol;
 		case Button:
 			if (ui.button(element.text)) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
+				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
 			}
 		case Image:
 			var image = getAsset(canvas, element.asset);
@@ -103,8 +107,9 @@ class Canvas {
 			Ext.elementGroup(ui,element);
 
 		case Check:
-			if(ui.check(Id.handle().nest(element.id), element.text)){
-			}
+			var checked = ui.check(Id.handle().nest(element.id), element.text);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});
+			
 		case Radio:
 			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
 				var e = element.event;
@@ -112,7 +117,8 @@ class Canvas {
 			}
 		case InlineRadio:
 			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.subDefine.texts);
-			if(inlineIndex == element.subDefine.currentValue){
+			if(inlineIndex != element.subDefine.currentValue){
+				element.subDefine.currentValue = inlineIndex;
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
@@ -129,8 +135,6 @@ class Canvas {
 		case CheckGroup:
 		case Count:
 		}
-		
-		// if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {

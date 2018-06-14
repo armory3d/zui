@@ -299,8 +299,6 @@ class Ext {
 				else if(elem.type == ElementType.Button){
 					if (ui.button(elem.text)) {
 						elem.subDefine.callback({text: elem.text});
-
-						
 					}
 				}
 				i--;
