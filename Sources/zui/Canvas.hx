@@ -1,6 +1,5 @@
 package zui;
 import zui.Zui;
-import haxe.ds.Either;
 
 
 @:access(zui.Zui)
@@ -26,7 +25,15 @@ class Canvas {
 		_ui = ui;
 		ui.begin(g);
 		ui.g = g;
-		if(previewMode)ui.window(hwin,coff,coff,screenW,screenH,true);
+		if(previewMode){
+			if(ui.window(hwin,coff,coff,screenW,screenH,true)){
+				for (elem in canvas.elements) drawElement(ui, canvas, elem);
+			}
+		}
+		else{
+			for (elem in canvas.elements) drawElement(ui, canvas, elem);
+		}
+		
 
 		for (elem in canvas.elements) {
 			if (elem.parent == null) drawElement(ui, canvas, elem);
@@ -93,8 +100,7 @@ class Canvas {
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
 			if (ui.button(element.text)) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
+				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
 			}
 			ui.t.BUTTON_H = bh;
 		
@@ -149,8 +155,9 @@ class Canvas {
 			Ext.elementGroup(ui,element);
 
 		case Check:
-			if(ui.check(Id.handle().nest(element.id), element.text)){
-			}
+			var checked = ui.check(Id.handle().nest(element.id), element.text);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});
+			
 		case Radio:
 			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
 				var e = element.event;
@@ -158,7 +165,8 @@ class Canvas {
 			}
 		case InlineRadio:
 			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.subDefine.texts);
-			if(inlineIndex == element.subDefine.currentValue){
+			if(inlineIndex != element.subDefine.currentValue){
+				element.subDefine.currentValue = inlineIndex;
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
