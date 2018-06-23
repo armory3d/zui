@@ -23,6 +23,7 @@ class Zui {
 	public var isReleased = false;
 	public var changed = false; // Global elements change check
 	public var alwaysRedraw = false; // Hurts performance
+	public var imageInvertY = false;
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -510,7 +511,7 @@ class Zui {
 		var released = getReleased(h);
 		g.color = tint;
 		var h_float:Float = h; // TODO: hashlink fix
-		g.drawScaledImage(image, x, _y, w, h_float);
+		imageInvertY ? g.drawScaledImage(image, x, _y + h_float, w, -h_float) : g.drawScaledImage(image, x, _y, w, h_float);
 		
 		endElement(h);
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
