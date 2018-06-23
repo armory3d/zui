@@ -1172,7 +1172,9 @@ class Zui {
 		if (code == kha.input.KeyCode.Space) this.char = " ";
 	}
 
-	public function onKeyUp(code: kha.input.KeyCode) {}
+	public function onKeyUp(code: kha.input.KeyCode) {
+		this.key = null;
+	}
 
 	public function onKeyPress(char: String) {
 		isKeyDown = true;

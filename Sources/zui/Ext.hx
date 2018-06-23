@@ -279,7 +279,6 @@ class Ext {
 		if(elementGroup.type != ElementType.ElementGroup) return;
 		var elements:Array<TElement> =  elementGroup.children;
 		var i = elements.length;
-		var e = null;
 		for(y in 0...Math.ceil(elements.length/3)){
 			if (i%3 == 2)ui.row([1/2,1/2]);
 			if (i%3 == 0 )ui.row([1/3,1/3,1/3]);
@@ -289,7 +288,7 @@ class Ext {
 				if(elem.type == ElementType.Radio){
 					if (ui.radio(Id.handle().nest(elementGroup.id), i, elem.name) && elem.subDefine.currentValue != i ){
 						elem.subDefine.currentValue = i;
-						elem.subDefine.callback({text: elem.text, position: i});
+						if(Reflect.isFunction(elem.subDefine.callback)) elem.subDefine.callback({text: elem.text, position: i});
 					}
 				}
 				else if(elem.type == ElementType.Check){
@@ -298,7 +297,7 @@ class Ext {
 				}
 				else if(elem.type == ElementType.Button){
 					if (ui.button(elem.text)) {
-						elem.subDefine.callback({text: elem.text});
+						if(Reflect.isFunction(elem.subDefine.callback)) elem.subDefine.callback({text: elem.text});
 					}
 				}
 				i--;
