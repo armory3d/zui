@@ -68,6 +68,9 @@ class Canvas {
 			ui._y -= ch - screenH;
 		}
 
+		var rotated = element.rotation != null && element.rotation != 0;
+		if (rotated) ui.g.pushRotation(element.rotation, ui._x + element.width / 2, ui._y + element.height / 2);
+
 		switch (element.type) {
 		case Text:
 			var size = ui.fontSize;
@@ -135,6 +138,7 @@ class Canvas {
 		case CheckGroup:
 		case Count:
 		}
+		if (rotated) ui.g.popTransformation();
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
@@ -173,6 +177,7 @@ typedef TElement = {
 	var y: Float;
 	var width: Int;
 	var height: Int;
+	@:optional var rotation: Null<Float>;
 	@:optional var text: String;
 	@:optional var event: String;
 	@:optional var color: Null<Int>;
