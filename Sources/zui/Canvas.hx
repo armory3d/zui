@@ -25,12 +25,16 @@ class Canvas {
 		ui.begin(g);
 		ui.g = g;
 		if(previewMode){
+			var windows =[];
 			if(ui.window(hwin,coff,coff,screenW,screenH,true)){
-				for (elem in canvas.elements) drawElement(ui, canvas, elem);
+				for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
 			}
+			for(window in windows) drawElement(ui,canvas,window);
 		}
 		else{
-			for (elem in canvas.elements) drawElement(ui, canvas, elem);
+			var windows =[];
+			for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
+			for(window in windows) drawElement(ui,canvas,window);
 		}
 		
 
@@ -84,6 +88,10 @@ class Canvas {
 			ui.text(element.text);
 			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
+		case TextInput:
+			ui.g.font = ui.ops.font;
+			var str = ui.textInput(Id.handle().nest(element.id, {text: element.text}),element.name,Left);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: str});
 		case Button:
 			if (ui.button(element.text)) {
 				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
@@ -136,6 +144,10 @@ class Canvas {
 		case Tab:
 			if(ui.tab(Id.handle().nest(element.id), element.text)){
 				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
+			}
+		case Window:
+			if(ui.window(Id.handle().nest(element.id), Std.int(element.x),Std.int(element.y),element.width,element.height,element.subDefine.draggable)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
 			}
 		case RadioGroup:
 		case ButtonGroup:
@@ -208,6 +220,7 @@ class TSubDefines {
 	@:optional public var accent: Int;
 	@:optional public var isTree: Bool;
 	@:optional public var showLabel: Bool;
+	@:optional public var draggable: Bool;
 	@:optional public var callback: TMessage-> Void;
 }
 @:struct  @:structInit class TMessage {
@@ -226,50 +239,56 @@ typedef TAsset = {
 
 @:enum abstract ElementType(Int) from Int {
 	var Text = 0;
-	var Image = 1;
-	var Button = 2;
-	var ButtonGroup = 3;
-	var Combo = 4;
-	var Slider = 5;
-	var Radio = 6;
-	var RadioGroup = 7;
-	var Check = 8;
-	var CheckGroup = 9;
-	var InlineRadio = 10;
-	var ElementGroup =11;
-	var Panel = 12;
-	var Tab = 13;
-	var Count = 14;
+	var TextInput = 1;
+	var Image = 2;
+	var Button = 3;
+	var ButtonGroup = 4;
+	var Combo = 5;
+	var Slider = 6;
+	var Radio = 7;
+	var RadioGroup = 8;
+	var Check = 9;
+	var CheckGroup = 10;
+	var InlineRadio = 11;
+	var ElementGroup =12;
+	var Panel = 13;
+	var Tab = 14;
+	var Window = 15;
+	var Count = 16;
 	public static function getType(name: String):Int{
 		switch(name){
 			case 'Text':
 				return 0;
-			case 'Image':
+			case 'TextInput':
 				return 1;
-			case 'Button':
+			case 'Image':
 				return 2;
-			case 'ButtonGroup':
+			case 'Button':
 				return 3;
-			case 'Combo':
+			case 'ButtonGroup':
 				return 4;
-			case 'Slider':
+			case 'Combo':
 				return 5;
-			case 'Radio':
+			case 'Slider':
 				return 6;
-			case 'RadioGroup':
+			case 'Radio':
 				return 7;
-			case 'Check':
+			case 'RadioGroup':
 				return 8;
-			case 'CheckGroup':
+			case 'Check':
 				return 9;
-			case 'InlineRadio':
+			case 'CheckGroup':
 				return 10;
-			case 'ElementGroup':
+			case 'InlineRadio':
 				return 11;
-			case 'Panel':
+			case 'ElementGroup':
 				return 12;
-			case 'Tab':
+			case 'Panel':
 				return 13;
+			case 'Tab':
+				return 14;
+			case 'Window':
+				return 15;
 			default:
 				return -1;
 		}
