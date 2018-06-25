@@ -626,8 +626,9 @@ class Zui {
 			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 		}
 
+		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
 		var off = TEXT_OFFSET();
-		var lineHeight = ELEMENT_H();
+		var lineHeight = ELEMENT_H()*Math.ceil(text.length/maxCharsPerLine);
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
@@ -640,6 +641,9 @@ class Zui {
 				g.fillRect(hlStart, _y + (lineHeight - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 			}
 		}
+		cursorY = Math.ceil(text.length/maxCharsPerLine)-1;
+		lineHeight = ELEMENT_H();
+		cursorHeight = lineHeight - buttonOffsetY * 3.0;
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
@@ -650,6 +654,7 @@ class Zui {
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.fillRect(cursorX, _y + (lineHeight - t.ELEMENT_OFFSET)*cursorY- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
+		cursorY = 0;
 		
 		if (asFloat) text = formatFloatString(text);
 		textSelectedCurrentText = text;
