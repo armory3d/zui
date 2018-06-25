@@ -999,7 +999,7 @@ class Zui {
 	}
 
 	function drawTooltip() {
-		globalG.color = 0xffefefef;
+		globalG.color = t.TEXT_COL;
 		var lines = tooltipText.split("\n");
 		var tooltipW:Float = 0;
 		for (line in lines) {
@@ -1010,7 +1010,7 @@ class Zui {
 		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * lines.length * 0.6);
 		globalG.font = ops.font;
 		globalG.fontSize = fontSize;
-		globalG.color = 0xff111111;
+		globalG.color = t.ACCENT_COL;
 		for (i in 0...lines.length) {
 			globalG.drawString(lines[i], tooltipX + 5, tooltipY + i * fontSize);
 		}
