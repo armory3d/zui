@@ -607,8 +607,9 @@ class Zui {
 			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 		}
 
+		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
 		var off = TEXT_OFFSET();
-		var lineHeight = ELEMENT_H();
+		var lineHeight = ELEMENT_H()*Math.ceil(text.length/maxCharsPerLine);
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
@@ -617,16 +618,20 @@ class Zui {
 			var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
 			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 		}
+		cursorY = Math.ceil(text.length/maxCharsPerLine)-1;
+		lineHeight = ELEMENT_H();
+		cursorHeight = lineHeight - buttonOffsetY * 3.0;
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
 		if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
 			g.color = t.TEXT_COL; // Cursor
-			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
+			var str = align == Left ? text.substr(maxCharsPerLine*cursorY, cursorX) : text.substring(cursorX, text.length);
 			var strw = g.font.width(g.fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
+		cursorY = 0;
 		
 		if (asFloat) text = formatFloatString(text);
 		textSelectedCurrentText = text;
@@ -659,7 +664,71 @@ class Zui {
 
 		return handle.text;
 	}
+	public function textArea(handle: Handle, contour = true, label = "", align:Align = Left, asFloat = false):Array<String>{
+		var texts:Array<String> = [];
+		if (!isVisible(ELEMENT_H())) { endElement(); return texts; }
 
+		var hover = getHover();
+		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
+
+		// save height
+		var oldHeight = t.ELEMENT_H; 
+
+		var startEdit = getReleased() || tabPressed;
+		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
+		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
+		if (submitTextHandle == handle) submitTextEdit();
+		else handle.changed = false;
+
+		if (label != "") {
+			//Draw label on top
+		}
+		
+		g.color = t.TEXT_COL; // Text
+		if(textSelectedHandle != handle){
+			texts = stringToLines(handle.text);
+			for(i in 0...texts.length ){
+				drawString(g, texts[i], null, (t.ELEMENT_H - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET, align);
+			}
+		}
+		else{
+			texts = stringToLines(textSelectedCurrentText);
+			for(i in 0...texts.length ){
+				drawString(g, texts[i], null, (t.ELEMENT_H - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET, align);
+			}
+		}
+		t.ELEMENT_H = (t.ELEMENT_H - t.ELEMENT_OFFSET) * texts.length - t.ELEMENT_OFFSET;
+		if(contour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2,t.ELEMENT_H);
+
+		endElement();
+		
+		t.ELEMENT_H = oldHeight;
+
+		return texts;
+	}
+	private function stringToLines(string: String):Array<String>{
+		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
+		var texts:Array<String> = [];
+		if(string.length > maxCharsPerLine){
+			var strLength = string.length;
+			var numLines = Math.ceil(strLength/maxCharsPerLine);
+			for(i in 0...numLines){
+				var str:String;
+				if(strLength > maxCharsPerLine){
+					str = string.substring(i*maxCharsPerLine,i*maxCharsPerLine+maxCharsPerLine);
+					strLength -= maxCharsPerLine;
+					texts.push(str);
+				}
+				else{
+					str = string.substring(i*maxCharsPerLine,i*maxCharsPerLine+strLength);
+					texts.push(str);
+					return texts;
+				}
+			}
+		}
+		texts.push(string);
+		return texts;
+	}
 	inline function setHighlight(start:Int, end:Int) {
 		highlightStart = start < end ? start : end;
 		highlightEnd = start < end ? end : start;
