@@ -29,10 +29,12 @@ class Canvas {
 		return events;
 	}
 
-	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement) {
+	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement, px = 0.0, py = 0.0) {
 
-		ui._x = canvas.x + scaled(element.x);
-		ui._y = canvas.y + scaled(element.y);
+		if (!element.visible) return;
+
+		ui._x = canvas.x + scaled(element.x) + scaled(px);
+		ui._y = canvas.y + scaled(element.y) + scaled(py);
 		ui._w = scaled(element.width);
 
 		var cw = scaled(canvas.width);
@@ -91,7 +93,7 @@ class Canvas {
 			}
 		}
 
-		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
 
 		if (rotated) ui.g.popTransformation();
 	}
@@ -141,6 +143,7 @@ typedef TElement = {
 	@:optional var anchor: Null<Int>;
 	@:optional var children: Array<TElement>;
 	@:optional var asset: String;
+	@:optional var visible: Null<Bool>;
 }
 
 typedef TAsset = {
