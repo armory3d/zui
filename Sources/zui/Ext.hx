@@ -271,6 +271,30 @@ class Ext {
 		out[1] = d / (qx + e);
 		out[2] = qx;
 	}
+
+	public static function textArea(ui: Zui, lines:Array<String>, grow = false, label = "", align:Align = Left, asFloat = false):Array<String>{
+		if(ui.panel(Id.handle({selected: true}),'',0,false)){
+			var newLines = lines;
+			var index = 1;
+			var maxChars = Std.int(ui._w/ Std.int(ui.fontSize / 2));
+			for(i in 0...lines.length){
+				var handle = Id.handle().nest(-1-index,{text: newLines[i]});
+				var tempStr = ui.textInput(handle,false);
+				trace(handle.text);
+				if(tempStr != newLines[i]){
+					if(handle.text.length > maxChars){
+						newLines[i] = tempStr.substring(0,maxChars);
+						newLines[i+1] = tempStr.substring(maxChars+1) + newLines[i+1];
+					}
+					else{newLines[i] = tempStr;}
+				}
+				index +=1;
+			}
+			return newLines;
+		}
+		return null;
+
+	}
 	/** Usage: Draws a group of elements proportionaly.
 	 This simplifies the formating the visuals of multiple elements of the same type.
 	 If the modifiers of the element has a callback it will be called on interaction with the element**/

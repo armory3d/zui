@@ -655,12 +655,12 @@ class Zui {
 		textSelectedCurrentText = text;
 	}
 
-	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
+	public function textInput(handle: Handle, contour = true, label = "", align:Align = Left, asFloat = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
-		drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
+		if(contour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);

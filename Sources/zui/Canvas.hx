@@ -26,12 +26,16 @@ class Canvas {
 		ui.begin(g);
 		ui.g = g;
 		if(previewMode){
+			var windows =[];
 			if(ui.window(hwin,coff,coff,screenW,screenH,true)){
-				for (elem in canvas.elements) drawElement(ui, canvas, elem);
+				for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
 			}
+			for(window in windows) drawElement(ui,canvas,window);
 		}
 		else{
-			for (elem in canvas.elements) drawElement(ui, canvas, elem);
+			var windows =[];
+			for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
+			for(window in windows) drawElement(ui,canvas,window);
 		}
 		
 
@@ -178,6 +182,10 @@ class Canvas {
 			if(ui.tab(Id.handle().nest(element.id), element.text)){
 				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
 			}
+		case Window:
+			if(ui.window(Id.handle().nest(element.id), Std.int(element.x),Std.int(element.y),element.width,element.height,element.subDefine.draggable)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+			}
 		case RadioGroup:
 		case ButtonGroup:
 		case CheckGroup:
@@ -255,6 +263,7 @@ class TSubDefines {
 	@:optional public var accent: Int;
 	@:optional public var isTree: Bool;
 	@:optional public var showLabel: Bool;
+	@:optional public var draggable: Bool;
 	@:optional public var callback: TMessage-> Void;
 }
 @:struct  @:structInit class TMessage {
