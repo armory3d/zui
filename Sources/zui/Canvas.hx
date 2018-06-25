@@ -10,6 +10,7 @@ class Canvas {
 
 	public static var screenW = -1;
 	public static var screenH = -1;
+	static var _ui: Zui;
 
 	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics, previewMode = false, coff=0, hwin:Handle=null): Array<String> {
 		
@@ -20,6 +21,7 @@ class Canvas {
 
 		events = [];
 
+		_ui = ui;
 		ui.begin(g);
 		ui.g = g;
 		if(previewMode){
@@ -36,14 +38,16 @@ class Canvas {
 		return events;
 	}
 
-	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement) {
+	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement, px = 0.0, py = 0.0) {
 
-		ui._x = canvas.x + element.x;
-		ui._y = canvas.y + element.y;
-		ui._w = element.width;
+		if (!element.visible) return;
 
-		var cw = canvas.width;
-		var ch = canvas.height;
+		ui._x = canvas.x + scaled(element.x) + scaled(px);
+		ui._y = canvas.y + scaled(element.y) + scaled(py);
+		ui._w = scaled(element.width);
+
+		var cw = scaled(canvas.width);
+		var ch = scaled(canvas.height);
 
 		switch (element.anchor) {
 		case Top:
@@ -69,13 +73,13 @@ class Canvas {
 		}
 
 		var rotated = element.rotation != null && element.rotation != 0;
-		if (rotated) ui.g.pushRotation(element.rotation, ui._x + element.width / 2, ui._y + element.height / 2);
+		if (rotated) ui.g.pushRotation(element.rotation, ui._x + scaled(element.width) / 2, ui._y + scaled(element.height) / 2);
 
 		switch (element.type) {
 		case Text:
 			var size = ui.fontSize;
 			var tcol = ui.t.TEXT_COL;
-			ui.fontSize = element.height;
+			ui.fontSize = scaled(element.height);
 			ui.t.TEXT_COL = element.color;
 			ui.text(element.text);
 			ui.fontSize = size;
@@ -89,7 +93,7 @@ class Canvas {
 			if (image != null) {
 				ui.imageScrollAlign = false;
 				var tint = element.color != null ? element.color : 0xffffffff;
-				if (ui.image(image, tint, element.height) == zui.Zui.State.Released) {
+				if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
 					var e = element.event;
 					if (e != null && e != "") events.push(e);
 				}
@@ -127,11 +131,11 @@ class Canvas {
 			}
 		case Panel:
 			if(ui.panel(Id.handle().nest(element.id,{selected: element.subDefine.selected}), element.text,element.subDefine.accent,element.subDefine.isTree)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
 			}
 		case Tab:
 			if(ui.tab(Id.handle().nest(element.id), element.text)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
 			}
 		case RadioGroup:
 		case ButtonGroup:
@@ -157,6 +161,8 @@ class Canvas {
 		if (assetId == -1) for (a in canvas.assets) if (assetId < a.id) assetId = a.id;
 		return ++assetId;
 	}
+
+	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE); }
 }
 
 typedef TCanvas = {
@@ -184,6 +190,7 @@ typedef TElement = {
 	@:optional var anchor: Null<Int>;
 	@:optional var children: Array<TElement>;
 	@:optional var asset: String;
+	@:optional var visible: Null<Bool>;
 	@:optional var subDefine: TSubDefines;
 }
 class TSubDefines {
