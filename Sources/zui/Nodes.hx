@@ -98,7 +98,6 @@ class Nodes {
 
 		// Zoom canvas
 		if (ui.inputWheelDelta != 0) {
-			var old = zoom;
 			zoom += -ui.inputWheelDelta / 10;
 			if (zoom < 0.4) zoom = 0.4;
 			else if (zoom > 1.0) zoom = 1.0;
