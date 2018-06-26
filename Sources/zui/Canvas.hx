@@ -3,7 +3,7 @@ package zui;
 @:access(zui.Zui)
 class Canvas {
 
-	public static var assetMap = new Map<Int, kha.Image>();
+	public static var assetMap = new Map<Int, Dynamic>(); // kha.Image | kha.Font
 	static var events:Array<String> = [];
 
 	public static var screenW = -1;
@@ -70,13 +70,20 @@ class Canvas {
 
 		switch (element.type) {
 		case Text:
+			var font = ui.ops.font;
 			var size = ui.fontSize;
 			var tcol = ui.t.TEXT_COL;
+			
+			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
+			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
 			ui.t.TEXT_COL = element.color;
 			ui.text(element.text);
+
+			ui.ops.font = font;
 			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
+		
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
@@ -85,9 +92,11 @@ class Canvas {
 				if (e != null && e != "") events.push(e);
 			}
 			ui.t.BUTTON_H = bh;
+		
 		case Image:
 			var image = getAsset(canvas, element.asset);
-			if (image != null) {
+			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
+			if (image != null && !fontAsset) {
 				ui.imageScrollAlign = false;
 				var tint = element.color != null ? element.color : 0xffffffff;
 				if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
@@ -107,7 +116,7 @@ class Canvas {
 		if (rotated) ui.g.popTransformation();
 	}
 
-	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
+	public static function getAsset(canvas: TCanvas, asset: String): Dynamic { // kha.Image | kha.Font {
 		for (a in canvas.assets) if (a.name == asset) return assetMap.get(a.id);
 		return null;
 	}
