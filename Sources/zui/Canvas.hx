@@ -105,6 +105,7 @@ class Canvas {
 				}
 				ui.imageScrollAlign = true;
 			}
+		case Empty:
 		}
 
 		if (element.children != null) {
@@ -180,6 +181,15 @@ typedef TAsset = {
 	var Text = 0;
 	var Image = 1;
 	var Button = 2;
+	var Empty = 3;
+	// var HLayout = 4;
+	// var VLayout = 5;
+	// var Check = 6;
+	// var Radio = 7;
+	// var Combo = 8;
+	// var Shape = 9;
+	// var Slider = 10;
+	// var Input = 11;
 }
 
 @:enum abstract Anchor(Int) from Int {
