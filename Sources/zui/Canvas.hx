@@ -37,6 +37,9 @@ class Canvas {
 			for(window in windows) drawElement(ui,canvas,window);
 		}
 		
+		for (elem in canvas.elements) {
+			if (elem.parent == null) drawElement(ui, canvas, elem);
+		}
 
 		ui.end();
 		return events;
@@ -44,7 +47,7 @@ class Canvas {
 
 	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement, px = 0.0, py = 0.0) {
 
-		if (!element.visible) return;
+		if (element == null || !element.visible) return;
 
 		ui._x = canvas.x + scaled(element.x) + scaled(px);
 		ui._y = canvas.y + scaled(element.y) + scaled(py);
@@ -93,9 +96,12 @@ class Canvas {
 			var str = ui.textInput(Id.handle().nest(element.id, {text: element.text}),element.name,Left);
 			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: str});
 		case Button:
+			var bh = ui.t.BUTTON_H;
+			ui.t.BUTTON_H = scaled(element.height);
 			if (ui.button(element.text)) {
 				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
 			}
+			ui.t.BUTTON_H = bh;
 		case Image:
 			var image = getAsset(canvas, element.asset);
 			if (image != null) {
@@ -124,6 +130,8 @@ class Canvas {
 		case Check:
 			var checked = ui.check(Id.handle().nest(element.id), element.text);
 			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});
+			}
+		}
 			
 		case Radio:
 			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
@@ -155,6 +163,9 @@ class Canvas {
 		case Count:
 		}
 		if (rotated) ui.g.popTransformation();
+		if (element.children != null) {
+			for (id in element.children) {
+				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y +
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
@@ -172,6 +183,11 @@ class Canvas {
 	public static function getAssetId(canvas: TCanvas): Int {
 		if (assetId == -1) for (a in canvas.assets) if (assetId < a.id) assetId = a.id;
 		return ++assetId;
+	}
+
+	static function elemById(canvas: TCanvas, id: Int): TElement {
+		for (e in canvas.elements) if (e.id == id) return e;
+		return null;
 	}
 
 	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE); }
@@ -200,7 +216,8 @@ typedef TElement = {
 	@:optional var event: String;
 	@:optional var color: Null<Int>;
 	@:optional var anchor: Null<Int>;
-	@:optional var children: Array<TElement>;
+	@:optional var parent: Null<Int>; // id
+	@:optional var children: Array<Int>; // ids
 	@:optional var asset: String;
 	@:optional var visible: Null<Bool>;
 	@:optional var subDefine: TSubDefines;
