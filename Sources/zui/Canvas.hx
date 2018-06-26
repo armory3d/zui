@@ -23,7 +23,9 @@ class Canvas {
 		ui.begin(g);
 		ui.g = g;
 
-		for (elem in canvas.elements) drawElement(ui, canvas, elem);
+		for (elem in canvas.elements) {
+			if (elem.parent == null) drawElement(ui, canvas, elem);
+		}
 
 		ui.end();
 		return events;
@@ -31,7 +33,7 @@ class Canvas {
 
 	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement, px = 0.0, py = 0.0) {
 
-		if (!element.visible) return;
+		if (element == null || !element.visible) return;
 
 		ui._x = canvas.x + scaled(element.x) + scaled(px);
 		ui._y = canvas.y + scaled(element.y) + scaled(py);
@@ -76,10 +78,13 @@ class Canvas {
 			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
 		case Button:
+			var bh = ui.t.BUTTON_H;
+			ui.t.BUTTON_H = scaled(element.height);
 			if (ui.button(element.text)) {
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
+			ui.t.BUTTON_H = bh;
 		case Image:
 			var image = getAsset(canvas, element.asset);
 			if (image != null) {
@@ -93,7 +98,11 @@ class Canvas {
 			}
 		}
 
-		if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
+		if (element.children != null) {
+			for (id in element.children) {
+				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
+			}
+		}
 
 		if (rotated) ui.g.popTransformation();
 	}
@@ -113,6 +122,11 @@ class Canvas {
 	public static function getAssetId(canvas: TCanvas): Int {
 		if (assetId == -1) for (a in canvas.assets) if (assetId < a.id) assetId = a.id;
 		return ++assetId;
+	}
+
+	static function elemById(canvas: TCanvas, id: Int): TElement {
+		for (e in canvas.elements) if (e.id == id) return e;
+		return null;
 	}
 
 	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE); }
@@ -141,7 +155,8 @@ typedef TElement = {
 	@:optional var event: String;
 	@:optional var color: Null<Int>;
 	@:optional var anchor: Null<Int>;
-	@:optional var children: Array<TElement>;
+	@:optional var parent: Null<Int>; // id
+	@:optional var children: Array<Int>; // ids
 	@:optional var asset: String;
 	@:optional var visible: Null<Bool>;
 }
