@@ -620,15 +620,16 @@ class Zui {
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
+					cursorY = multiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
 				}
 			}
 			cursorY = isMultiline ? Math.floor(text.length/maxCharsPerLine): 0;
 			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 		}
 
-		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
 		var off = TEXT_OFFSET();
-		var lineHeight = ELEMENT_H()*Math.ceil(text.length/maxCharsPerLine);
+		var value = Math.ceil(text.length/maxCharsPerLine+0.001);
+		var lineHeight = multiline ? ELEMENT_H()*value:ELEMENT_H();
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
@@ -641,7 +642,6 @@ class Zui {
 				g.fillRect(hlStart, _y + (lineHeight - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 			}
 		}
-		cursorY = Math.ceil(text.length/maxCharsPerLine)-1;
 		lineHeight = ELEMENT_H();
 		cursorHeight = lineHeight - buttonOffsetY * 3.0;
 
@@ -654,7 +654,6 @@ class Zui {
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.fillRect(cursorX, _y + (lineHeight - t.ELEMENT_OFFSET)*cursorY- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
-		cursorY = 0;
 		
 		if (asFloat) text = formatFloatString(text);
 		textSelectedCurrentText = text;

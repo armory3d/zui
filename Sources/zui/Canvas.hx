@@ -156,7 +156,7 @@ class Canvas {
 				element.subDefine.currentFValue = sliderValue;
 			}
 		case ElementGroup:
-			Ext.elementGroup(ui,element);
+			Ext.elementGroup(ui,canvas,element);
 
 		case Check:
 			var checked = ui.check(Id.handle().nest(element.id), element.text);
@@ -184,7 +184,7 @@ class Canvas {
 			}
 		case Window:
 			if(ui.window(Id.handle().nest(element.id), Std.int(element.x),Std.int(element.y),element.width,element.height,element.subDefine.draggable)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c));
 			}
 		case RadioGroup:
 		case ButtonGroup:
@@ -212,7 +212,7 @@ class Canvas {
 		return ++assetId;
 	}
 
-	static function elemById(canvas: TCanvas, id: Int): TElement {
+	public static function elemById(canvas: TCanvas, id: Int): TElement {
 		for (e in canvas.elements) if (e.id == id) return e;
 		return null;
 	}
