@@ -125,14 +125,11 @@ class Canvas {
 				element.subDefine.currentFValue = sliderValue;
 			}
 		case ElementGroup:
-			Ext.elementGroup(ui,element);
+			Ext.elementGroup(ui,canvas,element);
 
 		case Check:
 			var checked = ui.check(Id.handle().nest(element.id), element.text);
-			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});
-			}
-		}
-			
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});	
 		case Radio:
 			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
 				var e = element.event;
@@ -147,15 +144,15 @@ class Canvas {
 			}
 		case Panel:
 			if(ui.panel(Id.handle().nest(element.id,{selected: element.subDefine.selected}), element.text,element.subDefine.accent,element.subDefine.isTree)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c), element.x, element.y);
 			}
 		case Tab:
 			if(ui.tab(Id.handle().nest(element.id), element.text)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c, element.x, element.y);
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c), element.x, element.y);
 			}
 		case Window:
 			if(ui.window(Id.handle().nest(element.id), Std.int(element.x),Std.int(element.y),element.width,element.height,element.subDefine.draggable)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c));
 			}
 		case RadioGroup:
 		case ButtonGroup:
@@ -165,7 +162,9 @@ class Canvas {
 		if (rotated) ui.g.popTransformation();
 		if (element.children != null) {
 			for (id in element.children) {
-				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y +
+				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y +py);
+			}
+		}
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
@@ -185,7 +184,7 @@ class Canvas {
 		return ++assetId;
 	}
 
-	static function elemById(canvas: TCanvas, id: Int): TElement {
+	public static function elemById(canvas: TCanvas, id: Int): TElement {
 		for (e in canvas.elements) if (e.id == id) return e;
 		return null;
 	}

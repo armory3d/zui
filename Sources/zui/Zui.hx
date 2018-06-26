@@ -559,14 +559,25 @@ class Zui {
 		textSelectedCurrentText = "";
 	}
 
-	function updateTextEdit(align:Align = Left, asFloat: Bool) {
+	function updateTextEdit(align:Align = Left, asFloat: Bool,multiline = false) {
 		var text = textSelectedCurrentText;
+		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
 		if (isKeyDown) { // Process input
 			if (key == kha.input.KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
+				if (cursorX==0 && cursorY > 0){cursorY--;cursorX = maxCharsPerLine;}
 			}
 			else if (key == kha.input.KeyCode.Right) {
-				if (cursorX < text.length) cursorX++;
+				if (cursorX+maxCharsPerLine*cursorY < text.length) cursorX++;
+				if (cursorX > maxCharsPerLine*(cursorY+1)){cursorX = 0; cursorY++;}
+			}
+			else if(key == kha.input.KeyCode.Up){
+				if(cursorY >0)cursorY--;
+			}
+			else if(key == kha.input.KeyCode.Down){
+				var numLines = Math.ceil(text.length/maxCharsPerLine);
+				if(cursorY+2 == numLines ) cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY+1)*maxCharsPerLine : cursorX;
+				if(numLines > cursorY)cursorY++;
 			}
 			else if (key == kha.input.KeyCode.Backspace) { // Remove char
 				if (cursorX > 0) {
@@ -592,6 +603,7 @@ class Zui {
 			}
 			else if (key == kha.input.KeyCode.Home) {
 				cursorX = 0;
+				cursorY = 0;
 			}
 			else if (key == kha.input.KeyCode.End) {
 				cursorX = text.length;
@@ -602,23 +614,23 @@ class Zui {
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
+					cursorY = multiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
 				}
 			}
 			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 		}
 
-		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
 		var off = TEXT_OFFSET();
-		var lineHeight = ELEMENT_H()*Math.ceil(text.length/maxCharsPerLine);
+		var value = Math.ceil(text.length/maxCharsPerLine+0.001);
+		var lineHeight = multiline ? ELEMENT_H()*value:ELEMENT_H();
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
 			var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
 			var hlstrw = g.font.width(g.fontSize, hlstr);
 			var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
-			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+			g.fillRect(hlStart, _y + 0 * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 		}
-		cursorY = Math.ceil(text.length/maxCharsPerLine)-1;
 		lineHeight = ELEMENT_H();
 		cursorHeight = lineHeight - buttonOffsetY * 3.0;
 
@@ -631,7 +643,6 @@ class Zui {
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
-		cursorY = 0;
 		
 		if (asFloat) text = formatFloatString(text);
 		textSelectedCurrentText = text;
@@ -676,7 +687,7 @@ class Zui {
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
+		if (textSelectedHandle == handle) updateTextEdit(align, asFloat,true);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 

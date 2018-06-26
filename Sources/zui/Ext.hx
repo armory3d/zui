@@ -275,16 +275,16 @@ class Ext {
 	/** Usage: Draws a group of elements proportionaly.
 	 This simplifies the formating the visuals of multiple elements of the same type.
 	 If the modifiers of the element has a callback it will be called on interaction with the element**/
-	public static function elementGroup(ui: Zui, elementGroup: TElement){
+	public static function elementGroup(ui: Zui, canvas: TCanvas, elementGroup: TElement){
 		if(elementGroup.type != ElementType.ElementGroup) return;
-		var elements:Array<TElement> =  elementGroup.children;
+		var elements:Array<Int> =  elementGroup.children;
 		var i = elements.length;
 		for(y in 0...Math.ceil(elements.length/3)){
 			if (i%3 == 2)ui.row([1/2,1/2]);
 			if (i%3 == 0 )ui.row([1/3,1/3,1/3]);
 			var validIteration = 1;// We want to draw the first element of each iteration; Each iteration is of max length of three
 			while (validIteration != 0) {
-				var elem = elements[i-1];
+				var elem = Canvas.elemById(canvas,elements[i-1]);
 				if(elem.type == ElementType.Radio){
 					if (ui.radio(Id.handle().nest(elementGroup.id), i, elem.name) && elem.subDefine.currentValue != i ){
 						elem.subDefine.currentValue = i;
