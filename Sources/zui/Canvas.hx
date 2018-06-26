@@ -33,7 +33,7 @@ class Canvas {
 
 	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement, px = 0.0, py = 0.0) {
 
-		if (element == null || !element.visible) return;
+		if (element == null || element.visible == false) return;
 
 		ui._x = canvas.x + scaled(element.x) + scaled(px);
 		ui._y = canvas.y + scaled(element.y) + scaled(py);
