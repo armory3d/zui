@@ -679,7 +679,7 @@ class Zui {
 
 		return handle.text;
 	}
-	public function textArea(handle: Handle,label = "", align:Align = Left, lines:Int = 0,drawContour:Bool = true):Array<String>{
+	public function textArea(handle: Handle,label = "", align:Align = Left, fixedLines:Int = 0,drawContour:Bool = true):Array<String>{
 		var texts:Array<String> = [];
 		if (!isVisible(ELEMENT_H())) { endElement(); return texts; }
 
@@ -691,7 +691,7 @@ class Zui {
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align, false,true,lines);
+		if (textSelectedHandle == handle) updateTextEdit(align, false,true,fixedLines);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 
@@ -712,11 +712,11 @@ class Zui {
 				drawString(g, texts[i], null, (t.ELEMENT_H - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET, align);
 			}
 		}
-		if(lines == 0){
+		if(fixedLines == 0){
 			t.ELEMENT_H = (t.ELEMENT_H - t.ELEMENT_OFFSET) * texts.length - t.ELEMENT_OFFSET;
 		}
-		else if(lines > 0){
-			t.ELEMENT_H = (t.ELEMENT_H - t.ELEMENT_OFFSET) * lines - t.ELEMENT_OFFSET;
+		else if(fixedLines > 0){
+			t.ELEMENT_H = (t.ELEMENT_H - t.ELEMENT_OFFSET) * fixedLines - t.ELEMENT_OFFSET;
 		}
 
 		if(drawContour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2,t.ELEMENT_H);
