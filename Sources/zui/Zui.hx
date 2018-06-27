@@ -629,7 +629,6 @@ class Zui {
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
 			var end = highlightEnd;
-			trace(cursorX);
 			for(i in 0...numLines){
 				end =  maxCharsPerLine*i > (numLines-2)*maxCharsPerLine ? text.length - (numLines-1)*maxCharsPerLine : maxCharsPerLine;
 				var hlstr = align == Left ? text.substr(highlightStart, end) : text.substring(end, highlightStart);
