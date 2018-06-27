@@ -317,9 +317,9 @@ class Nodes {
 				ui._w = w;
 				
 				var val = node.outputs[but.output].default_value;
-				nhandle.r = val[0]; nhandle.g = val[1]; nhandle.b = val[2];
+				nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				Ext.colorWheel(ui, nhandle, false);
-				val[0] = nhandle.r; val[1] = nhandle.g; val[2] = nhandle.b;
+				val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
 			}
 			else if (but.type == 'VALUE') {
 				ny += lineh;
