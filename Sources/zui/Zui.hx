@@ -561,7 +561,7 @@ class Zui {
 
 	function updateTextEdit(align:Align = Left, asFloat: Bool,isMultiline:Bool = false, fixLines:Int = 0) {
 		var text = textSelectedCurrentText;
-		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
+		var maxCharsPerLine = Std.int(_w/(fontSize / 2));
 		var numLines = Math.ceil(text.length/maxCharsPerLine);
 		if (isKeyDown) { // Process input
 			if (key == kha.input.KeyCode.Left) { // Move cursor
@@ -630,7 +630,7 @@ class Zui {
 		if (highlightStart != highlightEnd) {
 			var end = highlightEnd;
 			for(i in 0...numLines){
-				end =  maxCharsPerLine*i > (numLines-2)*maxCharsPerLine ? text.length - (numLines-1)*maxCharsPerLine : maxCharsPerLine;
+				if(isMultiline) end =  maxCharsPerLine*i > (numLines-2)*maxCharsPerLine ? text.length - (numLines-1)*maxCharsPerLine : maxCharsPerLine;
 				var hlstr = align == Left ? text.substr(highlightStart, end) : text.substring(end, highlightStart);
 				var hlstrw = g.font.width(g.fontSize, hlstr);
 				var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
