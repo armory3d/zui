@@ -9,6 +9,7 @@ class Canvas {
 	public static var screenW = -1;
 	public static var screenH = -1;
 	static var _ui: Zui;
+	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
 	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
 		
@@ -112,6 +113,21 @@ class Canvas {
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
 			ui.g.color = col;
 
+		case Check:
+			ui.check(h.nest(element.id), element.text);
+
+		case Radio:
+			ui.inlineRadio(h.nest(element.id), element.text.split(";"));
+
+		case Combo:
+			ui.combo(h.nest(element.id), element.text.split(";"));
+
+		case Slider:
+			ui.slider(h.nest(element.id), element.text, 0.0, 1.0, true);
+
+		case Input:
+			ui.textInput(h.nest(element.id), element.text);
+
 		case Empty:
 		}
 
@@ -191,12 +207,12 @@ typedef TAsset = {
 	var Empty = 3;
 	// var HLayout = 4;
 	// var VLayout = 5;
-	// var Check = 6;
-	// var Radio = 7;
-	// var Combo = 8;
+	var Check = 6;
+	var Radio = 7;
+	var Combo = 8;
 	var Shape = 9;
-	// var Slider = 10;
-	// var Input = 11;
+	var Slider = 10;
+	var Input = 11;
 }
 
 @:enum abstract Anchor(Int) from Int {
