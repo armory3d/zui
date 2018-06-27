@@ -620,7 +620,7 @@ class Zui {
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
-					cursorY = multiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
+					cursorY = isMultiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
 				}
 			}
 			cursorY = isMultiline ? Math.floor(text.length/maxCharsPerLine): 0;
@@ -628,8 +628,7 @@ class Zui {
 		}
 
 		var off = TEXT_OFFSET();
-		var value = Math.ceil(text.length/maxCharsPerLine+0.001);
-		var lineHeight = multiline ? ELEMENT_H()*value:ELEMENT_H();
+		var lineHeight = ELEMENT_H();
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
@@ -642,8 +641,6 @@ class Zui {
 				g.fillRect(hlStart, _y + (lineHeight - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 			}
 		}
-		lineHeight = ELEMENT_H();
-		cursorHeight = lineHeight - buttonOffsetY * 3.0;
 
 		// Flash cursor
 		var time = kha.Scheduler.time();

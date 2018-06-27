@@ -190,6 +190,7 @@ class Canvas {
 		case ButtonGroup:
 		case CheckGroup:
 		case Count:
+		case Empty:
 		}
 
 		if (rotated) ui.g.popTransformation();
@@ -268,6 +269,7 @@ class TSubDefines {
 }
 @:struct  @:structInit class TMessage {
 	@:optional public var text: String;
+	@:optional public var texts: Array<String>;
 	@:optional public var position: Int;
 	@:optional public var isCheck: Bool;
 
