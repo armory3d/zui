@@ -102,6 +102,10 @@ class Canvas {
 			ui.g.font = ui.ops.font;
 			var str = ui.textInput(Id.handle().nest(element.id, {text: element.text}),element.name,Left);
 			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: str});
+		case TextArea:
+			ui.g.font = ui.ops.font;
+			var str = ui.textArea(Id.handle().nest(element.id, {text: element.text}),element.name,Left);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({texts: str});
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
@@ -173,6 +177,7 @@ class Canvas {
 		case ButtonGroup:
 		case CheckGroup:
 		case Count:
+		case Empty:
 		}
 		if (rotated) ui.g.popTransformation();
 		if (element.children != null) {
@@ -256,6 +261,7 @@ class TSubDefines {
 }
 @:struct  @:structInit class TMessage {
 	@:optional public var text: String;
+	@:optional public var texts: Array<String>;
 	@:optional public var position: Int;
 	@:optional public var isCheck: Bool;
 
@@ -270,57 +276,63 @@ typedef TAsset = {
 
 @:enum abstract ElementType(Int) from Int {
 	var Text = 0;
-	var Shape = 9;
 	var TextInput = 1;
-	var Image = 2;
-	var Button = 3;
-	var ButtonGroup = 4;
-	var Combo = 5;
-	var Slider = 6;
+	var TextArea = 2;
+	var Image = 3;
+	var Combo = 4;
+	var Slider = 5;
+	var Button = 6;
 	var Radio = 7;
-	var RadioGroup = 8;
-	var Check = 9;
-	var CheckGroup = 10;
-	var InlineRadio = 11;
-	var ElementGroup =12;
-	var Panel = 13;
-	var Tab = 14;
-	var Window = 15;
-	var Count = 16;
-	public static function getType(name: String):Int{
+	var Check = 8;
+	var Shape = 9;
+	var InlineRadio = 10;
+	var ElementGroup = 11;
+	var RadioGroup = 12;
+	var ButtonGroup = 13;
+	var CheckGroup = 14;
+	var Panel = 15;
+	var Tab = 16;
+	var Window = 17;
+	var Count = 18;
+	var Empty = -1;
+	public static function getType(name: String):ElementType{
 		switch(name){
 			case 'Text':
-				return 0;
+				return Text;
 			case 'TextInput':
-				return 1;
+				return TextInput;
+			case 'TextArea':
+				return TextArea;
 			case 'Image':
-				return 2;
-			case 'Button':
-				return 3;
-			case 'ButtonGroup':
-				return 4;
+				return Image;
 			case 'Combo':
-				return 5;
+				return Combo;
 			case 'Slider':
-				return 6;
+				return Slider;
+			case 'Button':
+				return Button;
 			case 'Radio':
-				return 7;
-			case 'RadioGroup':
-				return 8;
+				return Radio;
 			case 'Check':
-				return 9;
-			case 'CheckGroup':
-				return 10;
+				return Check;
+			case 'Shape':
+				return Shape;
 			case 'InlineRadio':
-				return 11;
+				return InlineRadio;
 			case 'ElementGroup':
-				return 12;
+				return ElementGroup;
+			case 'RadioGroup':
+				return RadioGroup;
+			case 'ButtonGroup':
+				return ButtonGroup;
+			case 'CheckGroup':
+				return CheckGroup;
 			case 'Panel':
-				return 13;
+				return Panel;
 			case 'Tab':
-				return 14;
+				return Tab;
 			case 'Window':
-				return 15;
+				return Window;
 			default:
 				return -1;
 		}

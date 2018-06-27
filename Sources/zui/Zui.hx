@@ -559,9 +559,10 @@ class Zui {
 		textSelectedCurrentText = "";
 	}
 
-	function updateTextEdit(align:Align = Left, asFloat: Bool,multiline = false) {
+	function updateTextEdit(align:Align = Left, asFloat: Bool,isMultiline = false) {
 		var text = textSelectedCurrentText;
 		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
+		var numLines = Math.ceil(text.length/maxCharsPerLine);
 		if (isKeyDown) { // Process input
 			if (key == kha.input.KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
@@ -569,13 +570,14 @@ class Zui {
 			}
 			else if (key == kha.input.KeyCode.Right) {
 				if (cursorX+maxCharsPerLine*cursorY < text.length) cursorX++;
-				if (cursorX > maxCharsPerLine*(cursorY+1)){cursorX = 0; cursorY++;}
+				if(cursorX == text.length && cursorY == 0)cursorY = numLines-1;
+				else if (cursorX > maxCharsPerLine*(cursorY+1)){cursorX = 0; cursorY++;}
+				
 			}
 			else if(key == kha.input.KeyCode.Up){
 				if(cursorY >0)cursorY--;
 			}
 			else if(key == kha.input.KeyCode.Down){
-				var numLines = Math.ceil(text.length/maxCharsPerLine);
 				if(cursorY+2 == numLines ) cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY+1)*maxCharsPerLine : cursorX;
 				if(numLines > cursorY)cursorY++;
 			}
@@ -614,25 +616,27 @@ class Zui {
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
-					cursorY = multiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
+					cursorY = isMultiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
 				}
 			}
 			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 		}
 
 		var off = TEXT_OFFSET();
-		var value = Math.ceil(text.length/maxCharsPerLine+0.001);
-		var lineHeight = multiline ? ELEMENT_H()*value:ELEMENT_H();
+		var lineHeight = ELEMENT_H();
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
-			var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
-			var hlstrw = g.font.width(g.fontSize, hlstr);
-			var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
-			g.fillRect(hlStart, _y + 0 * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+			var end = highlightEnd;
+			trace(cursorX);
+			for(i in 0...numLines){
+				end =  maxCharsPerLine*i > (numLines-2)*maxCharsPerLine ? text.length - (numLines-1)*maxCharsPerLine : maxCharsPerLine;
+				var hlstr = align == Left ? text.substr(highlightStart, end) : text.substring(end, highlightStart);
+				var hlstrw = g.font.width(g.fontSize, hlstr);
+				var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
+				g.fillRect(hlStart, _y + (lineHeight - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+			}
 		}
-		lineHeight = ELEMENT_H();
-		cursorHeight = lineHeight - buttonOffsetY * 3.0;
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
@@ -641,7 +645,7 @@ class Zui {
 			var str = align == Left ? text.substr(maxCharsPerLine*cursorY, cursorX) : text.substring(cursorX, text.length);
 			var strw = g.font.width(g.fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
-			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
+			g.fillRect(cursorX, _y + (lineHeight - t.ELEMENT_OFFSET)*cursorY- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
 		
 		if (asFloat) text = formatFloatString(text);
