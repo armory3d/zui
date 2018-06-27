@@ -725,6 +725,8 @@ class Zui {
  
 		if(drawContour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2,t.ELEMENT_H);
 
+		if(drawContour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2,t.ELEMENT_H);
+
 		endElement();
 		
 		t.ELEMENT_H = oldHeight;
