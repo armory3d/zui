@@ -1303,9 +1303,6 @@ class Handle {
 	public var selected = false;
 	public var position = 0;
 	public var color = kha.Color.White;
-	public var r = 0.0;
-	public var g = 0.0;
-	public var b = 0.0;
 	public var value = 0.0;
 	public var text = "";
 	public var texture: kha.Image = null;

@@ -5,12 +5,13 @@ import zui.Zui;
 @:access(zui.Zui)
 class Canvas {
 
-	public static var assetMap = new Map<Int, kha.Image>();
+	public static var assetMap = new Map<Int, Dynamic>(); // kha.Image | kha.Font
 	static var events:Array<String> = [];
 
 	public static var screenW = -1;
 	public static var screenH = -1;
 	static var _ui: Zui;
+	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
 	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics, previewMode = false, coff=0, hwin:Handle=null): Array<String> {
 		
@@ -47,7 +48,7 @@ class Canvas {
 
 	static function drawElement(ui: Zui, canvas: TCanvas, element: TElement, px = 0.0, py = 0.0) {
 
-		if (element == null || !element.visible) return;
+		if (element == null || element.visible == false) return;
 
 		ui._x = canvas.x + scaled(element.x) + scaled(px);
 		ui._y = canvas.y + scaled(element.y) + scaled(py);
@@ -84,11 +85,17 @@ class Canvas {
 
 		switch (element.type) {
 		case Text:
+			var font = ui.ops.font;
 			var size = ui.fontSize;
 			var tcol = ui.t.TEXT_COL;
+			
+			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
+			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
 			ui.t.TEXT_COL = element.color;
 			ui.text(element.text);
+
+			ui.ops.font = font;
 			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
 		case TextInput:
@@ -102,9 +109,11 @@ class Canvas {
 				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
 			}
 			ui.t.BUTTON_H = bh;
+		
 		case Image:
 			var image = getAsset(canvas, element.asset);
-			if (image != null) {
+			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
+			if (image != null && !fontAsset) {
 				ui.imageScrollAlign = false;
 				var tint = element.color != null ? element.color : 0xffffffff;
 				if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
@@ -113,6 +122,12 @@ class Canvas {
 				}
 				ui.imageScrollAlign = true;
 			}
+		case Shape:
+			var col = ui.g.color;
+			ui.g.color = element.color;
+			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
+			ui.g.color = col;
+
 		case Combo:
 			var comboIndex = ui.combo(Id.handle().nest(element.id),element.subDefine.texts,element.text,element.subDefine.showLabel);
 			if( comboIndex != element.subDefine.currentValue){
@@ -167,7 +182,7 @@ class Canvas {
 		}
 	}
 
-	public static function getAsset(canvas: TCanvas, asset: String): kha.Image {
+	public static function getAsset(canvas: TCanvas, asset: String): Dynamic { // kha.Image | kha.Font {
 		for (a in canvas.assets) if (a.name == asset) return assetMap.get(a.id);
 		return null;
 	}
@@ -255,6 +270,7 @@ typedef TAsset = {
 
 @:enum abstract ElementType(Int) from Int {
 	var Text = 0;
+	var Shape = 9;
 	var TextInput = 1;
 	var Image = 2;
 	var Button = 3;
