@@ -174,10 +174,11 @@ class Ext {
 	static var wheelSelectedHande: Handle = null;
 	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, rowAlign = false): kha.Color {
 		if (w == null) w = ui._w;
-		rgbToHsv(handle.r, handle.g, handle.b, ar);
+		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
 		var chue = ar[0];
 		var csat = ar[1];
 		var cval = ar[2];
+		var calpha = handle.color.A;
 		// Wheel
 		var px = ui._x;
 		var py = ui._y;
@@ -205,8 +206,9 @@ class Ext {
 		ui.g.color = 0xffffffff;
 		ui.g.fillRect(cx - 2, cy - 2, 4, 4);
 		// Val slider
-		if (rowAlign) ui.row([1/2, 1/2]);
+		if (rowAlign) alpha ? ui.row([1/3, 1/3, 1/3]) : ui.row([1/2, 1/2]);
 		cval = ui.slider(handle.nest(0, {value: 1.0}), "Value", 0.0, 1.0, true);
+		if (alpha) calpha = ui.slider(handle.nest(1, {value: 1.0}), "Alpha", 0.0, 1.0, true);
 		// Mouse picking
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
@@ -222,10 +224,7 @@ class Ext {
 		}
 		// Save as rgb
 		hsvToRgb(chue, csat, cval, ar);
-		handle.r = ar[0];
-		handle.g = ar[1];
-		handle.b = ar[2];
-		handle.color = kha.Color.fromFloats(handle.r, handle.g, handle.b);
+		handle.color = kha.Color.fromFloats(ar[0], ar[1], ar[2], calpha);
 		ui.text("", Right, handle.color);
 		return handle.color;
 	}
