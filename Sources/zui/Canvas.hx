@@ -105,6 +105,13 @@ class Canvas {
 				}
 				ui.imageScrollAlign = true;
 			}
+
+		case Shape:
+			var col = ui.g.color;
+			ui.g.color = element.color;
+			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
+			ui.g.color = col;
+
 		case Empty:
 		}
 
@@ -187,7 +194,7 @@ typedef TAsset = {
 	// var Check = 6;
 	// var Radio = 7;
 	// var Combo = 8;
-	// var Shape = 9;
+	var Shape = 9;
 	// var Slider = 10;
 	// var Input = 11;
 }
