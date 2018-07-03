@@ -826,6 +826,8 @@ class Zui {
 			scrollingHandle = handle;
 			isScrolling = true;
 		}
+		
+		handle.changed = false;
 		if (handle.scrolling) { // Scroll
 			var range = to - from;
 			var sliderX = _x + _windowX + buttonOffsetY;
@@ -837,7 +839,6 @@ class Zui {
 			else if (handle.value > to) handle.value = to;
 			handle.changed = changed = true;
 		}
-		else handle.changed = false;
 
 		var hover = getHover();
 		drawSlider(handle.value, from, to, filled, hover); // Slider
@@ -856,7 +857,6 @@ class Zui {
 			submitTextEdit();
 			handle.value = Std.parseFloat(handle.text);
 		}
-		else handle.changed = false;
 		
 		g.color = t.LABEL_COL;// Text
 		drawString(g, text, null, 0, align);
