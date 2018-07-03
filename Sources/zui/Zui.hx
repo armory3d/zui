@@ -460,7 +460,7 @@ class Zui {
 	public function panel(handle: Handle, text: String, accent = 0, isTree = false): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
 		if (getReleased()) handle.selected = !handle.selected;
-		var hover = getHover();
+		// var hover = getHover();
 
 		if (accent > 0) { // Bg
 			g.color = t.PANEL_BG_COL;
