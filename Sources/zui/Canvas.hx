@@ -1,4 +1,6 @@
 package zui;
+import zui.Zui;
+
 
 @:access(zui.Zui)
 class Canvas {
@@ -11,7 +13,7 @@ class Canvas {
 	static var _ui: Zui;
 	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
-	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
+	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics, previewMode = false, coff=0, hwin:Handle=null): Array<String> {
 		
 		if (screenW == -1) {
 			screenW = kha.System.windowWidth();
@@ -23,7 +25,19 @@ class Canvas {
 		_ui = ui;
 		ui.begin(g);
 		ui.g = g;
-
+		if(previewMode){
+			var windows =[];
+			if(ui.window(hwin,coff,coff,screenW,screenH,true)){
+				for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
+			}
+			for(window in windows) drawElement(ui,canvas,window);
+		}
+		else{
+			var windows =[];
+			for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
+			for(window in windows) drawElement(ui,canvas,window);
+		}
+		
 		for (elem in canvas.elements) {
 			if (elem.parent == null) drawElement(ui, canvas, elem);
 		}
@@ -84,13 +98,19 @@ class Canvas {
 			ui.ops.font = font;
 			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
-		
+		case TextInput:
+			ui.g.font = ui.ops.font;
+			var str = ui.textInput(Id.handle().nest(element.id, {text: element.text}),element.name,Left);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: str});
+		case TextArea:
+			ui.g.font = ui.ops.font;
+			var str = ui.textArea(Id.handle().nest(element.id, {text: element.text}),element.name,Left);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({texts: str});
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
 			if (ui.button(element.text)) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
+				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
 			}
 			ui.t.BUTTON_H = bh;
 		
@@ -106,38 +126,65 @@ class Canvas {
 				}
 				ui.imageScrollAlign = true;
 			}
-
 		case Shape:
 			var col = ui.g.color;
 			ui.g.color = element.color;
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
 			ui.g.color = col;
 
-		case Check:
-			ui.check(h.nest(element.id), element.text);
-
-		case Radio:
-			ui.inlineRadio(h.nest(element.id), element.text.split(";"));
-
 		case Combo:
-			ui.combo(h.nest(element.id), element.text.split(";"));
-
+			var comboIndex = ui.combo(Id.handle().nest(element.id),element.subDefine.texts,element.text,element.subDefine.showLabel);
+			if( comboIndex != element.subDefine.currentValue){
+				element.subDefine.currentValue = comboIndex; 
+			}
 		case Slider:
-			ui.slider(h.nest(element.id), element.text, 0.0, 1.0, true);
+			var sliderValue = ui.slider(Id.handle().nest(element.id),element.name,element.subDefine.from, element.subDefine.to,
+			element.subDefine.filled,element.subDefine.precision,element.subDefine.displayValue);
+			if( sliderValue > element.subDefine.currentFValue || sliderValue < element.subDefine.currentFValue){
+				element.subDefine.currentFValue = sliderValue;
+			}
+		case ElementGroup:
+			Ext.elementGroup(ui,canvas,element);
 
-		case Input:
-			ui.textInput(h.nest(element.id), element.text);
-
+		case Check:
+			var checked = ui.check(Id.handle().nest(element.id), element.text);
+			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});	
+		case Radio:
+			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case InlineRadio:
+			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.subDefine.texts);
+			if(inlineIndex != element.subDefine.currentValue){
+				element.subDefine.currentValue = inlineIndex;
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+		case Panel:
+			if(ui.panel(Id.handle().nest(element.id,{selected: element.subDefine.selected}), element.text,element.subDefine.accent,element.subDefine.isTree)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c), element.x, element.y);
+			}
+		case Tab:
+			if(ui.tab(Id.handle().nest(element.id), element.text)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c), element.x, element.y);
+			}
+		case Window:
+			if(ui.window(Id.handle().nest(element.id), Std.int(element.x),Std.int(element.y),element.width,element.height,element.subDefine.draggable)){
+				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c));
+			}
+		case RadioGroup:
+		case ButtonGroup:
+		case CheckGroup:
+		case Count:
 		case Empty:
 		}
-
+		if (rotated) ui.g.popTransformation();
 		if (element.children != null) {
 			for (id in element.children) {
-				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
+				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y +py);
 			}
 		}
-
-		if (rotated) ui.g.popTransformation();
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): Dynamic { // kha.Image | kha.Font {
@@ -157,7 +204,7 @@ class Canvas {
 		return ++assetId;
 	}
 
-	static function elemById(canvas: TCanvas, id: Int): TElement {
+	public static function elemById(canvas: TCanvas, id: Int): TElement {
 		for (e in canvas.elements) if (e.id == id) return e;
 		return null;
 	}
@@ -172,7 +219,7 @@ typedef TCanvas = {
 	var width: Int;
 	var height: Int;
 	var elements: Array<TElement>;
-	@:optional var assets: Array<TAsset>;
+	@:optional var assets: Array<TAsset>; 
 }
 
 typedef TElement = {
@@ -192,6 +239,32 @@ typedef TElement = {
 	@:optional var children: Array<Int>; // ids
 	@:optional var asset: String;
 	@:optional var visible: Null<Bool>;
+	@:optional var subDefine: TSubDefines;
+}
+class TSubDefines {
+
+	public function new(){};
+	@:optional public var texts: Array<String>;
+	@:optional public var currentValue: Int;
+	@:optional public var currentFValue: Float;
+	@:optional public var from: Float;
+	@:optional public var to: Float;
+	@:optional public var filled: Bool;
+	@:optional public var displayValue: Bool;
+	@:optional public var precision: Int;
+	@:optional public var selected: Bool;
+	@:optional public var accent: Int;
+	@:optional public var isTree: Bool;
+	@:optional public var showLabel: Bool;
+	@:optional public var draggable: Bool;
+	@:optional public var callback: TMessage-> Void;
+}
+@:struct  @:structInit class TMessage {
+	@:optional public var text: String;
+	@:optional public var texts: Array<String>;
+	@:optional public var position: Int;
+	@:optional public var isCheck: Bool;
+
 }
 
 typedef TAsset = {
@@ -200,19 +273,70 @@ typedef TAsset = {
 	var file:String;
 }
 
+
 @:enum abstract ElementType(Int) from Int {
 	var Text = 0;
-	var Image = 1;
-	var Button = 2;
-	var Empty = 3;
-	// var HLayout = 4;
-	// var VLayout = 5;
-	var Check = 6;
+	var TextInput = 1;
+	var TextArea = 2;
+	var Image = 3;
+	var Combo = 4;
+	var Slider = 5;
+	var Button = 6;
 	var Radio = 7;
-	var Combo = 8;
+	var Check = 8;
 	var Shape = 9;
-	var Slider = 10;
-	var Input = 11;
+	var InlineRadio = 10;
+	var ElementGroup = 11;
+	var RadioGroup = 12;
+	var ButtonGroup = 13;
+	var CheckGroup = 14;
+	var Panel = 15;
+	var Tab = 16;
+	var Window = 17;
+	var Count = 18;
+	var Empty = -1;
+	public static function getType(name: String):ElementType{
+		switch(name){
+			case 'Text':
+				return Text;
+			case 'TextInput':
+				return TextInput;
+			case 'TextArea':
+				return TextArea;
+			case 'Image':
+				return Image;
+			case 'Combo':
+				return Combo;
+			case 'Slider':
+				return Slider;
+			case 'Button':
+				return Button;
+			case 'Radio':
+				return Radio;
+			case 'Check':
+				return Check;
+			case 'Shape':
+				return Shape;
+			case 'InlineRadio':
+				return InlineRadio;
+			case 'ElementGroup':
+				return ElementGroup;
+			case 'RadioGroup':
+				return RadioGroup;
+			case 'ButtonGroup':
+				return ButtonGroup;
+			case 'CheckGroup':
+				return CheckGroup;
+			case 'Panel':
+				return Panel;
+			case 'Tab':
+				return Tab;
+			case 'Window':
+				return Window;
+			default:
+				return -1;
+		}
+	}
 }
 
 @:enum abstract Anchor(Int) from Int {
