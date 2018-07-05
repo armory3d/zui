@@ -1,6 +1,5 @@
 package zui;
 
-
 @:access(zui.Zui)
 class Canvas {
 
