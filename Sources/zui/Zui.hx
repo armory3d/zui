@@ -566,23 +566,26 @@ class Zui {
  		if (isKeyDown) { // Process input
 			if (key == kha.input.KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
-				if (cursorX==0 && cursorY > 0)
-					{cursorY--;cursorX = maxCharsPerLine;}
+				if (cursorX==0 && cursorY > 0){
+					cursorY--;
+					cursorX = maxCharsPerLine;
+				}
 			}
  			else if (key == kha.input.KeyCode.Right) {
-				if (cursorX+maxCharsPerLine*cursorY < text.length) cursorX++;
-				if(cursorX == text.length && cursorY == 0)cursorY = numLines-1;
-				else if (cursorX > maxCharsPerLine*(cursorY+1))
-					{cursorX = 0; cursorY++;}
-				
+				if (cursorX-maxCharsPerLine*cursorY < text.length-maxCharsPerLine*cursorY-1)cursorX++;
+				if(cursorX == text.length && cursorY == 0 && numLines !=1)cursorY = numLines;
+				else if (cursorX > maxCharsPerLine*(cursorY+1)){
+					cursorX = cursorX > text.length - (cursorY)*maxCharsPerLine ? text.length - (cursorY)*maxCharsPerLine : cursorX; 
+				}
 			}
 			else if(key == kha.input.KeyCode.Up){
 				if(cursorY >0)cursorY--;
 			}
 			else if(key == kha.input.KeyCode.Down){
-				if(cursorY+2 == numLines )
-					{cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY+1)*maxCharsPerLine : cursorX;}
-				if(numLines > cursorY)cursorY++;
+				if(cursorY+1 == numLines ){
+					cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY)*maxCharsPerLine : cursorX;
+				}
+				if(numLines > cursorY && numLines != 1)cursorY++;
  			}
 			else if (key == kha.input.KeyCode.Backspace) { // Remove char
 				if (cursorX > 0) {
@@ -590,7 +593,7 @@ class Zui {
 						text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
 					}
 					else {
-						text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
+						text = text.substr(0, maxCharsPerLine*cursorY+cursorX - 1) + text.substr(maxCharsPerLine*cursorY+cursorX, text.length);
 					}
 					cursorX--;
 				}
@@ -612,18 +615,25 @@ class Zui {
 			}
 			else if (key == kha.input.KeyCode.End) {
 				cursorX = text.length;
+				cursorY = numLines;
 			}
 			else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
-				var canGrow = fixLines > 0 ? cursorY*maxCharsPerLine < fixLines * maxCharsPerLine - 1 : isMultiline || !isMultiline && text.length < maxCharsPerLine+1;
+				var canGrow = fixLines > 0 ? text.length < fixLines * maxCharsPerLine  : isMultiline || !isMultiline && text.length < maxCharsPerLine+1;
 				if (char != null && char != "" && canGrow) {
+					if (highlightStart != highlightEnd){
+						text = '';
+						cursorX =0;
+					}
 					if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
+					cursorY = isMultiline && numLines != Math.floor(text.length/maxCharsPerLine) ? Math.floor(text.length/maxCharsPerLine): cursorY;
 				}
 			}
-			cursorY = isMultiline ? Math.floor(text.length/maxCharsPerLine): 0;
-			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
+			cursorX = cursorX > text.length - (cursorY)*maxCharsPerLine ? text.length - (cursorY)*maxCharsPerLine : cursorX;
+			if(cursorX > maxCharsPerLine){cursorY++;cursorX =0;}
+			setHighlight(maxCharsPerLine*cursorY+cursorX,maxCharsPerLine*cursorY+ cursorX); //TODO: Implement shift modifier key
 		}
 
 		var off = TEXT_OFFSET();
@@ -646,7 +656,7 @@ class Zui {
 		var time = kha.Scheduler.time();
 		if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
 			g.color = t.TEXT_COL; // Cursor
-			var str = align == Left ? text.substr(maxCharsPerLine*cursorY, cursorX) : text.substring(cursorX, text.length);
+			var str = align == Left ? text.substring(maxCharsPerLine*cursorY, maxCharsPerLine*cursorY+cursorX) : text.substring(cursorX, text.length);
 			var strw = g.font.width(g.fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.fillRect(cursorX, _y + (lineHeight - t.ELEMENT_OFFSET)*cursorY- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
@@ -665,7 +675,7 @@ class Zui {
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
+		if (textSelectedHandle == handle) updateTextEdit(align, asFloat,false,1);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 
