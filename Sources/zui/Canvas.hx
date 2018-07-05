@@ -1,4 +1,6 @@
 package zui;
+import zui.Zui;
+
 
 @:access(zui.Zui)
 class Canvas {
@@ -23,7 +25,6 @@ class Canvas {
 		_ui = ui;
 		ui.begin(g);
 		ui.g = g;
-
 		for (elem in canvas.elements) {
 			if (elem.parent == null) drawElement(ui, canvas, elem);
 		}
@@ -88,10 +89,7 @@ class Canvas {
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
-			if (ui.button(element.text)) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
-			}
+			ui.button(element.text);
 			ui.t.BUTTON_H = bh;
 		
 		case Image:
@@ -157,7 +155,7 @@ class Canvas {
 		return ++assetId;
 	}
 
-	static function elemById(canvas: TCanvas, id: Int): TElement {
+	public static function elemById(canvas: TCanvas, id: Int): TElement {
 		for (e in canvas.elements) if (e.id == id) return e;
 		return null;
 	}
@@ -172,7 +170,7 @@ typedef TCanvas = {
 	var width: Int;
 	var height: Int;
 	var elements: Array<TElement>;
-	@:optional var assets: Array<TAsset>;
+	@:optional var assets: Array<TAsset>; 
 }
 
 typedef TElement = {
@@ -193,12 +191,38 @@ typedef TElement = {
 	@:optional var asset: String;
 	@:optional var visible: Null<Bool>;
 }
+class TSubDefines {
+
+	public function new(){};
+	@:optional public var texts: Array<String>;
+	@:optional public var currentValue: Int;
+	@:optional public var currentFValue: Float;
+	@:optional public var from: Float;
+	@:optional public var to: Float;
+	@:optional public var filled: Bool;
+	@:optional public var displayValue: Bool;
+	@:optional public var precision: Int;
+	@:optional public var selected: Bool;
+	@:optional public var accent: Int;
+	@:optional public var isTree: Bool;
+	@:optional public var showLabel: Bool;
+	@:optional public var draggable: Bool;
+	@:optional public var callback: TMessage-> Void;
+}
+@:struct  @:structInit class TMessage {
+	@:optional public var text: String;
+	@:optional public var texts: Array<String>;
+	@:optional public var position: Int;
+	@:optional public var isCheck: Bool;
+
+}
 
 typedef TAsset = {
 	var id: Int;
 	var name:String;
 	var file:String;
 }
+
 
 @:enum abstract ElementType(Int) from Int {
 	var Text = 0;

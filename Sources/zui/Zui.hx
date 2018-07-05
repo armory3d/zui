@@ -559,22 +559,41 @@ class Zui {
 		textSelectedCurrentText = "";
 	}
 
-	function updateTextEdit(align:Align = Left, asFloat: Bool) {
-		var text = textSelectedCurrentText;
-		if (isKeyDown) { // Process input
+	function updateTextEdit(align:Align = Left, asFloat: Bool,isMultiline:Bool = false, fixLines:Int = 0) {
+ 		var text = textSelectedCurrentText;
+		var maxCharsPerLine = Std.int((_w-ELEMENT_OFFSET())/Std.int(fontSize / 2));
+		var numLines = Math.floor(text.length/maxCharsPerLine);
+ 		if (isKeyDown) { // Process input
 			if (key == kha.input.KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
+				if (cursorX==0 && cursorY > 0){
+					cursorY--;
+					cursorX = maxCharsPerLine;
+				}
 			}
-			else if (key == kha.input.KeyCode.Right) {
-				if (cursorX < text.length) cursorX++;
+ 			else if (key == kha.input.KeyCode.Right) {
+				if (cursorX-maxCharsPerLine*cursorY < text.length-maxCharsPerLine*cursorY-1)cursorX++;
+				if(cursorX == text.length && cursorY == 0 && numLines !=1)cursorY = numLines;
+				else if (cursorX > maxCharsPerLine*(cursorY+1)){
+					cursorX = cursorX > text.length - (cursorY)*maxCharsPerLine ? text.length - (cursorY)*maxCharsPerLine : cursorX; 
+				}
 			}
+			else if(key == kha.input.KeyCode.Up){
+				if(cursorY >0)cursorY--;
+			}
+			else if(key == kha.input.KeyCode.Down){
+				if(cursorY+1 == numLines ){
+					cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY)*maxCharsPerLine : cursorX;
+				}
+				if(numLines > cursorY && numLines != 1)cursorY++;
+ 			}
 			else if (key == kha.input.KeyCode.Backspace) { // Remove char
 				if (cursorX > 0) {
 					if (highlightStart != highlightEnd) {
 						text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
 					}
 					else {
-						text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
+						text = text.substr(0, maxCharsPerLine*cursorY+cursorX - 1) + text.substr(maxCharsPerLine*cursorY+cursorX, text.length);
 					}
 					cursorX--;
 				}
@@ -592,19 +611,29 @@ class Zui {
 			}
 			else if (key == kha.input.KeyCode.Home) {
 				cursorX = 0;
+				cursorY = 0;
 			}
 			else if (key == kha.input.KeyCode.End) {
 				cursorX = text.length;
+				cursorY = numLines;
 			}
 			else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
-				if (char != null && char != "") {
+				var canGrow = fixLines > 0 ? text.length < fixLines * maxCharsPerLine  : isMultiline || !isMultiline && text.length < maxCharsPerLine+1;
+				if (char != null && char != "" && canGrow) {
+					if (highlightStart != highlightEnd){
+						text = '';
+						cursorX =0;
+					}
 					if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
+					cursorY = isMultiline && numLines != Math.floor(text.length/maxCharsPerLine) ? Math.floor(text.length/maxCharsPerLine): cursorY;
 				}
 			}
-			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
+			cursorX = cursorX > text.length - (cursorY)*maxCharsPerLine ? text.length - (cursorY)*maxCharsPerLine : cursorX;
+			if(cursorX > maxCharsPerLine){cursorY++;cursorX =0;}
+			setHighlight(maxCharsPerLine*cursorY+cursorX,maxCharsPerLine*cursorY+ cursorX); //TODO: Implement shift modifier key
 		}
 
 		var off = TEXT_OFFSET();
@@ -612,27 +641,32 @@ class Zui {
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
-			var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
-			var hlstrw = g.font.width(g.fontSize, hlstr);
-			var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
-			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+			var end = highlightEnd;
+			var numIterations = isMultiline ?numLines+1 : numLines;
+			for(i in 0...numIterations){
+				if(isMultiline) end =  maxCharsPerLine*i > (numLines-1)*maxCharsPerLine ? text.length - (numLines)*maxCharsPerLine : maxCharsPerLine;
+				var hlstr = align == Left ? text.substr(highlightStart, end) : text.substring(end, highlightStart);
+				var hlstrw = g.font.width(g.fontSize, hlstr);
+				var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
+				g.fillRect(hlStart, _y + (lineHeight - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+			}
 		}
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
 		if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
 			g.color = t.TEXT_COL; // Cursor
-			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
+			var str = align == Left ? text.substring(maxCharsPerLine*cursorY, maxCharsPerLine*cursorY+cursorX) : text.substring(cursorX, text.length);
 			var strw = g.font.width(g.fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
-			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
+			g.fillRect(cursorX, _y + (lineHeight - t.ELEMENT_OFFSET)*cursorY- t.ELEMENT_OFFSET + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
 		
 		if (asFloat) text = formatFloatString(text);
 		textSelectedCurrentText = text;
 	}
 
-	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
+	public function textInput(handle: Handle,label = "", align:Align = Left, asFloat = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
@@ -641,7 +675,7 @@ class Zui {
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
+		if (textSelectedHandle == handle) updateTextEdit(align, asFloat,false,1);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 
@@ -658,6 +692,79 @@ class Zui {
 		endElement();
 
 		return handle.text;
+	}
+	public function textArea(handle: Handle,label = "", align:Align = Left, fixedLines:Int = 0,drawContour:Bool = true):Array<String>{
+		var texts:Array<String> = [];
+		if (!isVisible(ELEMENT_H())) { endElement(); return texts; }
+
+		var hover = getHover();
+		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
+
+		// save height
+		var oldHeight = t.ELEMENT_H; 
+
+		var startEdit = getReleased() || tabPressed;
+		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
+		if (textSelectedHandle == handle) updateTextEdit(align, false,true,fixedLines);
+		if (submitTextHandle == handle) submitTextEdit();
+		else handle.changed = false;
+
+	if (label != "") {
+			//Draw label on top
+		}
+		
+		g.color = t.TEXT_COL; // Text
+		if(textSelectedHandle != handle){
+			texts = stringToLines(handle.text);
+			for(i in 0...texts.length ){
+				drawString(g, texts[i], null, (t.ELEMENT_H - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET, align);
+			}
+		}
+		else{
+			texts = stringToLines(textSelectedCurrentText);
+			for(i in 0...texts.length ){
+				drawString(g, texts[i], null, (t.ELEMENT_H - t.ELEMENT_OFFSET)*i- t.ELEMENT_OFFSET, align);
+			}
+		}
+		if(fixedLines == 0){
+			t.ELEMENT_H = (t.ELEMENT_H - t.ELEMENT_OFFSET) * texts.length - t.ELEMENT_OFFSET;
+		}
+		else if(fixedLines > 0){
+			t.ELEMENT_H = (t.ELEMENT_H - t.ELEMENT_OFFSET) * fixedLines - t.ELEMENT_OFFSET;
+		}
+ 
+		if(drawContour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2,t.ELEMENT_H);
+
+		if(drawContour)drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2,t.ELEMENT_H);
+
+		endElement();
+		
+		t.ELEMENT_H = oldHeight;
+
+		return texts;
+	}
+	private function stringToLines(string: String):Array<String>{
+		var maxCharsPerLine = Std.int((_w-ELEMENT_OFFSET())/ Std.int(fontSize / 2));
+		var texts:Array<String> = [];
+		if(string.length > maxCharsPerLine){
+			var strLength = string.length;
+			var numLines = Math.floor(strLength/maxCharsPerLine);
+			for(i in 0...numLines+1){
+				var str:String;
+				if(strLength > maxCharsPerLine){
+					str = string.substring(i*maxCharsPerLine,i*maxCharsPerLine+maxCharsPerLine);
+					strLength -= maxCharsPerLine;
+					texts.push(str);
+				}
+				else{
+					str = string.substring(i*maxCharsPerLine,i*maxCharsPerLine+strLength);
+					texts.push(str);
+					return texts;
+				}
+			}
+		}
+		texts.push(string);
+		return texts;
 	}
 
 	inline function setHighlight(start:Int, end:Int) {
@@ -1172,7 +1279,9 @@ class Zui {
 		if (code == kha.input.KeyCode.Space) this.char = " ";
 	}
 
-	public function onKeyUp(code: kha.input.KeyCode) {}
+	public function onKeyUp(code: kha.input.KeyCode) {
+		this.key = null;
+	}
 
 	public function onKeyPress(char: String) {
 		isKeyDown = true;
@@ -1196,6 +1305,15 @@ class Zui {
 		if (handle.texture != null) handle.texture.unload();
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
+	}
+	public inline static function clamp(value:Float, min:Float, max:Float):Float
+	{
+		if (value < min)
+			return min;
+		else if (value > max)
+			return max;
+		else
+			return value;
 	}
 }
 

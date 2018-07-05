@@ -1,6 +1,7 @@
 package zui;
 
 import zui.Zui;
+import zui.Canvas;
 
 typedef ListOpts = {
 	?addCb: String->Void,
@@ -271,3 +272,4 @@ class Ext {
 		out[2] = qx;
 	}
 }
+
