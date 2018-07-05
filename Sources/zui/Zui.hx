@@ -561,25 +561,27 @@ class Zui {
 
 	function updateTextEdit(align:Align = Left, asFloat: Bool,isMultiline:Bool = false, fixLines:Int = 0) {
  		var text = textSelectedCurrentText;
- 		var maxCharsPerLine = Std.int(_w/(fontSize / 2));
-		var numLines = Math.ceil(text.length/maxCharsPerLine);
+		var maxCharsPerLine = Std.int((_w-ELEMENT_OFFSET())/Std.int(fontSize / 2));
+		var numLines = Math.floor(text.length/maxCharsPerLine);
  		if (isKeyDown) { // Process input
 			if (key == kha.input.KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
-				if (cursorX > 0) cursorX--;
-				if (cursorX==0 && cursorY > 0){cursorY--;cursorX = maxCharsPerLine;}
+				if (cursorX==0 && cursorY > 0)
+					{cursorY--;cursorX = maxCharsPerLine;}
 			}
  			else if (key == kha.input.KeyCode.Right) {
-				if (cursorX < text.length) cursorX++;
 				if (cursorX+maxCharsPerLine*cursorY < text.length) cursorX++;
 				if(cursorX == text.length && cursorY == 0)cursorY = numLines-1;
-				else if (cursorX > maxCharsPerLine*(cursorY+1)){cursorX = 0; cursorY++;}
+				else if (cursorX > maxCharsPerLine*(cursorY+1))
+					{cursorX = 0; cursorY++;}
+				
 			}
 			else if(key == kha.input.KeyCode.Up){
 				if(cursorY >0)cursorY--;
 			}
 			else if(key == kha.input.KeyCode.Down){
-				if(cursorY+2 == numLines ) cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY+1)*maxCharsPerLine : cursorX;
+				if(cursorY+2 == numLines )
+					{cursorX = cursorX > text.length - (cursorY+1)*maxCharsPerLine ? text.length - (cursorY+1)*maxCharsPerLine : cursorX;}
 				if(numLines > cursorY)cursorY++;
  			}
 			else if (key == kha.input.KeyCode.Backspace) { // Remove char
@@ -612,15 +614,15 @@ class Zui {
 				cursorX = text.length;
 			}
 			else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
-				var canGrow = fixLines > 0 ? cursorY*maxCharsPerLine < fixLines * maxCharsPerLine - 1 : true;
+				var canGrow = fixLines > 0 ? cursorY*maxCharsPerLine < fixLines * maxCharsPerLine - 1 : isMultiline || !isMultiline && text.length < maxCharsPerLine+1;
 				if (char != null && char != "" && canGrow) {
 					if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
-					cursorY = isMultiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
 				}
 			}
+			cursorY = isMultiline ? Math.floor(text.length/maxCharsPerLine): 0;
 			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
 		}
 
@@ -630,8 +632,8 @@ class Zui {
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
 			var end = highlightEnd;
-			for(i in 0...numLines){
-				if(isMultiline) end =  maxCharsPerLine*i > (numLines-2)*maxCharsPerLine ? text.length - (numLines-1)*maxCharsPerLine : maxCharsPerLine;
+			for(i in 0...numLines+1){
+				if(isMultiline) end =  maxCharsPerLine*i > (numLines-1)*maxCharsPerLine ? text.length - (numLines)*maxCharsPerLine : maxCharsPerLine;
 				var hlstr = align == Left ? text.substr(highlightStart, end) : text.substring(end, highlightStart);
 				var hlstrw = g.font.width(g.fontSize, hlstr);
 				var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
@@ -729,12 +731,12 @@ class Zui {
 		return texts;
 	}
 	private function stringToLines(string: String):Array<String>{
-		var maxCharsPerLine = Std.int(_w/ Std.int(fontSize / 2));
+		var maxCharsPerLine = Std.int((_w-ELEMENT_OFFSET())/ Std.int(fontSize / 2));
 		var texts:Array<String> = [];
 		if(string.length > maxCharsPerLine){
 			var strLength = string.length;
-			var numLines = Math.ceil(strLength/maxCharsPerLine);
-			for(i in 0...numLines){
+			var numLines = Math.floor(strLength/maxCharsPerLine);
+			for(i in 0...numLines+1){
 				var str:String;
 				if(strLength > maxCharsPerLine){
 					str = string.substring(i*maxCharsPerLine,i*maxCharsPerLine+maxCharsPerLine);
