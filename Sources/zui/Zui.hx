@@ -666,7 +666,7 @@ class Zui {
 		textSelectedCurrentText = text;
 	}
 
-	public function textInput(handle: Handle,label = "", align:Align = Left, asFloat = false): String {
+	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
@@ -1279,9 +1279,7 @@ class Zui {
 		if (code == kha.input.KeyCode.Space) this.char = " ";
 	}
 
-	public function onKeyUp(code: kha.input.KeyCode) {
-		this.key = null;
-	}
+	public function onKeyUp(code: kha.input.KeyCode) {}
 
 	public function onKeyPress(char: String) {
 		isKeyDown = true;
@@ -1305,15 +1303,6 @@ class Zui {
 		if (handle.texture != null) handle.texture.unload();
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
-	}
-	public inline static function clamp(value:Float, min:Float, max:Float):Float
-	{
-		if (value < min)
-			return min;
-		else if (value > max)
-			return max;
-		else
-			return value;
 	}
 }
 
