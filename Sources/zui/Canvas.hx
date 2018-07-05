@@ -13,7 +13,7 @@ class Canvas {
 	static var _ui: Zui;
 	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
-	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics, previewMode = false, coff=0, hwin:Handle=null): Array<String> {
+	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
 		
 		if (screenW == -1) {
 			screenW = kha.System.windowWidth();
@@ -25,20 +25,6 @@ class Canvas {
 		_ui = ui;
 		ui.begin(g);
 		ui.g = g;
-		if(previewMode){
-			var windows =[];
-			if(ui.window(hwin,coff,coff,screenW,screenH,true)){
-				for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
-			}
-			for(window in windows) drawElement(ui,canvas,window);
-		}
-		else{
-			var windows =[];
-			for (elem in canvas.elements) elem.type != Window ?	drawElement(ui, canvas, elem):windows.push(elem);
-			for(window in windows) drawElement(ui,canvas,window);
-		}
-		
-
 		for (elem in canvas.elements) {
 			if (elem.parent == null) drawElement(ui, canvas, elem);
 		}
@@ -103,9 +89,7 @@ class Canvas {
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
-			if (ui.button(element.text)) {
-				if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({text: element.text});
-			}
+			ui.button(element.text);
 			ui.t.BUTTON_H = bh;
 		
 		case Image:
@@ -149,48 +133,6 @@ class Canvas {
 			for (id in element.children) {
 				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
 			}
-		case Slider:
-			var sliderValue = ui.slider(Id.handle().nest(element.id),element.name,element.subDefine.from, element.subDefine.to,
-			element.subDefine.filled,element.subDefine.precision,element.subDefine.displayValue);
-			if( sliderValue > element.subDefine.currentFValue || sliderValue < element.subDefine.currentFValue){
-				element.subDefine.currentFValue = sliderValue;
-			}
-		case ElementGroup:
-			Ext.elementGroup(ui,canvas,element);
-
-		case Check:
-			var checked = ui.check(Id.handle().nest(element.id), element.text);
-			if(Reflect.isFunction(element.subDefine.callback)) element.subDefine.callback({isCheck: checked, text: element.text});
-			
-		case Radio:
-			if(ui.radio(Id.handle().nest(element.id),element.subDefine.currentValue,element.text)){
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
-			}
-		case InlineRadio:
-			var inlineIndex = ui.inlineRadio(Id.handle().nest(element.id),element.subDefine.texts);
-			if(inlineIndex != element.subDefine.currentValue){
-				element.subDefine.currentValue = inlineIndex;
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
-			}
-		case Panel:
-			if(ui.panel(Id.handle().nest(element.id,{selected: element.subDefine.selected}), element.text,element.subDefine.accent,element.subDefine.isTree)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
-			}
-		case Tab:
-			if(ui.tab(Id.handle().nest(element.id), element.text)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, c);
-			}
-		case Window:
-			if(ui.window(Id.handle().nest(element.id), Std.int(element.x),Std.int(element.y),element.width,element.height,element.subDefine.draggable)){
-				if (element.children != null) for (c in element.children) drawElement(ui, canvas, elemById(canvas,c));
-			}
-		case RadioGroup:
-		case ButtonGroup:
-		case CheckGroup:
-		case Count:
-		case Empty:
 		}
 
 		if (rotated) ui.g.popTransformation();

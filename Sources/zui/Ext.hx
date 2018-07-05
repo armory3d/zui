@@ -271,38 +271,5 @@ class Ext {
 		out[1] = d / (qx + e);
 		out[2] = qx;
 	}
-	/** Usage: Draws a group of elements proportionaly.
-	 This simplifies the formating of the visuals of multiple elements of the same type.
-	 If the modifiers of the element has a callback it will be called on interaction with the element**/
-	public static function elementGroup(ui: Zui, canvas: TCanvas, elementGroup: TElement, single = false ){
-		if(elementGroup.type != ElementType.ElementGroup) return;
-		var elements:Array<Int> =  elementGroup.children;
-		var i = elements.length;
-		for(y in 0...Math.ceil(elements.length/3)){
-			if (i%3 == 2 && !single)ui.row([1/2,1/2]);
-			if (i%3 == 0 && !single )ui.row([1/3,1/3,1/3]);
-			var validIteration = 1;// We want to draw the first element of each iteration; Each iteration is of max length of three
-			while (validIteration != 0) {
-				var elem = Canvas.elemById(canvas,elements[i-1]);
-				if(elem.type == ElementType.Radio){
-					if (ui.radio(Id.handle().nest(elementGroup.id), i, elem.name) && elem.subDefine.currentValue != i ){
-						elem.subDefine.currentValue = i;
-						if(Reflect.isFunction(elem.subDefine.callback)) elem.subDefine.callback({text: elem.text, position: i});
-					}
-				}
-				else if(elem.type == ElementType.Check){
-					var checked = ui.check(Id.handle().nest(elem.id), elem.text);
-					if(Reflect.isFunction(elem.subDefine.callback)) elem.subDefine.callback({isCheck: checked, text: elem.text});
-				}
-				else if(elem.type == ElementType.Button){
-					if (ui.button(elem.text)) {
-						if(Reflect.isFunction(elem.subDefine.callback)) elem.subDefine.callback({text: elem.text});
-					}
-				}
-				i--;
-				validIteration = Math.floor(i%3);
-			}
-		}
-	}
 }
 

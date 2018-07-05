@@ -620,7 +620,6 @@ class Zui {
 						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
 						cursorX++;
 					}
-					cursorY = isMultiline ? Math.ceil(text.length/maxCharsPerLine+0.001)-1: 0;
 				}
 			}
 			cursorY = isMultiline ? Math.floor(text.length/maxCharsPerLine): 0;
@@ -633,7 +632,8 @@ class Zui {
 		//Draw highlight
 		if (highlightStart != highlightEnd) {
 			var end = highlightEnd;
-			for(i in 0...numLines+1){
+			var numIterations = isMultiline ?numLines+1 : numLines;
+			for(i in 0...numIterations){
 				if(isMultiline) end =  maxCharsPerLine*i > (numLines-1)*maxCharsPerLine ? text.length - (numLines)*maxCharsPerLine : maxCharsPerLine;
 				var hlstr = align == Left ? text.substr(highlightStart, end) : text.substring(end, highlightStart);
 				var hlstrw = g.font.width(g.fontSize, hlstr);
