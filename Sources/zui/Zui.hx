@@ -233,6 +233,13 @@ class Zui {
 		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputReleased || inputDown || inputDownR || isKeyDown;
 	}
 
+	public function windowDirty(handle: Handle, x: Int, y: Int, w: Int, h: Int) {
+		var wx = x + handle.dragX;
+		var wy = y + handle.dragY;
+		var inputChanged = getInputInRect(wx, wy, w, h) && inputChanged();
+		return alwaysRedraw || isScrolling || isTyping || inputChanged;
+	}
+
 	// Returns true if redraw is needed
 	public function window(handle: Handle, x: Int, y: Int, w: Int, h: Int, drag = false): Bool {
 		if (handle.texture == null || w != handle.texture.width || h != handle.texture.height) {
@@ -250,9 +257,8 @@ class Zui {
 		_windowH = h;
 		windowHeader = 0;
 
-		var inputChanged = getInputInRect(_windowX, _windowY, _windowW, _windowH) && inputChanged();
-		if (alwaysRedraw || isScrolling || isTyping || inputChanged) {
-			handle.redraws = 2; // Redraw
+		if (windowDirty(handle, x, y, w, h)) {
+			handle.redraws = 2;
 		}
 
 		if (handle.redraws == 0) {
@@ -296,8 +302,9 @@ class Zui {
 		return true;
 	}
 
-	public function endWindow() {
+	public function endWindow(bindGlobalG = true) {
 		var handle = currentWindow;
+		if (handle == null) return;
 		if (handle.redraws > 0 || isScrolling || isTyping) {
 
 			if (tabNames != null) drawTabs();
@@ -368,7 +375,7 @@ class Zui {
 		windowEnded = true;
 
 		// Draw window texture
-		globalG.begin(false);
+		if (bindGlobalG) globalG.begin(false);
 		globalG.color = t.WINDOW_TINT_COL;
 		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 		globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
@@ -383,7 +390,7 @@ class Zui {
 		}
 		else tooltipShown = false;
 		
-		globalG.end();
+		if (bindGlobalG) globalG.end();
 	}
 
 	function scroll(delta: Float, fullHeight: Float) {
