@@ -20,18 +20,18 @@ class Ext {
 	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>, ?opts: ListOpts ): Int {
 		var selected = 0;
 		if (opts == null) opts = {};
-		
+
 		var addCb = opts.addCb != null ? opts.addCb : function(name: String) ar.push(name);
 		var removeCb = opts.removeCb != null ? opts.removeCb : function(i: Int) ar.splice(i, 1);
 		var getNameCb = opts.getNameCb != null ? opts.getNameCb : function(i: Int) return ar[i];
 		var setNameCb = opts.setNameCb != null ? opts.setNameCb : function(i: Int, name: String) ar[i] = name;
 		var getLabelCb = opts.getLabelCb != null ? opts.getLabelCb : function(i: Int) return '';
 		var itemDrawCb = opts.itemDrawCb;
-		var showRadio = opts.showRadio ? opts.showRadio : false;
-		var editable = opts.editable ? opts.editable : true;
-		var showAdd = opts.showAdd ? opts.showAdd : true;
+		var showRadio = opts.showRadio != null ? opts.showRadio : false;
+		var editable = opts.editable != null ? opts.editable : true;
+		var showAdd = opts.showAdd != null ? opts.showAdd : true;
 		var addLabel = opts.addLabel != null ? opts.addLabel : 'Add';
-		
+
 		var i = 0;
 		while (i < ar.length) {
 			if (showRadio) { // Prepend ratio button
@@ -107,7 +107,7 @@ class Ext {
 	static var lastPath = "";
 	public static function fileBrowser(ui: Zui, handle: Handle, foldersOnly = false): String {
 		var sep = "/";
-		
+
 		#if kha_krom
 
 		var cmd = "ls ";
