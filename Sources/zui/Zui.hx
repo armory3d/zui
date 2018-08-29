@@ -1186,17 +1186,17 @@ class Zui {
 		this.char = char;
 	}
 	
-	inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
-	inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
-	inline function ELEMENT_OFFSET() { return t.ELEMENT_OFFSET * SCALE; }
-	inline function ARROW_SIZE() { return t.ARROW_SIZE * SCALE; }
-	inline function BUTTON_H() { return t.BUTTON_H * SCALE; }
-	inline function CHECK_SIZE() { return t.CHECK_SIZE * SCALE; }
-	inline function CHECK_SELECT_SIZE() { return t.CHECK_SELECT_SIZE * SCALE; }
-	inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE); }
-	inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
-	inline function TAB_W() { return Std.int(t.TAB_W * SCALE); }
-	inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE; }
+	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
+	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
+	public inline function ELEMENT_OFFSET() { return t.ELEMENT_OFFSET * SCALE; }
+	public inline function ARROW_SIZE() { return t.ARROW_SIZE * SCALE; }
+	public inline function BUTTON_H() { return t.BUTTON_H * SCALE; }
+	public inline function CHECK_SIZE() { return t.CHECK_SIZE * SCALE; }
+	public inline function CHECK_SELECT_SIZE() { return t.CHECK_SELECT_SIZE * SCALE; }
+	public inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE); }
+	public inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
+	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE); }
+	public inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE; }
 
 	public function resize(handle:Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;
