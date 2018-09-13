@@ -129,6 +129,7 @@ class Zui {
 		this.ops = ops;
 		setScale(ops.scaleFactor);
 		if (ops.autoNotifyInput) registerInput();
+		bakeElements();
 	}
 
 	public function setScale(factor: Float) {
@@ -155,7 +156,6 @@ class Zui {
 	function bakeElements() {
 		if (checkSelectImage != null) {
 			checkSelectImage.unload();
-			checkSelectImage = null;
 		}
 		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_SIZE()), Std.int(CHECK_SELECT_SIZE()), null, NoDepthAndStencil, 1, ops.khaWindowId);
 		var g = checkSelectImage.g2;
