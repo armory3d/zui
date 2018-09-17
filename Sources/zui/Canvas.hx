@@ -8,6 +8,7 @@ class Canvas {
 
 	public static var screenW = -1;
 	public static var screenH = -1;
+	public static var locale = "en";
 	static var _ui: Zui;
 	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
@@ -79,7 +80,7 @@ class Canvas {
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
 			ui.t.TEXT_COL = element.color;
-			ui.text(element.text);
+			ui.text(getText(canvas, element));
 
 			ui.ops.font = font;
 			ui.fontSize = size;
@@ -88,7 +89,7 @@ class Canvas {
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
-			if (ui.button(element.text)) {
+			if (ui.button(getText(canvas, element))) {
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
@@ -114,19 +115,19 @@ class Canvas {
 			ui.g.color = col;
 
 		case Check:
-			ui.check(h.nest(element.id), element.text);
+			ui.check(h.nest(element.id), getText(canvas, element));
 
 		case Radio:
-			ui.inlineRadio(h.nest(element.id), element.text.split(";"));
+			ui.inlineRadio(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Combo:
-			ui.combo(h.nest(element.id), element.text.split(";"));
+			ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Slider:
-			ui.slider(h.nest(element.id), element.text, 0.0, 1.0, true);
+			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true);
 
 		case Input:
-			ui.textInput(h.nest(element.id), element.text);
+			ui.textInput(h.nest(element.id), getText(canvas, element));
 
 		case Empty:
 		}
@@ -138,6 +139,10 @@ class Canvas {
 		}
 
 		if (rotated) ui.g.popTransformation();
+	}
+
+	static inline function getText(canvas: TCanvas, e: TElement): String {
+		return e.text;
 	}
 
 	public static function getAsset(canvas: TCanvas, asset: String): Dynamic { // kha.Image | kha.Font {
@@ -173,6 +178,7 @@ typedef TCanvas = {
 	var height: Int;
 	var elements: Array<TElement>;
 	@:optional var assets: Array<TAsset>;
+	@:optional var locales: Array<TLocale>;
 }
 
 typedef TElement = {
@@ -198,6 +204,16 @@ typedef TAsset = {
 	var id: Int;
 	var name:String;
 	var file:String;
+}
+
+typedef TLocale = {
+	var name: String; // "en"
+	var texts: Array<TTranslatedText>;
+}
+
+typedef TTranslatedText = {
+	var id: Int; // element id
+	var text: String;
 }
 
 @:enum abstract ElementType(Int) from Int {
