@@ -39,13 +39,15 @@ class Zui {
 	var inputDown: Bool;
 	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
+	var isShiftDown = false;
+	var isCtrlDown = false;
+	var isAltDown = false;
 	var key: Null<kha.input.KeyCode> = null;
 	var char: String;
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
-	var highlightStart = 0;
-	var highlightEnd = 0;
+	var highlightAnchor = 0;
 
 	var ratios: Array<Float>; // Splitting rows
 	var curRatio = -1;
@@ -199,7 +201,6 @@ class Zui {
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
 		if (last) endInput();
 		if (tabPressedHandle != null) {
-			setHighlight(0, tabPressedHandle.text.length);
 			tabPressedHandle = null;
 		}
 	}
@@ -552,7 +553,7 @@ class Zui {
 		tabPressedHandle = handle;
 		cursorX = handle.text.length;
 		cursorY = 0;
-		setHighlight(0, cursorX); // Highlight all text when first selected
+		highlightAnchor = 0; // Highlight all text when first selected
 		if (kha.input.Keyboard.get() != null) {
 			kha.input.Keyboard.get().show();
 		}
@@ -576,18 +577,29 @@ class Zui {
 				if (cursorX < text.length) cursorX++;
 			}
 			else if (key == kha.input.KeyCode.Backspace) { // Remove char
-				if (cursorX > 0) {
-					if (highlightStart != highlightEnd) {
-						text = text.substr(0, highlightStart) + text.substr(highlightEnd, text.length);
-					}
-					else {
-						text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
-					}
+				if (cursorX > 0 && highlightAnchor == cursorX) {
+					text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
 					cursorX--;
+				}
+				else if (highlightAnchor < cursorX) {
+					text = text.substr(0, highlightAnchor) + text.substr(cursorX, text.length);
+					cursorX = highlightAnchor;
+				}
+				else {
+					text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
 				}
 			}
 			else if (key == kha.input.KeyCode.Delete) {
-				text = text.substr(0, highlightStart) + text.substr(highlightEnd + 1);
+				if (highlightAnchor == cursorX) {
+					text = text.substr(0, cursorX) + text.substr(cursorX + 1);
+				}
+				else if (highlightAnchor < cursorX) {
+					text = text.substr(0, highlightAnchor) + text.substr(cursorX, text.length);
+					cursorX = highlightAnchor;
+				}
+				else {
+					text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
+				}
 			}
 			else if (key == kha.input.KeyCode.Return) { // Deselect
 				deselectText(); // One-line text for now
@@ -606,22 +618,31 @@ class Zui {
 			else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
 				if (char != null && char != "") {
 					if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
-						text = text.substr(0, highlightStart) + char + text.substr(highlightEnd);
+						text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
 						cursorX++;
 					}
 				}
 			}
-			setHighlight(cursorX, cursorX); //TODO: Implement shift modifier key
+			if (!isShiftDown) highlightAnchor = cursorX;
 		}
 
 		var off = TEXT_OFFSET();
 		var lineHeight = ELEMENT_H();
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
 		//Draw highlight
-		if (highlightStart != highlightEnd) {
-			var hlstr = align == Left ? text.substr(highlightStart, highlightEnd) : text.substring(highlightEnd, highlightStart);
+		if (highlightAnchor != cursorX) {
+			var istart = cursorX;
+			var iend = highlightAnchor;
+			if (highlightAnchor < cursorX) {
+				istart = highlightAnchor;
+				iend = cursorX;
+			}
+			var hlstr = text.substr(istart, iend - istart);
 			var hlstrw = g.font.width(g.fontSize, hlstr);
-			var hlStart = align == Left ? _x + highlightStart + off : _x + _w - hlstrw - off;
+			var hlStart = align == Left ? _x + istart + off : _x + _w - hlstrw - off;
+			if (align == Right) {
+				hlStart -= g.font.width(g.fontSize, text.substr(iend, text.length));
+			}
 			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 		}
 
@@ -667,11 +688,6 @@ class Zui {
 		return handle.text;
 	}
 
-	inline function setHighlight(start:Int, end:Int) {
-		highlightStart = start < end ? start : end;
-		highlightEnd = start < end ? end : start;
-	}
-
 	inline function formatFloatString(text:String): String {
 		var f = Std.parseFloat(text);
 		if (f != f) f = 0; //NaN
@@ -698,7 +714,7 @@ class Zui {
 		if (kha.input.Keyboard.get() != null) {
 			kha.input.Keyboard.get().hide();
 		}
-		setHighlight(0, 0);
+		highlightAnchor = cursorX;
 	}
 
 	public function button(text: String, align:Align = Center): Bool {
@@ -1176,10 +1192,26 @@ class Zui {
 	public function onKeyDown(code: kha.input.KeyCode) {
 		isKeyDown = true;
 		this.key = code;
-		if (code == kha.input.KeyCode.Space) this.char = " ";
+
+		switch code {
+			case kha.input.KeyCode.Shift:
+				this.isShiftDown = true;
+				highlightAnchor = cursorX;
+			case kha.input.KeyCode.Control: this.isCtrlDown = true;
+			case kha.input.KeyCode.Alt: this.isAltDown = true;
+			case kha.input.KeyCode.Space: this.char = " ";
+			default:
+		}
 	}
 
-	public function onKeyUp(code: kha.input.KeyCode) {}
+	public function onKeyUp(code: kha.input.KeyCode) {
+		switch code {
+			case kha.input.KeyCode.Shift: this.isShiftDown = false;
+			case kha.input.KeyCode.Control: this.isCtrlDown = false;
+			case kha.input.KeyCode.Alt: this.isAltDown = false;
+			default:
+		}
+	}
 
 	public function onKeyPress(char: String) {
 		isKeyDown = true;
