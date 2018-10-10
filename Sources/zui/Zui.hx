@@ -872,8 +872,9 @@ class Zui {
 		return handle.position;
 	}
 
-	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true, align: Align = Right): Float {
+	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true, align: Align = Right, textEdit = true): Float {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
+		// if (getPushed() && inputDX != 0) {
 		if (getStarted()) {
 			handle.scrolling = true;
 			scrollingHandle = handle;
@@ -897,7 +898,7 @@ class Zui {
 		drawSlider(handle.value, from, to, filled, hover); // Slider
 
 		// Text edit
-		var startEdit = getReleased() || tabPressed;
+		var startEdit = (getReleased() || tabPressed) && textEdit;
 		if (startEdit) { // Mouse did not move
 			handle.text = handle.value + "";
 			startTextEdit(handle);
