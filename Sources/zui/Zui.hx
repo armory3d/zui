@@ -24,6 +24,7 @@ class Zui {
 	public var changed = false; // Global elements change check
 	public var alwaysRedraw = false; // Hurts performance
 	public var imageInvertY = false;
+	public var scrollEnabled = true;
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -44,6 +45,9 @@ class Zui {
 	var isAltDown = false;
 	var key: Null<kha.input.KeyCode> = null;
 	var char: String;
+	static var textToPaste = "";
+	static var textToCopy = "";
+	static var isCut = false;
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
@@ -54,8 +58,8 @@ class Zui {
 	var xBeforeSplit: Float;
 	var wBeforeSplit: Int;
 
-	var globalG: kha.graphics2.Graphics; // Drawing
-	public var g: kha.graphics2.Graphics;
+	public var g: kha.graphics2.Graphics; // Drawing
+	var globalG: kha.graphics2.Graphics;
 
 	var t:zui.Themes.TTheme;
 	var SCALE: Float;
@@ -90,7 +94,6 @@ class Zui {
 	var currentWindow: Handle;
 	var windowEnded = true;
 	var scrollingHandle: Handle = null; // Window or slider being scrolled
-	public var scrollEnabled = true;
 	var windowHeader = 0.0;
 
 	var textSelectedHandle: Handle = null;
@@ -176,12 +179,14 @@ class Zui {
 	public function registerInput() {
 		kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		kha.input.Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
+		kha.System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 		inputRegistered = true;
 	}
 
 	public function unregisterInput() {
 		kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
+		// kha.System.removeCutCopyPaste(onCut, onCopy, onPaste);
 		endInput();
 		inputX = inputY = 0;
 		inputRegistered = false;
@@ -212,6 +217,8 @@ class Zui {
 		inputDX = 0;
 		inputDY = 0;
 		inputWheelDelta = 0;
+		textToPaste = "";
+		isCut = false;
 	}
 
 	public function beginLayout(g: kha.graphics2.Graphics, x: Int, y: Int, w: Int) {
@@ -615,16 +622,38 @@ class Zui {
 			else if (key == kha.input.KeyCode.End) {
 				cursorX = text.length;
 			}
-			else if (key != kha.input.KeyCode.Shift && key != kha.input.KeyCode.CapsLock) {
-				if (char != null && char != "") {
-					if (char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
-						text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
-						cursorX++;
-					}
+			else if (key != kha.input.KeyCode.Shift &&
+					 key != kha.input.KeyCode.CapsLock &&
+					 key != kha.input.KeyCode.Control &&
+					 key != kha.input.KeyCode.Alt) { // Write
+				if (char != null && char != "" && char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
+					text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
+					cursorX++;
 				}
 			}
-			if (!isShiftDown) highlightAnchor = cursorX;
+			if (!isShiftDown && !isCtrlDown) highlightAnchor = cursorX; // Shift for highlight, ctrl for copy
 		}
+
+		if (textToPaste != "") { // Process cut copy paste
+			text = text.substr(0, highlightAnchor) + textToPaste + text.substr(cursorX);
+			cursorX += textToPaste.length;
+			highlightAnchor = cursorX;
+			textToPaste = "";
+		}
+		if (highlightAnchor == cursorX) textToCopy = text; // Copy
+		else if (highlightAnchor < cursorX) textToCopy = text.substring(highlightAnchor, cursorX);
+		else textToCopy = text.substring(cursorX, highlightAnchor);
+		if (isCut) { // Cut
+			if (highlightAnchor == cursorX) text = "";
+			else if (highlightAnchor < cursorX) {
+				text = text.substr(0, highlightAnchor) + text.substr(cursorX, text.length);
+				cursorX = highlightAnchor;
+			}
+			else {
+				text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
+			}
+		}
+
 
 		var off = TEXT_OFFSET();
 		var lineHeight = ELEMENT_H();
@@ -639,7 +668,8 @@ class Zui {
 			}
 			var hlstr = text.substr(istart, iend - istart);
 			var hlstrw = g.font.width(g.fontSize, hlstr);
-			var hlStart = align == Left ? _x + istart + off : _x + _w - hlstrw - off;
+			var startoff = g.font.width(g.fontSize, text.substr(0, istart));
+			var hlStart = align == Left ? _x + startoff + off : _x + _w - hlstrw - off;
 			if (align == Right) {
 				hlStart -= g.font.width(g.fontSize, text.substr(iend, text.length));
 			}
@@ -1217,6 +1247,10 @@ class Zui {
 		isKeyDown = true;
 		this.char = char;
 	}
+
+	public function onCut():String { isCut = true; return onCopy(); }
+	public function onCopy():String { return textToCopy; }
+	public function onPaste(s:String) { textToPaste = s; }
 	
 	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
 	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
