@@ -122,7 +122,7 @@ class Ext {
 		if (handle.text == "") initPath(handle, systemId);
 
 		var save = systemId == "Linux" ? "/tmp" : Krom.savePath();
-		save += systemId == "Windows" ? "\\dir.txt" : "/dir.txt";
+		save += sep + "dir.txt";
 		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + ' > ' + '"' + save + '"');
 		lastPath = handle.text;
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
@@ -156,15 +156,24 @@ class Ext {
 
 		#end
 
-		var nested = handle.text.indexOf("/", 1) != -1 || handle.text.indexOf("\\", 2) != -1;
+		// Up directory
+		var i1 = handle.text.indexOf("/");
+		var i2 = handle.text.indexOf("\\");
+		var nested =
+			(i1 > -1 && handle.text.length - 1 > i1) ||
+			(i2 > -1 && handle.text.length - 1 > i2);
 		if (nested && ui.button("..", Align.Left)) {
 			handle.text = handle.text.substring(0, handle.text.lastIndexOf(sep));
+			// Drive root
 			if (handle.text.length == 2 && handle.text.charAt(1) == ":") handle.text += sep;
 		}
 
+		// Directory contents
 		for (f in files) {
-			if (f != "" && f.charAt(0) != "." && ui.button(f, Align.Left)) {
-				handle.text += sep + f;
+			if (f == "" || f.charAt(0) == ".") continue; // Skip hidden
+			if (ui.button(f, Align.Left)) {
+				if (handle.text.charAt(handle.text.length - 1) != sep) handle.text += sep;
+				handle.text += f;
 			}
 		}
 
