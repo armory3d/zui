@@ -3,6 +3,11 @@ package zui;
 // Immediate Mode UI Library
 // https://github.com/armory3d/zui
 
+import kha.input.Mouse;
+import kha.input.Keyboard;
+import kha.input.KeyCode;
+import kha.graphics2.Graphics;
+
 @:structInit
 typedef ZuiOptions = {
 	font: kha.Font,
@@ -43,7 +48,7 @@ class Zui {
 	var isShiftDown = false;
 	var isCtrlDown = false;
 	var isAltDown = false;
-	var key: Null<kha.input.KeyCode> = null;
+	var key: Null<KeyCode> = null;
 	var char: String;
 	static var textToPaste = "";
 	static var textToCopy = "";
@@ -58,8 +63,8 @@ class Zui {
 	var xBeforeSplit: Float;
 	var wBeforeSplit: Int;
 
-	public var g: kha.graphics2.Graphics; // Drawing
-	var globalG: kha.graphics2.Graphics;
+	public var g: Graphics; // Drawing
+	var globalG: Graphics;
 
 	var t:zui.Themes.TTheme;
 	var SCALE: Float;
@@ -177,22 +182,22 @@ class Zui {
 	}
 
 	public function registerInput() {
-		kha.input.Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		kha.input.Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
+		Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
 		kha.System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 		inputRegistered = true;
 	}
 
 	public function unregisterInput() {
-		kha.input.Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		kha.input.Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
+		Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
 		// kha.System.removeCutCopyPaste(onCut, onCopy, onPaste);
 		endInput();
 		inputX = inputY = 0;
 		inputRegistered = false;
 	}
 
-	public function begin(g: kha.graphics2.Graphics) { // Begin UI drawing
+	public function begin(g: Graphics) { // Begin UI drawing
 		if (!elementsBaked) bakeElements();
 		globalG = g;
 		_x = 0; // Reset cursor
@@ -221,7 +226,7 @@ class Zui {
 		isCut = false;
 	}
 
-	public function beginLayout(g: kha.graphics2.Graphics, x: Int, y: Int, w: Int) {
+	public function beginLayout(g: Graphics, x: Int, y: Int, w: Int) {
 		if (!elementsBaked) bakeElements();
 		currentWindow = null;
 		this.g = g;
@@ -561,9 +566,7 @@ class Zui {
 		cursorX = handle.text.length;
 		cursorY = 0;
 		highlightAnchor = 0; // Highlight all text when first selected
-		if (kha.input.Keyboard.get() != null) {
-			kha.input.Keyboard.get().show();
-		}
+		if (Keyboard.get() != null) Keyboard.get().show();
 	}
 
 	function submitTextEdit() {
@@ -577,13 +580,13 @@ class Zui {
 	function updateTextEdit(align:Align = Left, asFloat: Bool) {
 		var text = textSelectedCurrentText;
 		if (isKeyDown) { // Process input
-			if (key == kha.input.KeyCode.Left) { // Move cursor
+			if (key == KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
 			}
-			else if (key == kha.input.KeyCode.Right) {
+			else if (key == KeyCode.Right) {
 				if (cursorX < text.length) cursorX++;
 			}
-			else if (key == kha.input.KeyCode.Backspace) { // Remove char
+			else if (key == KeyCode.Backspace) { // Remove char
 				if (cursorX > 0 && highlightAnchor == cursorX) {
 					text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
 					cursorX--;
@@ -596,7 +599,7 @@ class Zui {
 					text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
 				}
 			}
-			else if (key == kha.input.KeyCode.Delete) {
+			else if (key == KeyCode.Delete) {
 				if (highlightAnchor == cursorX) {
 					text = text.substr(0, cursorX) + text.substr(cursorX + 1);
 				}
@@ -608,30 +611,31 @@ class Zui {
 					text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
 				}
 			}
-			else if (key == kha.input.KeyCode.Return) { // Deselect
+			else if (key == KeyCode.Return) { // Deselect
 				deselectText(); // One-line text for now
 			}
-			else if (key == kha.input.KeyCode.Tab) { // Next field
+			else if (key == KeyCode.Tab) { // Next field
 				tabPressed = true;
 				deselectText();
 				key = null;
 			}
-			else if (key == kha.input.KeyCode.Home) {
+			else if (key == KeyCode.Home) {
 				cursorX = 0;
 			}
-			else if (key == kha.input.KeyCode.End) {
+			else if (key == KeyCode.End) {
 				cursorX = text.length;
 			}
-			else if (key != kha.input.KeyCode.Shift &&
-					 key != kha.input.KeyCode.CapsLock &&
-					 key != kha.input.KeyCode.Control &&
-					 key != kha.input.KeyCode.Alt) { // Write
+			else if (key != KeyCode.Shift &&
+					 key != KeyCode.CapsLock &&
+					 key != KeyCode.Control &&
+					 key != KeyCode.Alt) { // Write
 				if (char != null && char != "" && char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 					text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
 					cursorX++;
 				}
 			}
-			if (!isShiftDown && !isCtrlDown) highlightAnchor = cursorX; // Shift for highlight, ctrl for copy
+			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right);
+			if (!selecting && !isCtrlDown) highlightAnchor = cursorX;
 		}
 
 		if (textToPaste != "") { // Process cut copy paste
@@ -740,10 +744,7 @@ class Zui {
 		textSelectedHandle = null;
 		isTyping = false;
 		if (currentWindow != null) currentWindow.redraws = 2;
-
-		if (kha.input.Keyboard.get() != null) {
-			kha.input.Keyboard.get().hide();
-		}
+		if (Keyboard.get() != null) Keyboard.get().hide();
 		highlightAnchor = cursorX;
 	}
 
@@ -1070,7 +1071,7 @@ class Zui {
 		}
 	}
 
-	function drawString(g: kha.graphics2.Graphics, text: String,
+	function drawString(g: Graphics, text: String,
 						xOffset: Null<Float> = null, yOffset: Float = 0,
 						align:Align = Left) {
 		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
@@ -1134,7 +1135,7 @@ class Zui {
 		g.color = 0xffffffff;
 	}
 
-	inline function drawRect(g: kha.graphics2.Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
+	inline function drawRect(g: Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
 		if (strength == 0.0) strength = LINE_STRENGTH();
 		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, strength);
 	}
@@ -1220,33 +1221,30 @@ class Zui {
 		inputY = y;
 	}
 
-	public function onKeyDown(code: kha.input.KeyCode) {
-		isKeyDown = true;
+	public function onKeyDown(code: KeyCode) {
 		this.key = code;
-
+		isKeyDown = true;
 		switch code {
-			case kha.input.KeyCode.Shift:
-				this.isShiftDown = true;
-				highlightAnchor = cursorX;
-			case kha.input.KeyCode.Control: this.isCtrlDown = true;
-			case kha.input.KeyCode.Alt: this.isAltDown = true;
-			case kha.input.KeyCode.Space: this.char = " ";
-			default:
+		case KeyCode.Shift: isShiftDown = true;
+		case KeyCode.Control: isCtrlDown = true;
+		case KeyCode.Alt: isAltDown = true;
+		case KeyCode.Space: char = " ";
+		default:
 		}
 	}
 
-	public function onKeyUp(code: kha.input.KeyCode) {
+	public function onKeyUp(code: KeyCode) {
 		switch code {
-			case kha.input.KeyCode.Shift: this.isShiftDown = false;
-			case kha.input.KeyCode.Control: this.isCtrlDown = false;
-			case kha.input.KeyCode.Alt: this.isAltDown = false;
-			default:
+		case KeyCode.Shift: isShiftDown = false;
+		case KeyCode.Control: isCtrlDown = false;
+		case KeyCode.Alt: isAltDown = false;
+		default:
 		}
 	}
 
 	public function onKeyPress(char: String) {
-		isKeyDown = true;
 		this.char = char;
+		isKeyDown = true;
 	}
 
 	public function onCut():String { isCut = true; return onCopy(); }
