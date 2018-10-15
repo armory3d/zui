@@ -199,11 +199,13 @@ class Zui {
 
 	public function begin(g: Graphics) { // Begin UI drawing
 		if (!elementsBaked) bakeElements();
+		changed = false;
 		globalG = g;
 		_x = 0; // Reset cursor
 		_y = 0;
 		_w = 0;
 		_h = 0;
+
 	}
 
 	public function end(last = true) { // End drawing

@@ -59,7 +59,7 @@ class Themes {
 		FILL_ACCENT_BG: false,
 
 		WINDOW_BG_COL: 0xffefefef,
-		WINDOW_TINT_COL: 0x222222,
+		WINDOW_TINT_COL: 0xff222222,
 		ACCENT_COL: 0xffeeeeee,
 		ACCENT_HOVER_COL: 0xffbbbbbb,
 		ACCENT_SELECT_COL: 0xffaaaaaa,
