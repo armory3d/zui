@@ -205,7 +205,6 @@ class Zui {
 		_y = 0;
 		_w = 0;
 		_h = 0;
-
 	}
 
 	public function end(last = true) { // End drawing
