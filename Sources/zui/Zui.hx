@@ -555,11 +555,6 @@ class Zui {
 		endElement();
 	}
 
-	public function floatInput(handle: Handle, label = "", align:Align = Left): Float {
-		var text = textInput(handle, label, align, true);
-		return Std.parseFloat(text);
-	}
-
 	function startTextEdit(handle: Handle) {
 		isTyping = true;
 		submitTextHandle = textSelectedHandle;
@@ -582,7 +577,7 @@ class Zui {
 		textSelectedCurrentText = "";
 	}
 
-	function updateTextEdit(align:Align = Left, asFloat: Bool) {
+	function updateTextEdit(align:Align = Left) {
 		var text = textSelectedCurrentText;
 		if (isKeyDown) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
@@ -694,12 +689,11 @@ class Zui {
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
-		
-		if (asFloat) text = formatFloatString(text);
+
 		textSelectedCurrentText = text;
 	}
 
-	public function textInput(handle: Handle, label = "", align:Align = Left, asFloat = false): String {
+	public function textInput(handle: Handle, label = "", align:Align = Left): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
@@ -708,7 +702,7 @@ class Zui {
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align, asFloat);
+		if (textSelectedHandle == handle) updateTextEdit(align);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 
@@ -725,22 +719,6 @@ class Zui {
 		endElement();
 
 		return handle.text;
-	}
-
-	inline function formatFloatString(text:String): String {
-		var f = Std.parseFloat(text);
-		if (f != f) f = 0; //NaN
-		var f_text = Std.string(f);
-
-		if (Std.parseInt(text) == f) f_text += ".0";
-		if (text.charAt(0) == "-") {
-			if (f_text.charAt(0) != "-") f_text = "-" + f_text; //keep - for -0.0
-			if (text.charAt(1) == "-") { //change -- to -
-				f_text = text.substring(1, text.length);
-				cursorX--;
-			}
-		}
-		return f_text;
 	}
 
 	function deselectText() {
@@ -911,7 +889,7 @@ class Zui {
 		}
 		var lalign = align == Left ? Right : Left;
 		if (textSelectedHandle == handle) {
-			updateTextEdit(lalign, false);
+			updateTextEdit(lalign);
 		}
 		if (submitTextHandle == handle) {
 			submitTextEdit();

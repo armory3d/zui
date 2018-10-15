@@ -17,6 +17,13 @@ typedef ListOpts = {
 
 @:access(zui.Zui)
 class Ext {
+	public static function floatInput(ui: Zui, handle: Handle, label = "", align:Align = Left): Float {
+		handle.text = Std.string(handle.value);
+		var text = ui.textInput(handle, label, align);
+		handle.value = Std.parseFloat(text);
+		return handle.value;
+	}
+
 	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>, ?opts: ListOpts ): Int {
 		var selected = 0;
 		if (opts == null) opts = {};
