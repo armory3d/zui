@@ -41,7 +41,9 @@ class Zui {
 	var inputDY: Float;
 	var inputWheelDelta = 0;
 	var inputStarted: Bool; // Buttons
+	var inputStartedR: Bool;
 	var inputReleased: Bool;
+	var inputReleasedR: Bool;
 	var inputDown: Bool;
 	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
@@ -219,7 +221,9 @@ class Zui {
 	function endInput() {
 		isKeyDown = false; // Reset input - only one char for now
 		inputStarted = false;
+		inputStartedR = false;
 		inputReleased = false;
+		inputReleasedR = false;
 		inputDX = 0;
 		inputDY = 0;
 		inputWheelDelta = 0;
@@ -244,7 +248,7 @@ class Zui {
 	}
 
 	function inputChanged(): Bool {
-		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputReleased || inputDown || inputDownR || isKeyDown;
+		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputStartedR || inputReleased || inputReleasedR || inputDown || inputDownR || isKeyDown;
 	}
 
 	public function windowDirty(handle: Handle, x: Int, y: Int, w: Int, h: Int) {
@@ -1184,7 +1188,7 @@ class Zui {
 	}
 
 	public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
-		inputStarted = true;
+		button == 0 ? inputStarted = true : inputStartedR = true;
 		button == 0 ? inputDown = true : inputDownR = true;
 		var sx = Std.int(x * ops.scaleTexture);
 		var sy = Std.int(y * ops.scaleTexture);
@@ -1194,14 +1198,17 @@ class Zui {
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
-		if (isScrolling) {
-			isScrolling = false;
-			if (scrollingHandle != null) scrollingHandle.scrolling = false;
-			if (x == inputInitialX && y == inputInitialY) inputReleased = true; // Mouse not moved
+		if (button == 0) {
+			if (isScrolling) {
+				isScrolling = false;
+				if (scrollingHandle != null) scrollingHandle.scrolling = false;
+				if (x == inputInitialX && y == inputInitialY) inputReleased = true; // Mouse not moved
+			}
+			else { // To prevent action when scrolling is active
+				inputReleased = true;
+			}
 		}
-		else { // To prevent action when scrolling is active
-			inputReleased = true;
-		}
+		else if (button == 1) inputReleasedR = true;
 		button == 0 ? inputDown = false : inputDownR = false;
 		setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
 		deselectText();
