@@ -42,7 +42,7 @@ class Nodes {
 	inline function SOCKET_Y(pos:Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
 	inline function p(f: Float): Float { return f * SCALE; }
 
-	function getNode(nodes: Array<TNode>, id: Int): TNode {
+	public function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
 		return null;
 	}
@@ -53,7 +53,7 @@ class Nodes {
 		return ++nodeId;
 	}
 
-	function getLinkId(links: Array<TNodeLink>): Int {
+	public function getLinkId(links: Array<TNodeLink>): Int {
 		var id = 0;
 		for (l in links) if (l.id >= id) id = l.id + 1;
 		return id;
