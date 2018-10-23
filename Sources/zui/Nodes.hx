@@ -106,6 +106,11 @@ class Nodes {
 			uih = ui._h;
 		}
 		SCALE = ui.ops.scaleFactor * zoom;
+		var _SCALE = ui.SCALE;
+		ui.setScale(SCALE); // Apply zoomed scale
+		ui.elementsBaked = true;
+		ui.g.font = ui.ops.font;
+		ui.g.fontSize = ui.fontSize;
 
 		for (link in canvas.links) {
 			var from = getNode(canvas.nodes, link.from_id);
@@ -252,6 +257,9 @@ class Nodes {
 
 			drawNode(ui, node, canvas);
 		}
+
+		ui.setScale(_SCALE); // Restore non-zoomed scale
+		ui.elementsBaked = true;
 	}
 
 	// Global enum mapping for now..
@@ -283,25 +291,21 @@ class Nodes {
 
 		// Title
 		g.color = 0xffe7e7e7;
-		g.font = ui.ops.font;
-		var fontSize = zoom > 0.5 ? ui.fontSize : Std.int(ui.fontSize * 0.7);
-		g.fontSize = fontSize;
-		var textw = g.font.width(fontSize, text);
-		g.drawString(text, nx + w / 2 - textw / 2, ny + 4 * SCALE);
+		var textw = g.font.width(ui.fontSize, text);
+		g.drawString(text, nx + w / 2 - textw / 2, ny + p(4));
 		ny += lineh;
 
 		// Outputs
 		for (out in node.outputs) {
 			ny += lineh;
 			g.color = out.color;
-			// kha.graphics2.GraphicsExtension.fillCircle(g, nx + w, ny, 5);
-			g.drawScaledImage(socketImage, nx + w - 5, ny - 5, 10, 10);
+			g.drawScaledImage(socketImage, nx + w - p(5), ny - p(5), p(10), p(10));
 		}
 		ny -= lineh * node.outputs.length;
 		g.color = 0xffe7e7e7;
 		for (out in node.outputs) {
 			ny += lineh;
-			var strw = ui.ops.font.width(fontSize, out.name);
+			var strw = ui.ops.font.width(ui.fontSize, out.name);
 			g.drawString(out.name, nx + w - strw - p(12), ny - p(7));
 		}
 
@@ -373,13 +377,13 @@ class Nodes {
 			var inp = node.inputs[i];
 			ny += lineh;
 			g.color = inp.color;
-			g.drawScaledImage(socketImage, nx - 5, ny - 5, 10, 10);
+			g.drawScaledImage(socketImage, nx - p(5), ny - p(5), p(10), p(10));
 			var isLinked = false;
 			for (l in canvas.links) if (l.to_id == node.id && l.to_socket == i) { isLinked = true; break; }
 			if (!isLinked && inp.type == 'VALUE') {
-				ui._x = nx + 6;
-				ui._y = ny - 9;
-				ui._w = w - 6;
+				ui._x = nx + p(6);
+				ui._y = ny - p(9);
+				ui._w = Std.int(w - p(6));
 				var soc = inp;
 				var min = soc.min != null ? soc.min : 0.0;
 				var max = soc.max != null ? soc.max : 1.0;
