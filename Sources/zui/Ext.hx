@@ -128,7 +128,7 @@ class Ext {
 		}
 		if (handle.text == "") initPath(handle, systemId);
 
-		var save = systemId == "Linux" ? "/tmp" : Krom.savePath();
+		var save = systemId == "Windows" ? Krom.savePath() : "/tmp";
 		save += sep + "dir.txt";
 		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + ' > ' + '"' + save + '"');
 		lastPath = handle.text;
