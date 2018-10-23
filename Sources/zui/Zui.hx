@@ -120,6 +120,8 @@ class Zui {
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
 	var tooltipText = "";
+	var tooltipImg: kha.Image = null;
+	var tooltipInvertY = false;
 	var tooltipX = 0.0;
 	var tooltipY = 0.0;
 	var tooltipShown = false;
@@ -289,6 +291,7 @@ class Zui {
 		_w = !handle.scrollEnabled ? w : w - SCROLL_W(); // Exclude scrollbar if present
 		_h = h;
 		tooltipText = "";
+		tooltipImg = null;
 		tabNames = null;
 
 		if (t.FILL_WINDOW_BG) {
@@ -398,13 +401,15 @@ class Zui {
 		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 		globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
 		
-		if (tooltipText != "") {
+		if (tooltipText != "" || tooltipImg != null) {
 			if (!tooltipShown) { 
 				tooltipShown = true;
 				tooltipX = inputX;
 				tooltipTime = kha.Scheduler.time();
 			}
-			if (kha.Scheduler.time() - tooltipTime > t.TOOLTIP_DELAY) drawTooltip();
+			if (kha.Scheduler.time() - tooltipTime > t.TOOLTIP_DELAY) {
+				tooltipText != "" ? drawTooltip() : drawTooltipImage();
+			}
 		}
 		else tooltipShown = false;
 		
@@ -534,6 +539,7 @@ class Zui {
 		var started = getStarted(h);
 		var down = getPushed(h);
 		var released = getReleased(h);
+		var hover = getHover();
 		g.color = tint;
 		var h_float:Float = h; // TODO: hashlink fix
 		imageInvertY ? g.drawScaledImage(image, x, _y + h_float, w, -h_float) : g.drawScaledImage(image, x, _y, w, h_float);
@@ -922,6 +928,12 @@ class Zui {
 		tooltipY = _y + _windowY;
 	}
 
+	public function tooltipImage(image: kha.Image) {
+		tooltipImg = image;
+		tooltipInvertY = imageInvertY;
+		tooltipY = _y + _windowY;
+	}
+
 	function drawArrow(selected: Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
@@ -1052,6 +1064,16 @@ class Zui {
 		for (i in 0...lines.length) {
 			globalG.drawString(lines[i], tooltipX + 5, tooltipY + i * fontSize);
 		}
+	}
+
+	function drawTooltipImage() {
+		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipImg.width - 20);
+		globalG.color = 0xff000000;
+		globalG.fillRect(tooltipX, tooltipY, tooltipImg.width, tooltipImg.height);
+		globalG.color = 0xffffffff;
+		tooltipInvertY ?
+			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY + tooltipImg.height, tooltipImg.width, -tooltipImg.height) :
+			globalG.drawImage(tooltipImg, tooltipX, tooltipY);
 	}
 
 	function drawString(g: Graphics, text: String,

@@ -44,6 +44,7 @@ function inlineRadio(id: Handle, texts: Array<String>): Int;
 function combo(id: Handle, texts: Array<String>, label = ""): Int;
 function slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
 function tooltip(text: String);
+function tooltipImage(image: Image);
 
 // Formating
 function row(ratios: Array<Float>);
