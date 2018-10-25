@@ -878,7 +878,7 @@ class Zui {
 			var sliderW = _w - buttonOffsetY * 2;
 			var step = range / sliderW;
 			var value = from + (inputX - sliderX) * step;
-			handle.value = Std.int(value * precision) / precision;
+			handle.value = Math.round(value * precision) / precision;
 			if (handle.value < from) handle.value = from; // Stay in bounds
 			else if (handle.value > to) handle.value = to;
 			handle.changed = changed = true;
