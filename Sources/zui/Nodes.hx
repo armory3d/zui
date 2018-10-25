@@ -30,7 +30,10 @@ class Nodes {
 	function NODE_H(node:TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 132 * SCALE;//buttonsH += 80;
+			if (but.type == 'RGBA') buttonsH += 132 * SCALE;
+			else if (but.type == 'VECTOR') buttonsH += LINE_H() * 4;
+			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9;
+			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
 			else buttonsH += LINE_H();
 		}
 		var h = LINE_H() * 2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + buttonsH;
@@ -312,18 +315,37 @@ class Nodes {
 		// Buttons
 		var nhandle = handle.nest(node.id);
 		ny -= lineh / 3; // Fix align
-		for (but in node.buttons) {
+		for (buti in 0...node.buttons.length) {
+			var but = node.buttons[buti];
 
 			if (but.type == 'RGBA') {
 				ny += lineh; // 18 + 2 separator
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				
 				var val = node.outputs[but.output].default_value;
 				nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				Ext.colorWheel(ui, nhandle, false);
 				val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
+			}
+			else if (but.type == 'VECTOR') {
+				ny += lineh;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				var min = but.min != null ? but.min : 0.0;
+				var max = but.max != null ? but.max : 1.0;
+				var labelCol = ui.t.LABEL_COL;
+				var textOff = ui.t.TEXT_OFFSET;
+				ui.t.LABEL_COL = 0xffffffff;
+				ui.t.TEXT_OFFSET = 6;
+				ui.text(but.name);
+				but.default_value[0] = ui.slider(nhandle.nest(buti).nest(0, {value: but.default_value[0]}), "X", min, max, true, 100, true, Left);
+				but.default_value[1] = ui.slider(nhandle.nest(buti).nest(1, {value: but.default_value[1]}), "Y", min, max, true, 100, true, Left);
+				but.default_value[2] = ui.slider(nhandle.nest(buti).nest(2, {value: but.default_value[2]}), "Z", min, max, true, 100, true, Left);
+				ui.t.LABEL_COL = labelCol;
+				ui.t.TEXT_OFFSET = textOff;
+				ny += lineh * 3;
 			}
 			else if (but.type == 'VALUE') {
 				ny += lineh;
@@ -346,10 +368,9 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				// TODO: Handle both color and alpha, .output to array?
-				var soc = node.outputs[but.output];
-				soc.default_value = but.default_value = ui.textInput(nhandle.nest(0, {text: soc.default_value}), "");
-				// ny += 10; // Fix align?
+				var soc = but.output != null ? node.outputs[but.output] : null;
+				but.default_value = ui.textInput(nhandle.nest(0, {text: soc != null ? soc.default_value : ""}), but.name);
+				if (soc != null) soc.default_value = but.default_value;
 			}
 			else if (but.type == 'ENUM') {
 				ny += lineh;
@@ -360,14 +381,74 @@ class Nodes {
 				var texts = but.data != null ? but.data : getEnumTexts();
 				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, but.name);
 				soc.default_value = but.data != null ? but.data[but.default_value] : mapEnum(texts[but.default_value]);
-				// ny += 10; // Fix align?
 			}
 			else if (but.type == 'BOOL') {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				ui.check(nhandle.nest(0, {value: but.default_value}), but.name);
+				ui.check(nhandle.nest(0, {selected: but.default_value}), but.name);
+			}
+			else if (but.type == 'RAMP') {
+				ny += lineh;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				// Preview
+				var vals:Array<Array<Float>> = but.default_value;
+				var sw = w * SCALE;
+				for (val in vals) {
+					var pos = val[4];
+					var col = kha.Color.fromFloats(val[0], val[1], val[2]);
+					ui.fill(pos * sw, 0, (1.0 - pos) * sw, lineh - 2 * SCALE, col);
+				}
+				ui._y += lineh;
+				// Edit
+				ui.row([1/5, 1/5, 3/5]);
+				if (ui.button("+")) vals.push([0.0, 0.0, 0.0, 1.0, 1.0]); // [[r, g, b, a, pos], ..]
+				if (ui.button("-") && vals.length > 1) vals.pop();
+				var i = Std.int(ui.slider(nhandle.nest(1), "Index", 0, vals.length - 1, false, 1, true, Left));
+				var val = vals[i];
+				nhandle.nest(2).value = val[4];
+				val[4] = ui.slider(nhandle.nest(2), "Pos", 0, 1, true, 100, true, Left);
+				var chandle = nhandle.nest(3);
+				chandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
+				Ext.colorWheel(ui, chandle, false);
+				val[0] = chandle.color.R;
+				val[1] = chandle.color.G;
+				val[2] = chandle.color.B;
+				ny += lineh * 8 + lineh * 0.5;
+			}
+			else if (but.type == 'CURVES') {
+				ny += lineh;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				ui.row([1/3, 1/3, 1/3]);
+				ui.radio(nhandle.nest(1), 0, "X");
+				ui.radio(nhandle.nest(1), 1, "Y");
+				ui.radio(nhandle.nest(1), 2, "Z");
+				// Preview
+				var axis = nhandle.nest(1).position;
+				var val:Array<Float> = but.default_value[axis]; // [[x, y], [x, y], ..]
+				var num = Std.int(val.length / 2);
+				// for (i in 0...num) { ui.line(); }
+				ui._y += lineh * 5;
+				// Edit
+				ui.row([1/5, 1/5, 3/5]);
+				if (ui.button("+")) {
+					val.push(0); val.push(0);
+				}
+				if (ui.button("-")) {
+					if (val.length > 2) { val.pop(); val.pop(); }
+				}
+				var i = Std.int(ui.slider(nhandle.nest(axis).nest(2, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
+				ui.row([1/2, 1/2]);
+				nhandle.nest(3).value = val[i * 2    ];
+				nhandle.nest(4).value = val[i * 2 + 1];
+				val[i * 2    ] = ui.slider(nhandle.nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
+				val[i * 2 + 1] = ui.slider(nhandle.nest(4, {value: 0}), "Y", -1, 1, true, 100, true, Left);
+				ny += lineh * 7;
 			}
 		}
 		ny += lineh / 3; // Fix align
@@ -400,12 +481,6 @@ class Nodes {
 				g.drawString(inp.name, nx + p(12), ny - p(7));
 			}
 		}
-		// ny -= lineh * node.inputs.length;
-		// g.color = 0xffe7e7e7;
-		// for (inp in node.inputs) {
-			// ny += lineh;
-			// g.drawString(inp.name, nx + p(12), ny - p(7));
-		// }
 	}
 
 	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false) {
@@ -479,7 +554,7 @@ typedef TNodeLink = {
 typedef TNodeButton = {
 	var name: String;
 	var type: String;
-	var output: Int;
+	@:optional var output: Null<Int>;
 	@:optional var default_value: Dynamic;
 	@:optional var data: Array<String>;
 	@:optional var min: Null<Float>;
