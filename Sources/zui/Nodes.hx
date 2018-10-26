@@ -27,7 +27,7 @@ class Nodes {
 	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE + zoomPan; }
 	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE + zoomPan; }
 	inline function LINE_H(): Int { return Std.int(22 * SCALE); }
-	function NODE_H(node:TNode): Int {
+	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
 			if (but.type == 'RGBA') buttonsH += 132 * SCALE;
@@ -36,13 +36,15 @@ class Nodes {
 			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
 			else buttonsH += LINE_H();
 		}
-		var h = LINE_H() * 2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + buttonsH;
-		return Std.int(h);
+		return Std.int(buttonsH);
+	}
+	inline function NODE_H(node: TNode): Int {
+		return Std.int(LINE_H() * 2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + BUTTONS_H(node));
 	}
 	inline function NODE_W(): Int { return Std.int(140 * SCALE); }
-	inline function NODE_X(node:TNode) { return node.x * SCALE + PAN_X(); }
-	inline function NODE_Y(node:TNode) { return node.y * SCALE + PAN_Y(); }
-	inline function SOCKET_Y(pos:Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
+	inline function NODE_X(node: TNode) { return node.x * SCALE + PAN_X(); }
+	inline function NODE_Y(node: TNode) { return node.y * SCALE + PAN_Y(); }
+	inline function SOCKET_Y(pos: Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
 	inline function p(f: Float): Float { return f * SCALE; }
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
@@ -121,7 +123,7 @@ class Nodes {
 			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W();
 			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + SOCKET_Y(link.from_socket);
 			var toX = to == null ? ui.inputX : wx + NODE_X(to);
-			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length + to.buttons.length);
+			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length) + BUTTONS_H(to);
 
 			// Snap to nearest socket
 			if (linkDrag == link) {
@@ -158,7 +160,7 @@ class Nodes {
 						else if (to == null && node.id != from.id) {
 							for (i in 0...inps.length) {
 								var sx = wx + NODE_X(node) ;
-								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length + node.buttons.length);
+								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length) + BUTTONS_H(node);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
 								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
@@ -203,7 +205,7 @@ class Nodes {
 				if (linkDrag == null) {
 					for (i in 0...inps.length) {
 						var sx = wx + NODE_X(node);
-						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length + node.buttons.length);
+						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length) + BUTTONS_H(node);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
@@ -345,6 +347,7 @@ class Nodes {
 				but.default_value[2] = ui.slider(nhandle.nest(buti).nest(2, {value: but.default_value[2]}), "Z", min, max, true, 100, true, Left);
 				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
+				if (but.output != null) node.outputs[but.output].default_value = but.default_value;
 				ny += lineh * 3;
 			}
 			else if (but.type == 'VALUE') {
@@ -404,14 +407,16 @@ class Nodes {
 				}
 				ui._y += lineh;
 				// Edit
-				ui.row([1/5, 1/5, 3/5]);
+				ui.row([1/4, 1/4, 2/4]);
 				if (ui.button("+")) vals.push([0.0, 0.0, 0.0, 1.0, 1.0]); // [[r, g, b, a, pos], ..]
 				if (ui.button("-") && vals.length > 1) vals.pop();
-				var i = Std.int(ui.slider(nhandle.nest(1), "Index", 0, vals.length - 1, false, 1, true, Left));
+				but.data = ui.combo(nhandle.nest(1, {position: but.data}), ["Linear", "Constant"], "Interpolate");
+				ui.row([1/2, 1/2]);
+				var i = Std.int(ui.slider(nhandle.nest(2), "Index", 0, vals.length - 1, false, 1, true, Left));
 				var val = vals[i];
-				nhandle.nest(2).value = val[4];
-				val[4] = ui.slider(nhandle.nest(2), "Pos", 0, 1, true, 100, true, Left);
-				var chandle = nhandle.nest(3);
+				nhandle.nest(3).value = val[4];
+				val[4] = ui.slider(nhandle.nest(3), "Pos", 0, 1, true, 100, true, Left);
+				var chandle = nhandle.nest(4);
 				chandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				Ext.colorWheel(ui, chandle, false);
 				val[0] = chandle.color.R;
@@ -430,7 +435,7 @@ class Nodes {
 				ui.radio(nhandle.nest(1), 2, "Z");
 				// Preview
 				var axis = nhandle.nest(1).position;
-				var val:Array<Float> = but.default_value[axis]; // [[x, y], [x, y], ..]
+				var val:Array<Float> = but.default_value[axis]; // [[x, y, x, y,..], [x, y], ..]
 				var num = Std.int(val.length / 2);
 				// for (i in 0...num) { ui.line(); }
 				ui._y += lineh * 5;
@@ -440,9 +445,9 @@ class Nodes {
 					val.push(0); val.push(0);
 				}
 				if (ui.button("-")) {
-					if (val.length > 2) { val.pop(); val.pop(); }
+					if (val.length > 4) { val.pop(); val.pop(); }
 				}
-				var i = Std.int(ui.slider(nhandle.nest(axis).nest(2, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
+				var i = Std.int(ui.slider(nhandle.nest(2).nest(axis, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
 				ui.row([1/2, 1/2]);
 				nhandle.nest(3).value = val[i * 2    ];
 				nhandle.nest(4).value = val[i * 2 + 1];
@@ -556,7 +561,7 @@ typedef TNodeButton = {
 	var type: String;
 	@:optional var output: Null<Int>;
 	@:optional var default_value: Dynamic;
-	@:optional var data: Array<String>;
+	@:optional var data: Dynamic;
 	@:optional var min: Null<Float>;
 	@:optional var max: Null<Float>;
 }
