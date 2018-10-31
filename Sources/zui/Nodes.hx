@@ -380,10 +380,10 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				var soc = node.outputs[but.output];
-				var texts = but.data != null ? but.data : getEnumTexts();
-				but.default_value = ui.combo(nhandle.nest(0, {position: but.default_value}), texts, but.name);
-				soc.default_value = but.data != null ? but.data[but.default_value] : mapEnum(texts[but.default_value]);
+				var arrayData = Std.is(but.data, Array);
+				var texts = arrayData ? but.data : getEnumTexts();
+				but.default_value = ui.combo(nhandle.nest(buti, {position: but.default_value}), texts, but.name);
+				if (!arrayData) but.data = mapEnum(texts[but.default_value]);
 			}
 			else if (but.type == 'BOOL') {
 				ny += lineh;
