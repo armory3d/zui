@@ -48,7 +48,7 @@ function tooltipImage(image: Image);
 
 // Formating
 function row(ratios: Array<Float>);
-function separator();
+function separator(h = 4, fill = true);
 function indent();
 function unindent();
 ```
