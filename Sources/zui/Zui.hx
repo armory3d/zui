@@ -916,11 +916,13 @@ class Zui {
 		return handle.value;
 	}
 
-	public function separator() {
-		if (!isVisible(ELEMENT_H())) { _y += 2; return; }
-		g.color = t.SEPARATOR_COL;
-		g.fillRect(_x, _y, _w - TEXT_OFFSET(), LINE_STRENGTH());
-		_y += 2;
+	public function separator(h = 4, fill = true) {
+		if (!isVisible(ELEMENT_H())) { _y += h * SCALE; return; }
+		if (fill) {
+			g.color = t.SEPARATOR_COL;
+			g.fillRect(_x, _y, _w, h * SCALE);
+		}
+		_y += h * SCALE;
 	}
 
 	public function tooltip(text: String) {
