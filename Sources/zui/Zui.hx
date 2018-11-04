@@ -620,6 +620,10 @@ class Zui {
 			else if (key == KeyCode.Return) { // Deselect
 				deselectText(); // One-line text for now
 			}
+			else if (key == KeyCode.Escape) { // Cancel
+				textSelectedCurrentText = textSelectedHandle.text;
+				deselectText();
+			}
 			else if (key == KeyCode.Tab) { // Next field
 				tabPressed = true;
 				deselectText();
