@@ -2,7 +2,7 @@
 
 Portable immediate mode UI library designed for tooling and game debug. Built with Haxe and Kha. Check out live demo at [KodeGarden](http://kodegarden.org/#e199af106a797bafa301c3956ad6f1aea7929744).
 
-![](img/zui.jpg)
+![](https://armory3d.org/img/zui/zui.jpg)
 
 ## Getting started
 - Clone into *your_kha_project/Libraries*
@@ -148,7 +148,7 @@ zui.onMouseUp(button:Int, x:Int, y:Int)
 zui.onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int)
 zui.onMouseWheel(delta:Int)
 ```
-![](img/zui2.jpg)
+![](https://armory3d.org/img/zui/zui2.jpg)
 
 ---
 
