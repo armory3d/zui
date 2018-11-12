@@ -32,7 +32,7 @@ class Nodes {
 		for (but in node.buttons) {
 			if (but.type == 'RGBA') buttonsH += 132 * SCALE;
 			else if (but.type == 'VECTOR') buttonsH += LINE_H() * 4;
-			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9;
+			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9.5;
 			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
 			else buttonsH += LINE_H();
 		}
@@ -399,7 +399,7 @@ class Nodes {
 				ui._w = w;
 				// Preview
 				var vals:Array<Array<Float>> = but.default_value;
-				var sw = w * SCALE;
+				var sw = w / SCALE;
 				for (val in vals) {
 					var pos = val[4];
 					var col = kha.Color.fromFloats(val[0], val[1], val[2]);
@@ -407,12 +407,20 @@ class Nodes {
 				}
 				ui._y += lineh;
 				// Edit
+				var ihandle = nhandle.nest(2);
 				ui.row([1/4, 1/4, 2/4]);
-				if (ui.button("+")) vals.push([0.0, 0.0, 0.0, 1.0, 1.0]); // [[r, g, b, a, pos], ..]
-				if (ui.button("-") && vals.length > 1) vals.pop();
+				if (ui.button("+")) {
+					var last = vals[vals.length - 1];
+					vals.push([last[0], last[1], last[2], last[3], 1.0]); // [[r, g, b, a, pos], ..]
+					ihandle.value += 1;
+				}
+				if (ui.button("-") && vals.length > 1) {
+					vals.pop();
+					ihandle.value -= 1;
+				}
 				but.data = ui.combo(nhandle.nest(1, {position: but.data}), ["Linear", "Constant"], "Interpolate");
 				ui.row([1/2, 1/2]);
-				var i = Std.int(ui.slider(nhandle.nest(2), "Index", 0, vals.length - 1, false, 1, true, Left));
+				var i = Std.int(ui.slider(ihandle, "Index", 0, vals.length - 1, false, 1, true, Left));
 				var val = vals[i];
 				nhandle.nest(3).value = val[4];
 				val[4] = ui.slider(nhandle.nest(3), "Pos", 0, 1, true, 100, true, Left);
