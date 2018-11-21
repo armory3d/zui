@@ -763,13 +763,13 @@ class Zui {
 
 	public function check(handle: Handle, text: String): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
-		if (getReleased()) {
+		if (getReleased() && handle.active) {
 			handle.selected = !handle.selected;
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
-		var hover = getHover();
+		var hover = (handle.active) ? getHover() : false;
 		drawCheck(handle.selected, hover); // Check
 
 		g.color = t.TEXT_COL; // Text
@@ -782,13 +782,13 @@ class Zui {
 
 	public function radio(handle: Handle, position: Int, text: String): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position == position; }
-		if (getReleased()) {
+		if (getReleased() && handle.active) {
 			handle.position = position;
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
-		var hover = getHover();
+		var hover = (handle.active) ? getHover() : false;
 		drawRadio(handle.position == position, hover); // Radio
 
 		g.color = t.TEXT_COL; // Text
@@ -801,13 +801,13 @@ class Zui {
 
 	public function inlineRadio(handle: Handle, texts: Array<String>): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
-		if (getReleased()) {
+		if (getReleased() && handle.active) {
 			if (++handle.position >= texts.length) handle.position = 0;
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
 
-		var hover = getHover();
+		var hover = (handle.active) ? getHover() : false;
 		drawInlineRadio(texts[handle.position], hover); // Radio
 
 		endElement();
@@ -816,7 +816,7 @@ class Zui {
 
 	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align: Align = Left): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
-		if (getReleased()) {
+		if (getReleased() && handle.active) {
 			if (comboSelectedHandle == null) {
 				inputEnabled = false;
 				comboSelectedHandle = handle;
@@ -836,7 +836,7 @@ class Zui {
 		}
 		else handle.changed = false;
 
-		var hover = getHover();
+		var hover = (handle.active) ? getHover() : false;
 		if (hover) { // Bg
 			g.color = t.ACCENT_HOVER_COL;
 			drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
@@ -869,7 +869,7 @@ class Zui {
 	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true, align: Align = Right, textEdit = true): Float {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
 		// if (getPushed() && inputDX != 0) {
-		if (getStarted()) {
+		if (getStarted() && handle.active) {
 			handle.scrolling = true;
 			scrollingHandle = handle;
 			isScrolling = true;
@@ -888,11 +888,11 @@ class Zui {
 			handle.changed = changed = true;
 		}
 
-		var hover = getHover();
+		var hover = (handle.active) ? getHover() : false;
 		drawSlider(handle.value, from, to, filled, hover); // Slider
 
 		// Text edit
-		var startEdit = (getReleased() || tabPressed) && textEdit;
+		var startEdit = (getReleased() || tabPressed) && textEdit && handle.active;
 		if (startEdit) { // Mouse did not move
 			handle.text = handle.value + "";
 			startTextEdit(handle);
@@ -1286,6 +1286,7 @@ class Zui {
 }
 
 typedef HandleOptions = {
+	?active:Bool,
 	?selected: Bool,
 	?position: Int,
 	?value: Float,
@@ -1295,6 +1296,7 @@ typedef HandleOptions = {
 }
 
 class Handle {
+	public var active = true;
 	public var selected = false;
 	public var position = 0;
 	public var color = kha.Color.White;
@@ -1317,6 +1319,7 @@ class Handle {
 
 	public function new(ops: HandleOptions = null) {
 		if (ops != null) {
+			if (ops.active != null) active = ops.active;
 			if (ops.selected != null) selected = ops.selected;
 			if (ops.position != null) position = ops.position;
 			if (ops.value != null) value = ops.value;
