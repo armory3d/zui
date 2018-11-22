@@ -741,11 +741,11 @@ class Zui {
 		highlightAnchor = cursorX;
 	}
 
-	public function button(text: String, align:Align = Center): Bool {
+	public function button(text: String, align:Align = Center, active:Bool = true): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return false; }
-		var released = getReleased();
-		var pushed = getPushed();
-		var hover = getHover();
+		var released = (active) ? getReleased() : false;
+		var pushed = (active) ? getPushed() : false;
+		var hover = (active) ? getHover() : false;
 
 		g.color = pushed ? t.BUTTON_PRESSED_COL :
 				  hover ? t.BUTTON_HOVER_COL :
