@@ -189,7 +189,7 @@ typedef TElement = {
 	var y: Float;
 	var width: Int;
 	var height: Int;
-	@:optional var rotation: Null<Float>;
+	@:optional var rotation: Null<kha.FastFloat>;
 	@:optional var text: String;
 	@:optional var event: String;
 	@:optional var color: Null<Int>;
