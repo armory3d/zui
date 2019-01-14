@@ -68,7 +68,7 @@ class Zui {
 	public var g: Graphics; // Drawing
 	var globalG: Graphics;
 
-	var t:zui.Themes.TTheme;
+	var t: zui.Themes.TTheme;
 	var SCALE: Float;
 	var ops: ZuiOptions;
 	var fontSize: Int;
@@ -86,7 +86,7 @@ class Zui {
 	var radioOffsetY: Float;
 	var radioSelectOffsetX: Float;
 	var radioSelectOffsetY: Float;
-	var scrollAlign: Float = 0.0;
+	var scrollAlign = 0.0;
 	var imageScrollAlign = true;
 
 	var _x: Float; // Cursor(stack) position
@@ -583,7 +583,7 @@ class Zui {
 		textSelectedCurrentText = "";
 	}
 
-	function updateTextEdit(align:Align = Left) {
+	function updateTextEdit(align: Align = Left) {
 		var text = textSelectedCurrentText;
 		if (isKeyDown) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
@@ -703,7 +703,7 @@ class Zui {
 		textSelectedCurrentText = text;
 	}
 
-	public function textInput(handle: Handle, label = "", align:Align = Left): String {
+	public function textInput(handle: Handle, label = "", align: Align = Left): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
@@ -741,7 +741,7 @@ class Zui {
 		highlightAnchor = cursorX;
 	}
 
-	public function button(text: String, align:Align = Center): Bool {
+	public function button(text: String, align: Align = Center): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return false; }
 		var released = getReleased();
 		var pushed = getPushed();
@@ -1057,7 +1057,7 @@ class Zui {
 	function drawTooltip() {
 		globalG.color = t.TEXT_COL;
 		var lines = tooltipText.split("\n");
-		var tooltipW:Float = 0;
+		var tooltipW = 0.0;
 		for (line in lines) {
 			var lineTooltipW = ops.font.width(fontSize, line);
 			if (lineTooltipW > tooltipW) tooltipW = lineTooltipW;
@@ -1083,8 +1083,7 @@ class Zui {
 	}
 
 	function drawString(g: Graphics, text: String,
-						xOffset: Null<Float> = null, yOffset: Float = 0,
-						align:Align = Left) {
+						xOffset: Null<Float> = null, yOffset: Float = 0, align: Align = Left) {
 		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
 		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
 		
@@ -1098,7 +1097,7 @@ class Zui {
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
-	function endElement(elementSize:Null<Float> = null) {
+	function endElement(elementSize: Null<Float> = null) {
 		if (currentWindow == null) { _y += ELEMENT_H() + ELEMENT_OFFSET(); return; }
 		if (currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
@@ -1261,9 +1260,9 @@ class Zui {
 		isKeyDown = true;
 	}
 
-	public function onCut():String { isCut = true; return onCopy(); }
-	public function onCopy():String { return textToCopy; }
-	public function onPaste(s:String) { textToPaste = s; }
+	public function onCut(): String { isCut = true; return onCopy(); }
+	public function onCopy(): String { return textToCopy; }
+	public function onPaste(s: String) { textToPaste = s; }
 	
 	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
 	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
@@ -1277,7 +1276,7 @@ class Zui {
 	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE); }
 	public inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE; }
 
-	public function resize(handle:Handle, w: Int, h: Int, khaWindowId = 0) {
+	public function resize(handle: Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;
 		if (handle.texture != null) handle.texture.unload();
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
