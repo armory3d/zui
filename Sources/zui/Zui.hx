@@ -94,8 +94,8 @@ class Zui {
 	var _w: Int;
 	var _h: Int;
 
-	var _windowX: Float; // Window state
-	var _windowY: Float;
+	var _windowX = 0.0; // Window state
+	var _windowY = 0.0;
 	var _windowW: Float;
 	var _windowH: Float;
 	var currentWindow: Handle;
