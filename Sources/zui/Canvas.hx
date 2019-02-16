@@ -22,7 +22,11 @@ class Canvas {
 		events = [];
 
 		_ui = ui;
-		ui.begin(g);
+
+		g.end();
+		ui.begin(g); // Bake elements
+		g.begin(false);
+
 		ui.g = g;
 
 		for (elem in canvas.elements) {

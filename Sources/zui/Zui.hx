@@ -143,7 +143,6 @@ class Zui {
 		this.ops = ops;
 		setScale(ops.scaleFactor);
 		if (ops.autoNotifyInput) registerInput();
-		bakeElements();
 	}
 
 	public function setScale(factor: Float) {
