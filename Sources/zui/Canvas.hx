@@ -29,7 +29,10 @@ class Canvas {
 			if (elem.parent == null) drawElement(ui, canvas, elem);
 		}
 
-		ui.end();
+		g.end();
+		ui.end(); // Finish drawing
+		g.begin(false);
+
 		return events;
 	}
 
