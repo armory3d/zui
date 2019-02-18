@@ -3,14 +3,15 @@ package zui;
 @:access(zui.Zui)
 class Nodes {
 
-	public var nodeDrag: TNode = null;
-	public var nodeSelected: TNode = null;
+	public var nodesDrag = false;
+	public var nodesSelected: Array<TNode> = [];
 	public var panX = 0.0;
 	public var panY = 0.0;
 	public var zoom = 1.0;
 	public var uiw = 0;
 	public var uih = 0;
 	public var SCALE = 1.0;
+	var dragged = false;
 	var moveOnTop: TNode = null;
 	var linkDrag: TNodeLink = null;
 	var snapFromId = -1;
@@ -176,7 +177,15 @@ class Nodes {
 					}
 				}
 			}
-			var selected = nodeSelected != null && (link.from_id == nodeSelected.id || link.to_id == nodeSelected.id);
+
+			var selected = false;
+			for (n in nodesSelected) {
+				if (link.from_id == n.id || link.to_id == n.id) {
+					selected = true;
+					break;
+				}
+			}
+
 			drawLink(ui, fromX - wx, fromY - wy, toX - wx, toY - wy, selected);
 		}
 
@@ -186,11 +195,26 @@ class Nodes {
 
 			// Drag node
 			var nodeh = NODE_H(node);
-			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
-				nodeDrag = node;
-				nodeSelected = nodeDrag;
-				// Place selected node on top
-				moveOnTop = nodeSelected;
+			if (ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
+				if (ui.inputStarted) {
+					if (ui.isShiftDown) {
+						// Add to selection or deselect
+						isSelected(node) ?
+							nodesSelected.remove(node) :
+							nodesSelected.push(node);
+					}
+					else if (nodesSelected.length <= 1) {
+						// Selecting single node, otherwise wait for input release
+						nodesSelected = [node];
+					}
+					moveOnTop = node; // Place selected node on top
+					nodesDrag = true;
+					dragged = false;
+				}
+				else if (ui.inputReleased && !ui.isShiftDown && !dragged) {
+					// No drag performed, select single node
+					nodesSelected = [node];
+				}
 			}
 			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node) - LINE_H() / 2, NODE_W() + LINE_H(), nodeh + LINE_H())) {
 				// Check sockets
@@ -255,12 +279,14 @@ class Nodes {
 				}
 				snapToId = snapFromId = -1;
 				linkDrag = null;
-				nodeDrag = null;
+				nodesDrag = false;
 			}
-			if (nodeDrag == node && !ui.inputDownR) {
-				// handle.redraws = 2;
-				node.x += Std.int(ui.inputDX / SCALE);
-				node.y += Std.int(ui.inputDY / SCALE);
+			if (nodesDrag && isSelected(node) && !ui.inputDownR) {
+				if (ui.inputDX != 0 || ui.inputDY != 0) {
+					dragged = true;
+					node.x += Std.int(ui.inputDX / SCALE);
+					node.y += Std.int(ui.inputDY / SCALE);
+				}
 			}
 
 			drawNode(ui, node, canvas);
@@ -280,6 +306,8 @@ class Nodes {
 	public static var getEnumTexts: Void->Array<String> = null;
 	public static var mapEnum: String->String = null;
 	
+	inline function isSelected(node: TNode) { return nodesSelected.indexOf(node) >= 0; }
+
 	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
@@ -292,7 +320,7 @@ class Nodes {
 		var lineh = LINE_H();
 
 		// Outline
-		g.color = node == nodeSelected ? 0xffaaaaaa : 0xff202020;
+		g.color = isSelected(node) ? 0xffaaaaaa : 0xff202020;
 		g.fillRect(nx - 1, ny - 1, w + 2, h + 2);
 
 		// Header
