@@ -3,15 +3,16 @@ package zui;
 @:access(zui.Zui)
 class Nodes {
 
-	public var nodeDrag:TNode = null;
-	public var nodeSelected:TNode = null;
+	public var nodeDrag: TNode = null;
+	public var nodeSelected: TNode = null;
 	public var panX = 0.0;
 	public var panY = 0.0;
 	public var zoom = 1.0;
 	public var uiw = 0;
 	public var uih = 0;
 	public var SCALE = 1.0;
-	var linkDrag:TNodeLink = null;
+	var moveOnTop: TNode = null;
+	var linkDrag: TNodeLink = null;
 	var snapFromId = -1;
 	var snapToId = -1;
 	var snapSocket = 0;
@@ -188,6 +189,8 @@ class Nodes {
 			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
 				nodeDrag = node;
 				nodeSelected = nodeDrag;
+				// Place selected node on top
+				moveOnTop = nodeSelected;
 			}
 			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node) - LINE_H() / 2, NODE_W() + LINE_H(), nodeh + LINE_H())) {
 				// Check sockets
@@ -263,13 +266,19 @@ class Nodes {
 			drawNode(ui, node, canvas);
 		}
 
+		if (moveOnTop != null) {
+			canvas.nodes.remove(moveOnTop);
+			canvas.nodes.push(moveOnTop);
+			moveOnTop = null;
+		}
+
 		ui.setScale(_SCALE); // Restore non-zoomed scale
 		ui.elementsBaked = true;
 	}
 
 	// Global enum mapping for now..
-	public static var getEnumTexts:Void->Array<String> = null;
-	public static var mapEnum:String->String = null;
+	public static var getEnumTexts: Void->Array<String> = null;
+	public static var mapEnum: String->String = null;
 	
 	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
 		var wx = ui._windowX;
