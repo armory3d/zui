@@ -50,11 +50,13 @@ class Zui {
 	var isShiftDown = false;
 	var isCtrlDown = false;
 	var isAltDown = false;
+	var isBackspaceDown = false;
 	var key: Null<KeyCode> = null;
 	var char: String;
 	static var textToPaste = "";
 	static var textToCopy = "";
 	static var isCut = false;
+	static var isCopy = false;
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
@@ -230,6 +232,7 @@ class Zui {
 		inputWheelDelta = 0;
 		textToPaste = "";
 		isCut = false;
+		isCopy = false;
 	}
 
 	public function beginLayout(g: Graphics, x: Int, y: Int, w: Int) {
@@ -1240,6 +1243,7 @@ class Zui {
 		case KeyCode.Shift: isShiftDown = true;
 		case KeyCode.Control: isCtrlDown = true;
 		case KeyCode.Alt: isAltDown = true;
+		case KeyCode.Backspace: isBackspaceDown = true;
 		case KeyCode.Space: char = " ";
 		default:
 		}
@@ -1250,6 +1254,7 @@ class Zui {
 		case KeyCode.Shift: isShiftDown = false;
 		case KeyCode.Control: isCtrlDown = false;
 		case KeyCode.Alt: isAltDown = false;
+		case KeyCode.Backspace: isBackspaceDown = false;
 		default:
 		}
 	}
@@ -1260,7 +1265,7 @@ class Zui {
 	}
 
 	public function onCut(): String { isCut = true; return onCopy(); }
-	public function onCopy(): String { return textToCopy; }
+	public function onCopy(): String { isCopy = true; return textToCopy; }
 	public function onPaste(s: String) { textToPaste = s; }
 	
 	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }

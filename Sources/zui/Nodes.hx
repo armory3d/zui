@@ -24,6 +24,8 @@ class Nodes {
 	static var elementsBaked = false;
 	static var socketImage: kha.Image = null;
 
+	public static var excludeRemove: Array<String> = []; // No removal for listed node types
+
 	public function new() {}
 
 	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE + zoomPan; }
@@ -296,6 +298,16 @@ class Nodes {
 			canvas.nodes.remove(moveOnTop);
 			canvas.nodes.push(moveOnTop);
 			moveOnTop = null;
+		}
+
+		if (ui.isBackspaceDown && !ui.isTyping) {
+			var i = nodesSelected.length - 1;
+			while (i >= 0) {
+				var n = nodesSelected[i--];
+				if (excludeRemove.indexOf(n.type) >= 0) continue;
+				removeNode(n, canvas);
+				ui.changed = true;
+			}
 		}
 
 		ui.setScale(_SCALE); // Restore non-zoomed scale
