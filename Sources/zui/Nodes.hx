@@ -365,11 +365,11 @@ class Nodes {
 		g.fillRect(nx, ny, w, lineh);
 
 		// Body
-		g.color = 0xff202020;
+		g.color = 0xff292929;
 		g.fillRect(nx, ny + lineh, w, h - lineh);
 
 		// Title
-		g.color = 0xffe7e7e7;
+		g.color = 0xffa0e0e0;
 		var textw = g.font.width(ui.fontSize, text);
 		g.drawString(text, nx + w / 2 - textw / 2, ny + p(4));
 		ny += lineh;
@@ -381,7 +381,7 @@ class Nodes {
 			g.drawScaledImage(socketImage, nx + w - p(5), ny - p(5), p(10), p(10));
 		}
 		ny -= lineh * node.outputs.length;
-		g.color = 0xffe7e7e7;
+		g.color = 0xffa0e0e0;
 		for (out in node.outputs) {
 			ny += lineh;
 			var strw = ui.ops.font.width(ui.fontSize, out.name);
@@ -413,7 +413,7 @@ class Nodes {
 				var max = but.max != null ? but.max : 1.0;
 				var labelCol = ui.t.LABEL_COL;
 				var textOff = ui.t.TEXT_OFFSET;
-				ui.t.LABEL_COL = 0xffffffff;
+				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
 				ui.text(but.name);
 				but.default_value[0] = ui.slider(nhandle.nest(buti).nest(0, {value: but.default_value[0]}), "X", min, max, true, 100, true, Left);
@@ -434,7 +434,7 @@ class Nodes {
 				var max = but.max != null ? but.max : 1.0;
 				var labelCol = ui.t.LABEL_COL;
 				var textOff = ui.t.TEXT_OFFSET;
-				ui.t.LABEL_COL = 0xffffffff;
+				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
 				ui.t.LABEL_COL = labelCol;
@@ -557,14 +557,14 @@ class Nodes {
 				var max = soc.max != null ? soc.max : 1.0;
 				var labelCol = ui.t.LABEL_COL;
 				var textOff = ui.t.TEXT_OFFSET;
-				ui.t.LABEL_COL = 0xffffffff;
+				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
 				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else {
-				g.color = 0xffe7e7e7;
+				g.color = 0xffa0e0e0;
 				g.drawString(inp.name, nx + p(12), ny - p(7));
 			}
 		}
