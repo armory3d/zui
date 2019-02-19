@@ -23,6 +23,7 @@ class Nodes {
 	var lastNodesCount = 0;
 	static var elementsBaked = false;
 	static var socketImage: kha.Image = null;
+	static var clipboard = "";
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 
@@ -294,13 +295,37 @@ class Nodes {
 			drawNode(ui, node, canvas);
 		}
 
+		// Place selected node on top
 		if (moveOnTop != null) {
 			canvas.nodes.remove(moveOnTop);
 			canvas.nodes.push(moveOnTop);
 			moveOnTop = null;
 		}
 
-		if (ui.isBackspaceDown && !ui.isTyping) {
+		// Node copy & paste
+		var cutSelected = false;
+		if (Zui.isCopy) {
+			var copyNodes: Array<TNode> = [];
+			for (n in nodesSelected) {
+				if (excludeRemove.indexOf(n.type) >= 0) continue;
+				copyNodes.push(n);
+			}
+			clipboard = haxe.Json.stringify(copyNodes);
+			cutSelected = Zui.isCut;
+		}
+		if (Zui.isPaste) {
+			nodesSelected = haxe.Json.parse(clipboard);
+			for (n in nodesSelected) {
+				// Unique id and cut links
+				n.id = getNodeId(canvas.nodes);
+				n.x += 10;
+				n.y += 10;
+				canvas.nodes.push(n);
+			}
+		}
+
+		// Node removal
+		if ((ui.isBackspaceDown || cutSelected) && !ui.isTyping) {
 			var i = nodesSelected.length - 1;
 			while (i >= 0) {
 				var n = nodesSelected[i--];

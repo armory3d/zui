@@ -57,6 +57,9 @@ class Zui {
 	static var textToCopy = "";
 	static var isCut = false;
 	static var isCopy = false;
+	static var isPaste = false;
+	static var copyReceiver: Zui = null;
+	static var copyFrame = 0;
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
@@ -145,6 +148,14 @@ class Zui {
 		this.ops = ops;
 		setScale(ops.scaleFactor);
 		if (ops.autoNotifyInput) registerInput();
+		if (copyReceiver == null) {
+			copyReceiver = this;
+			kha.System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
+			kha.System.notifyOnFrames(function(frames: Array<kha.Framebuffer>) {
+				// Set isCopy to false on next frame
+				if ((isCopy || isPaste) && ++copyFrame > 1) { isCopy = isCut = isPaste = false; copyFrame = 0; }
+			});
+		}
 	}
 
 	public function setScale(factor: Float) {
@@ -189,7 +200,6 @@ class Zui {
 	public function registerInput() {
 		Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
-		kha.System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 		inputRegistered = true;
 	}
 
@@ -231,8 +241,6 @@ class Zui {
 		inputDY = 0;
 		inputWheelDelta = 0;
 		textToPaste = "";
-		isCut = false;
-		isCopy = false;
 	}
 
 	public function beginLayout(g: Graphics, x: Int, y: Int, w: Int) {
@@ -1266,7 +1274,7 @@ class Zui {
 
 	public function onCut(): String { isCut = true; return onCopy(); }
 	public function onCopy(): String { isCopy = true; return textToCopy; }
-	public function onPaste(s: String) { textToPaste = s; }
+	public function onPaste(s: String) { isPaste = true; textToPaste = s; }
 	
 	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
 	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
