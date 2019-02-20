@@ -1041,10 +1041,14 @@ class Zui {
 	function drawCombo() {
 		var _g = g;
 		globalG.color = 0xff222222;
-		var elementSize = ELEMENT_H() + ELEMENT_OFFSET();
+		var elementSize = Std.int(ELEMENT_H() + ELEMENT_OFFSET());
+		var comboH = (comboSelectedTexts.length + 1) * elementSize;
 		globalG.begin(false);
-		globalG.fillRect(comboSelectedX, comboSelectedY, comboSelectedW, (comboSelectedTexts.length + 1) * elementSize);
-		beginLayout(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
+		var outOfScreen = comboSelectedY + comboH > kha.System.windowHeight();
+		var comboY = outOfScreen ? comboSelectedY - comboH - elementSize : comboSelectedY;
+		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
+		beginLayout(globalG, comboSelectedX, comboY, comboSelectedW);
+
 		inputEnabled = true;
 		for (i in 0...comboSelectedTexts.length) {
 			if (button(comboSelectedTexts[i], comboSelectedAlign)) {
