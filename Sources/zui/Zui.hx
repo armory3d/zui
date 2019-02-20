@@ -189,6 +189,8 @@ class Zui {
 		g.color = t.ACCENT_SELECT_COL;
 		g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
 		g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
+		// g.drawLine(0, checkSelectImage.height / 2, checkSelectImage.width / 3, checkSelectImage.height, 2 * SCALE);
+		// g.drawLine(checkSelectImage.width / 3, checkSelectImage.height, checkSelectImage.width, 0, 2 * SCALE);
 		g.end();
 		elementsBaked = true;
 	}
@@ -1152,6 +1154,12 @@ class Zui {
 	public function fill(x: Float, y: Float, w: Float, h: Float, color: kha.Color) {
 		g.color = color;
 		g.fillRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE);
+		g.color = 0xffffffff;
+	}
+
+	public function rect(x: Float, y: Float, w: Float, h: Float, color: kha.Color, strength = 1.0) {
+		g.color = color;
+		g.drawRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE, strength);
 		g.color = 0xffffffff;
 	}
 
