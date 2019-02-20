@@ -454,10 +454,9 @@ class Zui {
 		inputY = restoreY;
 		if (currentWindow == null) return;
 		var tabX = 0.0;
+		var tabH = Std.int(BUTTON_H() * 1.1);
 		var origy = _y;
 		_y = currentWindow.dragEnabled ? 15 : 0;
-
-		var tabH = Std.int(BUTTON_H() * 1.1);
 
 		g.color = t.WINDOW_BG_COL; // Underline tab buttons
 		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH);
