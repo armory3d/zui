@@ -324,6 +324,12 @@ class Nodes {
 			}
 		}
 
+		// Select all nodes
+		if (ui.isCtrlDown && ui.key == kha.input.KeyCode.A) {
+			nodesSelected = [];
+			for (n in canvas.nodes) nodesSelected.push(n);
+		}
+
 		// Node removal
 		if ((ui.isBackspaceDown || cutSelected) && !ui.isTyping) {
 			var i = nodesSelected.length - 1;
@@ -365,7 +371,7 @@ class Nodes {
 		g.fillRect(nx, ny, w, lineh);
 
 		// Body
-		g.color = 0xff292929;
+		g.color = ui.t.WINDOW_BG_COL;
 		g.fillRect(nx, ny + lineh, w, h - lineh);
 
 		// Title
