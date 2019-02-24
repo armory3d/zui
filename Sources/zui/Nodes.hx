@@ -609,6 +609,7 @@ class Nodes {
 }
 
 typedef TNodeCanvas = {
+	var name: String;
 	var nodes: Array<TNode>;
 	var links: Array<TNodeLink>;
 }
