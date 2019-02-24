@@ -577,7 +577,10 @@ class Zui {
 		textToSubmit = textSelectedCurrentText;
 		textSelectedHandle = handle;
 		textSelectedCurrentText = handle.text;
-		tabPressed = false;
+		if (tabPressed) {
+			tabPressed = false;
+			isKeyDown = false; // Prevent text deselect after tab press
+		}
 		tabPressedHandle = handle;
 		cursorX = handle.text.length;
 		cursorY = 0;
