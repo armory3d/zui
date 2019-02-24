@@ -111,6 +111,7 @@ class Ext {
 		// ~
 	}
 
+	public static var dataPath = "";
 	static var lastPath = "";
 	public static function fileBrowser(ui: Zui, handle: Handle, foldersOnly = false): String {
 		var sep = "/";
@@ -128,8 +129,7 @@ class Ext {
 		}
 		if (handle.text == "") initPath(handle, systemId);
 
-		var save = systemId == "Windows" ? Krom.savePath() : "/tmp";
-		save += sep + "dir.txt";
+		var save = Krom.getFilesLocation() + sep + dataPath + "dir.txt";
 		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + ' > ' + '"' + save + '"');
 		lastPath = handle.text;
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
