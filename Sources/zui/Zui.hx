@@ -227,6 +227,17 @@ class Zui {
 	public function end(last = true) { // End drawing
 		if (!windowEnded) endWindow();
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
+		if (tooltipText != "" || tooltipImg != null) {
+			if (!tooltipShown) {
+				tooltipShown = true;
+				tooltipX = inputX;
+				tooltipTime = kha.Scheduler.time();
+			}
+			if (kha.Scheduler.time() - tooltipTime > t.TOOLTIP_DELAY) {
+				tooltipText != "" ? drawTooltip() : drawTooltipImage();
+			}
+		}
+		else tooltipShown = false;
 		if (last) endInput();
 		if (tabPressedHandle != null) {
 			tabPressedHandle = null;
@@ -412,19 +423,6 @@ class Zui {
 		globalG.color = t.WINDOW_TINT_COL;
 		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 		globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
-		
-		if (tooltipText != "" || tooltipImg != null) {
-			if (!tooltipShown) { 
-				tooltipShown = true;
-				tooltipX = inputX;
-				tooltipTime = kha.Scheduler.time();
-			}
-			if (kha.Scheduler.time() - tooltipTime > t.TOOLTIP_DELAY) {
-				tooltipText != "" ? drawTooltip() : drawTooltipImage();
-			}
-		}
-		else tooltipShown = false;
-		
 		if (bindGlobalG) globalG.end();
 	}
 
@@ -551,7 +549,7 @@ class Zui {
 		var started = getStarted(h);
 		var down = getPushed(h);
 		var released = getReleased(h);
-		var hover = getHover();
+		var hover = getHover(h);
 		g.color = tint;
 		var h_float:Float = h; // TODO: hashlink fix
 		imageInvertY ? g.drawScaledImage(image, x, _y + h_float, w, -h_float) : g.drawScaledImage(image, x, _y, w, h_float);
@@ -699,16 +697,17 @@ class Zui {
 			if (align == Right) {
 				hlStart -= g.font.width(g.fontSize, text.substr(iend, text.length));
 			}
+			g.color = t.ACCENT_SELECT_COL;
 			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
 		}
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
 		if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
-			g.color = t.TEXT_COL; // Cursor
 			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
 			var strw = g.font.width(g.fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
+			g.color = t.TEXT_COL; // Cursor
 			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
 		}
 
@@ -1079,6 +1078,7 @@ class Zui {
 			if (lineTooltipW > tooltipW) tooltipW = lineTooltipW;
 		}
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipW - 20);
+		globalG.begin(false);
 		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * lines.length * 0.6);
 		globalG.font = ops.font;
 		globalG.fontSize = fontSize;
@@ -1086,16 +1086,19 @@ class Zui {
 		for (i in 0...lines.length) {
 			globalG.drawString(lines[i], tooltipX + 5, tooltipY + i * fontSize);
 		}
+		globalG.end();
 	}
 
 	function drawTooltipImage() {
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipImg.width - 20);
 		globalG.color = 0xff000000;
+		globalG.begin(false);
 		globalG.fillRect(tooltipX, tooltipY, tooltipImg.width, tooltipImg.height);
 		globalG.color = 0xffffffff;
 		tooltipInvertY ?
 			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY + tooltipImg.height, tooltipImg.width, -tooltipImg.height) :
 			globalG.drawImage(tooltipImg, tooltipX, tooltipY);
+		globalG.end();
 	}
 
 	function drawString(g: Graphics, text: String,
