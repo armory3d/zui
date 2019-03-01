@@ -331,7 +331,7 @@ class Nodes {
 		}
 
 		// Node removal
-		if ((ui.isBackspaceDown || cutSelected) && !ui.isTyping) {
+		if ((ui.isBackspaceDown || ui.isDeleteDown || cutSelected) && !ui.isTyping) {
 			var i = nodesSelected.length - 1;
 			while (i >= 0) {
 				var n = nodesSelected[i--];

@@ -51,6 +51,7 @@ class Zui {
 	var isCtrlDown = false;
 	var isAltDown = false;
 	var isBackspaceDown = false;
+	var isDeleteDown = false;
 	var key: Null<KeyCode> = null;
 	var char: String;
 	static var textToPaste = "";
@@ -1270,6 +1271,7 @@ class Zui {
 		case KeyCode.Control: isCtrlDown = true;
 		case KeyCode.Alt: isAltDown = true;
 		case KeyCode.Backspace: isBackspaceDown = true;
+		case KeyCode.Delete: isDeleteDown = true;
 		case KeyCode.Space: char = " ";
 		default:
 		}
@@ -1281,6 +1283,7 @@ class Zui {
 		case KeyCode.Control: isCtrlDown = false;
 		case KeyCode.Alt: isAltDown = false;
 		case KeyCode.Backspace: isBackspaceDown = false;
+		case KeyCode.Delete: isDeleteDown = false;
 		default:
 		}
 	}
