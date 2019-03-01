@@ -1309,6 +1309,8 @@ class Zui {
 	public function resize(handle: Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;
 		if (handle.texture != null) handle.texture.unload();
+		if (w < 1) w = 1;
+		if (h < 1) h = 1;
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 	}
