@@ -109,7 +109,7 @@ class Nodes {
 		// Zoom canvas
 		if (ui.inputWheelDelta != 0) {
 			zoom += -ui.inputWheelDelta / 10;
-			if (zoom < 0.4) zoom = 0.4;
+			if (zoom < 0.5) zoom = 0.5;
 			else if (zoom > 1.0) zoom = 1.0;
 			zoom = Math.round(zoom * 10) / 10;
 			uiw = ui._w;
