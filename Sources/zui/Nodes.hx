@@ -310,18 +310,37 @@ class Nodes {
 				if (excludeRemove.indexOf(n.type) >= 0) continue;
 				copyNodes.push(n);
 			}
-			clipboard = haxe.Json.stringify(copyNodes);
+			var copyLinks: Array<TNodeLink> = [];
+			for (l in canvas.links) {
+				if (getNode(nodesSelected, l.from_id) != null &&
+					getNode(nodesSelected, l.to_id) != null) {
+					copyLinks.push(l);
+				}
+			}
+			var copyCanvas: TNodeCanvas = { name: canvas.name, nodes: copyNodes, links: copyLinks };
+			clipboard = haxe.Json.stringify(copyCanvas);
 			cutSelected = Zui.isCut;
 		}
 		if (Zui.isPaste) {
-			nodesSelected = haxe.Json.parse(clipboard);
-			for (n in nodesSelected) {
-				// Unique id and cut links
+			var pasteCanvas: TNodeCanvas = haxe.Json.parse(clipboard);
+			for (l in pasteCanvas.links) {
+				// Assign unique link id
+				l.id = getLinkId(canvas.links);
+				canvas.links.push(l);
+			}
+			for (n in pasteCanvas.nodes) {
+				// Assign unique node id
+				var old_id = n.id;
 				n.id = getNodeId(canvas.nodes);
+				for (l in pasteCanvas.links) {
+					if (l.from_id == old_id) l.from_id = n.id;
+					else if (l.to_id == old_id) l.to_id = n.id;
+				}
 				n.x += 10;
 				n.y += 10;
 				canvas.nodes.push(n);
 			}
+			nodesSelected = pasteCanvas.nodes;
 		}
 
 		// Select all nodes
