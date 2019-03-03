@@ -458,6 +458,7 @@ class Zui {
 		var tabH = Std.int(BUTTON_H() * 1.1);
 		var origy = _y;
 		_y = currentWindow.dragEnabled ? 15 : 0;
+		tabHandle.changed = false;
 
 		g.color = t.WINDOW_BG_COL; // Underline tab buttons
 		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH);
@@ -477,6 +478,7 @@ class Zui {
 				tabScroll = h.scrollOffset;
 				tabHandle.position = i; // Set new tab
 				currentWindow.redraws = 3;
+				tabHandle.changed = true;
 			}
 			var selected = tabHandle.position == i;
 
