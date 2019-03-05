@@ -52,6 +52,7 @@ class Zui {
 	var isAltDown = false;
 	var isBackspaceDown = false;
 	var isDeleteDown = false;
+	var isEscapeDown = false;
 	var key: Null<KeyCode> = null;
 	var char: String;
 	static var textToPaste = "";
@@ -758,11 +759,12 @@ class Zui {
 		highlightAnchor = cursorX;
 	}
 
-	public function button(text: String, align: Align = Center): Bool {
+	public function button(text: String, align: Align = Center, label = ""): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return false; }
 		var released = getReleased();
 		var pushed = getPushed();
 		var hover = getHover();
+		if (released) changed = true;
 
 		g.color = pushed ? t.BUTTON_PRESSED_COL :
 				  hover ? t.BUTTON_HOVER_COL :
@@ -772,6 +774,7 @@ class Zui {
 
 		g.color = t.BUTTON_TEXT_COL;
 		drawString(g, text, TEXT_OFFSET(), 0, align);
+		if (label != "") drawString(g, label, TEXT_OFFSET(), 0, align == Right ? Left : Right);
 
 		endElement();
 
@@ -1274,6 +1277,7 @@ class Zui {
 		case KeyCode.Alt: isAltDown = true;
 		case KeyCode.Backspace: isBackspaceDown = true;
 		case KeyCode.Delete: isDeleteDown = true;
+		case KeyCode.Escape: isEscapeDown = true;
 		case KeyCode.Space: char = " ";
 		default:
 		}
@@ -1286,6 +1290,7 @@ class Zui {
 		case KeyCode.Alt: isAltDown = false;
 		case KeyCode.Backspace: isBackspaceDown = false;
 		case KeyCode.Delete: isDeleteDown = false;
+		case KeyCode.Escape: isEscapeDown = false;
 		default:
 		}
 	}
