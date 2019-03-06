@@ -661,7 +661,7 @@ class Zui {
 					cursorX++;
 				}
 			}
-			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right);
+			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Shift);
 			if (!selecting && !isCtrlDown) highlightAnchor = cursorX;
 		}
 
