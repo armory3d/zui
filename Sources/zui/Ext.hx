@@ -223,10 +223,15 @@ class Ext {
 		ui.g.fillRect(cx - 2, cy - 2, 4, 4);
 		// Val slider
 		if (rowAlign) alpha ? ui.row([1/3, 1/3, 1/3]) : ui.row([1/2, 1/2]);
-		var valhandle = handle.nest(0);
-		valhandle.value = Math.round(cval * 100) / 100;
-		cval = ui.slider(valhandle, "Value", 0.0, 1.0, true);
-		if (alpha) calpha = ui.slider(handle.nest(1, {value: Math.round(calpha * 100) / 100}), "Alpha", 0.0, 1.0, true);
+		var valHandle = handle.nest(0);
+		valHandle.value = Math.round(cval * 100) / 100;
+		cval = ui.slider(valHandle, "Value", 0.0, 1.0, true);
+		if (valHandle.changed) handle.changed = ui.changed = true;
+		if (alpha) {
+			var alphaHandle = handle.nest(1, {value: Math.round(calpha * 100) / 100});
+			calpha = ui.slider(alphaHandle, "Alpha", 0.0, 1.0, true);
+			if (alphaHandle.changed) handle.changed = ui.changed = true;
+		}
 		// Mouse picking
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
