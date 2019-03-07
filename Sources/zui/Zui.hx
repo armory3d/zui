@@ -1048,7 +1048,7 @@ class Zui {
 	static var comboFirst = true;
 	function drawCombo() {
 		var _g = g;
-		globalG.color = 0xff222222;
+		globalG.color = t.SEPARATOR_COL;
 		var elementSize = Std.int(ELEMENT_H() + ELEMENT_OFFSET());
 		var comboH = (comboSelectedTexts.length + 1) * elementSize;
 		globalG.begin(false);

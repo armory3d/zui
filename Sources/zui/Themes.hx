@@ -34,6 +34,7 @@ class Themes {
 		LABEL_COL: 0xffaaaaaa,
 		ARROW_COL: 0xffcac9c7,
 		SEPARATOR_COL: 0xff262626,
+		HIGHLIGHT_COL: 0xff205d9c,
 	};
 
 	// 2x scaled, for games
@@ -69,6 +70,7 @@ class Themes {
 		LABEL_COL: 0xffaaaaaa,
 		ARROW_COL: 0xffcac9c7,
 		SEPARATOR_COL: 0xff999999,
+		HIGHLIGHT_COL: 0xff205d9c,
 	};
 }
 
@@ -104,4 +106,5 @@ typedef TTheme = {
 	var LABEL_COL: Int;
 	var ARROW_COL: Int;
 	var SEPARATOR_COL: Int;
+	var HIGHLIGHT_COL: Int;
 }
