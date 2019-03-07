@@ -235,7 +235,7 @@ class Zui {
 				tooltipX = inputX;
 				tooltipTime = kha.Scheduler.time();
 			}
-			if (kha.Scheduler.time() - tooltipTime > t.TOOLTIP_DELAY) {
+			if (kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
 				tooltipText != "" ? drawTooltip() : drawTooltipImage();
 			}
 		}
@@ -710,7 +710,7 @@ class Zui {
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
-		if (time % (t.FLASH_SPEED * 2.0) < t.FLASH_SPEED) {
+		if (time % (FLASH_SPEED() * 2.0) < FLASH_SPEED()) {
 			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
 			var strw = g.font.width(g.fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
@@ -1315,6 +1315,8 @@ class Zui {
 	public inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
 	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE); }
 	public inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE; }
+	inline function FLASH_SPEED() { return 0.5; }
+	inline function TOOLTIP_DELAY() { return 1.0; }
 
 	public function resize(handle: Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;

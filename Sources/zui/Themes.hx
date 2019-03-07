@@ -15,8 +15,6 @@ class Themes {
 		TEXT_OFFSET: 8,
 		TAB_W: 12,
 		LINE_STRENGTH: 1,
-		FLASH_SPEED: 0.5,
-		TOOLTIP_DELAY: 1.0,
 		FILL_WINDOW_BG: false,
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
@@ -52,8 +50,6 @@ class Themes {
 		TEXT_OFFSET: 8 * 2,
 		TAB_W: 12 * 2,
 		LINE_STRENGTH: 1 * 2,
-		FLASH_SPEED: 0.5,
-		TOOLTIP_DELAY: 1.0,
 		FILL_WINDOW_BG: false,
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
@@ -89,8 +85,6 @@ typedef TTheme = {
 	var TEXT_OFFSET: Int;
 	var TAB_W: Int;
 	var LINE_STRENGTH: Int;
-	var FLASH_SPEED: Float;
-	var TOOLTIP_DELAY: Float;
 	var FILL_WINDOW_BG: Bool;
 	var FILL_BUTTON_BG: Bool;
 	var FILL_ACCENT_BG: Bool;
