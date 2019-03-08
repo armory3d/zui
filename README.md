@@ -1,6 +1,6 @@
 # zui
 
-Portable immediate mode UI library designed for tooling and game debug. Built with Haxe and Kha. Check out live demo at [KodeGarden](http://kodegarden.org/#e199af106a797bafa301c3956ad6f1aea7929744).
+Portable immediate mode UI library designed for tools and debug interfaces. Written in [Haxe](https://haxe.org/) and [Kha](http://kha.tech/), used in [ArmorPaint](http://armorpaint.org).
 
 ![](https://armory3d.org/img/zui/zui.jpg)
 
@@ -37,7 +37,7 @@ function panel(id: Handle, text: String, accent = 1): Bool;
 function image(image: Image): State;
 function text(text: String, align = Left, bg = 0);
 function textInput(id: Handle, label = ""): String;
-function button(text: String, align = Center): Bool;
+function button(text: String, align = Center, label = ""): Bool;
 function check(id: Handle, text: String): Bool;
 function radio(groupId: Handle, pos: Int, text: String): Bool;
 function inlineRadio(id: Handle, texts: Array<String>): Int;
