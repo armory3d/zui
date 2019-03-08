@@ -2,7 +2,7 @@
 
 Portable immediate mode UI library designed for tools and debug interfaces. Written in [Haxe](https://haxe.org/) and [Kha](http://kha.tech/), used in [ArmorPaint](http://armorpaint.org).
 
-![](https://armory3d.org/img/zui/zui.jpg)
+![](https://armorpaint.org/img/zui.jpg)
 
 ## Getting started
 - Clone into *your_kha_project/Libraries*
@@ -148,7 +148,6 @@ zui.onMouseUp(button:Int, x:Int, y:Int)
 zui.onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int)
 zui.onMouseWheel(delta:Int)
 ```
-![](https://armory3d.org/img/zui/zui2.jpg)
 
 ---
 
