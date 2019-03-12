@@ -143,9 +143,11 @@ class Ext {
 		#elseif kha_webgl
 
 		var files:Array<String> = [];
-		if (untyped process.versions['electron'] != null) {
+
+		var userAgent = untyped navigator.userAgent.toLowerCase();
+		if (userAgent.indexOf(' electron/') > -1) {
 			if (handle.text == "") {
-				var pp = untyped process.platform;
+				var pp = untyped window.process.platform;
 				var systemId = pp == "win32" ? "Windows" : (pp == "darwin" ? "OSX" : "Linux");
 				initPath(handle, systemId);
 			}
