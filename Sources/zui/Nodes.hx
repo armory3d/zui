@@ -373,6 +373,9 @@ class Nodes {
 	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
+		var uiX = ui._x;
+		var uiY = ui._y;
+		var uiW = ui._w;
 		var w = NODE_W();
 		var g = ui.g;
 		var h = NODE_H(node);
@@ -593,6 +596,10 @@ class Nodes {
 				g.drawString(inp.name, nx + p(12), ny - p(7));
 			}
 		}
+
+		ui._x = uiX;
+		ui._y = uiY;
+		ui._w = uiW;
 	}
 
 	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false) {
