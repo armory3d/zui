@@ -5,23 +5,19 @@ import zui.*;
 
 class Elements {
 	var ui: Zui;
-	var initialized = false;
-	var itemList:Array<String>;
+	var itemList = ["Item 1", "Item 2", "Item 3"];
 
 	public function new() {
 		Assets.loadEverything(loadingFinished);
-		itemList = ["Item 1", "Item 2", "Item 3"];
 	}
 
 	function loadingFinished() {
-		initialized = true;
 		ui = new Zui({font: Assets.fonts.DroidSans});
+		kha.System.notifyOnFrames(render);
 	}
 
-	public function render(framebuffer: Framebuffer): Void {
-		if (!initialized) return;
-
-		var g = framebuffer.g2;
+	public function render(framebuffers: Array<Framebuffer>): Void {
+		var g = framebuffers[0].g2;
 
 		g.begin();
 		// Draw your stuff...
@@ -107,9 +103,5 @@ class Elements {
 		ui.end();	
 
 		// Draw more of your stuff...
-	}
-
-	public function update(): Void {
-		if (!initialized) return;
 	}
 }

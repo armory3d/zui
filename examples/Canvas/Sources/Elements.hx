@@ -6,7 +6,6 @@ import zui.Canvas;
 
 class Elements {
 	var ui: Zui;
-	var initialized = false;
 
 	var canvas:TCanvas = {
 		name: "Canvas",
@@ -61,25 +60,21 @@ class Elements {
 	}
 
 	function loadingFinished() {
-		initialized = true;
 		ui = new Zui({font: Assets.fonts.DroidSans});
 
 		// Map images referenced in canvas
 		for (a in canvas.assets) {
 			Canvas.assetMap.set(0, Reflect.field(kha.Assets.images, a.name));
 		}
+
+		kha.System.notifyOnFrames(render);
 	}
 
-	public function render(framebuffer: Framebuffer): Void {
-		if (!initialized) return;
-		var g = framebuffer.g2;
+	public function render(framebuffers: Array<Framebuffer>): Void {
+		var g = framebuffers[0].g2;
 
 		g.begin();
 		Canvas.draw(ui, canvas, g);
 		g.end();
-	}
-
-	public function update(): Void {
-		if (!initialized) return;
 	}
 }

@@ -5,7 +5,6 @@ import zui.*;
 
 class Elements {
 	var ui: Zui;
-	var initialized = false;
 
 	static inline var scale = 2.0;
 
@@ -14,14 +13,12 @@ class Elements {
 	}
 
 	function loadingFinished() {
-		initialized = true;
 		ui = new Zui({font: Assets.fonts.DroidSans, scaleFactor: scale});
+		kha.System.notifyOnFrames(render);
 	}
 
-	public function render(framebuffer: Framebuffer): Void {
-		if (!initialized) return;
-
-		var g = framebuffer.g2;
+	public function render(framebuffers: Array<Framebuffer>): Void {
+		var g = framebuffers[0].g2;
 
 		g.begin();
 		// Draw your stuff...
@@ -47,9 +44,5 @@ class Elements {
 		ui.end();	
 
 		// Draw more of your stuff...
-	}
-
-	public function update(): Void {
-		if (!initialized) return;
 	}
 }

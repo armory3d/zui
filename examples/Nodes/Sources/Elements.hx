@@ -7,19 +7,19 @@ import zui.Nodes;
 class Elements {
 	var ui: Zui;
 	var nodes: Nodes;
-	var initialized = false;
 
 	public function new() {
 		Assets.loadEverything(loadingFinished);
 	}
 
 	function loadingFinished() {
-		initialized = true;
 		ui = new Zui({font: Assets.fonts.DroidSans});
 		nodes = new Nodes();
+		kha.System.notifyOnFrames(render);
 	}
 
 	var canvas:TNodeCanvas = {
+		name: "My Nodes",
 		nodes: [
 			{
 				id: 0,
@@ -73,9 +73,8 @@ class Elements {
 		]
 	};
 
-	public function render(framebuffer: Framebuffer): Void {
-		if (!initialized) return;
-		var g = framebuffer.g2;
+	public function render(framebuffers: Array<Framebuffer>): Void {
+		var g = framebuffers[0].g2;
 
 		g.begin();
 		g.end();
@@ -85,9 +84,5 @@ class Elements {
 			nodes.nodeCanvas(ui, canvas);
 		}
 		ui.end();
-	}
-
-	public function update(): Void {
-		if (!initialized) return;
 	}
 }
