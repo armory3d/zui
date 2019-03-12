@@ -9,11 +9,11 @@ Portable immediate mode UI library designed for tools and debug interfaces. Writ
 - Add `project.addLibrary('zui');` into *khafile.js*
 ``` hx
 	// In init()
-	var ui = new Zui({ font: myFont, khaWindowId: 0, scaleFactor: 1.0 });
+	var ui = new Zui({ font: myFont });
 
 	// In render()
-	public function render(frame:Framebuffer) {
-		var g = frame.g2;
+	public function render(frames: Array<Framebuffer>) {
+		var g = frames[0].g2;
 		g.begin();
 		// Draw your stuff...
 		g.end();
@@ -127,7 +127,7 @@ g2.end();
 **Using Id.handle() in a for loop**
 ```hx
 // Id.handle() works at compile time
-// Call .nest() to get unique handle per interation
+// Call .nest() to get unique handle per iteration
 for (i in 0...3) Id.handle().nest(i);
 // Or use new zui.Handle() directly
 ```
