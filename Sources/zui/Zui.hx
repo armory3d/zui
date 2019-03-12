@@ -1325,7 +1325,7 @@ class Zui {
 		if (h < 1) h = 1;
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
-		handle.texture.g2.mipmapScaleQuality = kha.graphics2.ImageScaleQuality.High;
+		// handle.texture.g2.mipmapScaleQuality = kha.graphics2.ImageScaleQuality.High;
 	}
 }
 
