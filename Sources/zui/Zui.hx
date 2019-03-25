@@ -461,11 +461,13 @@ class Zui {
 		_y = currentWindow.dragEnabled ? 15 : 0;
 		tabHandle.changed = false;
 
-		g.color = t.WINDOW_BG_COL; // Underline tab buttons
-		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH);
-		g.color = t.ACCENT_COL;
-		g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH, _windowW - buttonOffsetY * 2, LINE_STRENGTH());
+		g.color = t.SEPARATOR_COL;
+		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH + 2);
+		g.color = t.ACCENT_COL; // Underline tab buttons
+		g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH + 2, _windowW - buttonOffsetY * 2, LINE_STRENGTH());
 		
+		_y += 2;
+
 		for (i in 0...tabNames.length) {
 			_x = tabX;
 			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 14 * SCALE);
@@ -483,10 +485,11 @@ class Zui {
 			}
 			var selected = tabHandle.position == i;
 
-			g.color = (pushed || hover || selected) ? t.ACCENT_COL : //
-					  t.SEPARATOR_COL; //
+			g.color = selected ? t.WINDOW_BG_COL :
+					  (pushed || hover) ? t.BUTTON_HOVER_COL :
+					  t.SEPARATOR_COL;
 			tabX += _w + 1;
-			drawRect(g, !selected, _x + buttonOffsetY, _y + buttonOffsetY, _w, tabH);
+			drawRect(g, true, _x + buttonOffsetY, _y + buttonOffsetY, _w, tabH);
 			g.color = selected ? t.BUTTON_TEXT_COL : t.LABEL_COL;
 			drawString(g, tabNames[i], TEXT_OFFSET(), 0, Align.Left);
 
