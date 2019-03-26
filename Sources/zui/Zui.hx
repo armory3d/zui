@@ -128,6 +128,7 @@ class Zui {
 	var comboToSubmit = 0;
 	var tooltipText = "";
 	var tooltipImg: kha.Image = null;
+	var tooltipImgMaxWidth: Null<Int> = null;
 	var tooltipInvertY = false;
 	var tooltipX = 0.0;
 	var tooltipY = 0.0;
@@ -957,8 +958,9 @@ class Zui {
 		tooltipY = _y + _windowY;
 	}
 
-	public function tooltipImage(image: kha.Image) {
+	public function tooltipImage(image: kha.Image, maxWidth: Null<Int> = null) {
 		tooltipImg = image;
+		tooltipImgMaxWidth = maxWidth;
 		tooltipInvertY = imageInvertY;
 		tooltipY = _y + _windowY;
 	}
@@ -1102,14 +1104,17 @@ class Zui {
 	}
 
 	function drawTooltipImage() {
-		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipImg.width - 20);
+		var w = tooltipImg.width;
+		if (tooltipImgMaxWidth != null && w > tooltipImgMaxWidth) w = tooltipImgMaxWidth;
+		var h = tooltipImg.height * (w / tooltipImg.width);
+		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - w - 20);
 		globalG.color = 0xff000000;
 		globalG.begin(false);
-		globalG.fillRect(tooltipX, tooltipY, tooltipImg.width, tooltipImg.height);
+		globalG.fillRect(tooltipX, tooltipY, w, h);
 		globalG.color = 0xffffffff;
 		tooltipInvertY ?
-			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY + tooltipImg.height, tooltipImg.width, -tooltipImg.height) :
-			globalG.drawImage(tooltipImg, tooltipX, tooltipY);
+			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY + h, w, -h) :
+			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY, w, h);
 		globalG.end();
 	}
 
