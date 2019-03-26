@@ -982,7 +982,7 @@ class Zui {
 	}
 
 	function drawTree(selected: Bool) {
-		var SIGN_W = 7;
+		var SIGN_W = 7 * SCALE;
 		var x = _x + arrowOffsetX + 1;
 		var y = _y + arrowOffsetY + 1;
 		g.color = t.ARROW_COL;
