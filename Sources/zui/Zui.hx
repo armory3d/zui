@@ -1109,6 +1109,7 @@ class Zui {
 		if (tooltipImgMaxWidth != null && w > tooltipImgMaxWidth) w = tooltipImgMaxWidth;
 		var h = tooltipImg.height * (w / tooltipImg.width);
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - w - 20);
+		tooltipY = Math.min(tooltipY, kha.System.windowHeight() - h - 20);
 		globalG.color = 0xff000000;
 		globalG.begin(false);
 		globalG.fillRect(tooltipX, tooltipY, w, h);
