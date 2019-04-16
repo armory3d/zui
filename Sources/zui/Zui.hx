@@ -875,15 +875,15 @@ class Zui {
 		var y = _y + arrowOffsetY + 3;
 		g.fillTriangle(x, y, x + ARROW_SIZE(), y, x + ARROW_SIZE() / 2, y + ARROW_SIZE() / 2);
 
-		g.color = t.TEXT_COL; // Value
-
 		if (showLabel && label != "") {
 			if (align == Left) _x -= 15;
+			g.color = t.LABEL_COL;
 			drawString(g, label, null, 0, align == Left ? Right : Left);
 			if (align == Left) _x += 15;
 		}
 		
 		if (align == Right) _x -= 15;
+		g.color = t.TEXT_COL; // Value
 		drawString(g, texts[handle.position], null, 0, align);
 		if (align == Right) _x += 15;
 
