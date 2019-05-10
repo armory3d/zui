@@ -392,7 +392,8 @@ class Zui {
 				if (handle.scrolling) { // Scroll
 					scroll(inputDY * e, fullHeight);
 				}
-				else if (inputWheelDelta != 0) { // Wheel
+				else if (inputWheelDelta != 0 && comboSelectedHandle == null &&
+						 getInputInRect(_windowX, _windowY, _windowW, _windowH)) { // Wheel
 					scroll(inputWheelDelta * ELEMENT_H(), fullHeight);
 				}
 				
