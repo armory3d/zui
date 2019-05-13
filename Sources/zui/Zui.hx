@@ -527,9 +527,9 @@ class Zui {
 		return handle.selected;
 	}
 	
-	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null): State {
-		var iw = image.width * SCALE;
-		var ih = image.height * SCALE;
+	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null, sx = 0, sy = 0, sw = 0, sh = 0): State {
+		var iw = (sw > 0 ? sw : image.width) * SCALE;
+		var ih = (sh > 0 ? sh : image.height) * SCALE;
 		var w = Math.min(iw, _w);
 		var x = _x;
 		if (imageScrollAlign) {
@@ -561,7 +561,16 @@ class Zui {
 		var hover = getHover(h);
 		g.color = tint;
 		var h_float:Float = h; // TODO: hashlink fix
-		imageInvertY ? g.drawScaledImage(image, x, _y + h_float, w, -h_float) : g.drawScaledImage(image, x, _y, w, h_float);
+		if (sw > 0) { // Source rect specified
+			imageInvertY ?
+				g.drawScaledSubImage(image, sx, sy, sw, sh, x, _y + h_float, w, -h_float) :
+				g.drawScaledSubImage(image, sx, sy, sw, sh, x, _y, w, h_float);
+		}
+		else {
+			imageInvertY ?
+				g.drawScaledImage(image, x, _y + h_float, w, -h_float) :
+				g.drawScaledImage(image, x, _y, w, h_float);
+		}
 		
 		endElement(h);
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
