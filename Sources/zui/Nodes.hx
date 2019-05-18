@@ -464,7 +464,7 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
-				soc.default_value = ui.slider(nhandle.nest(0, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
+				soc.default_value = ui.slider(nhandle.nest(buti, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
 				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
 			}
@@ -474,7 +474,7 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				var soc = but.output != null ? node.outputs[but.output] : null;
-				but.default_value = ui.textInput(nhandle.nest(0, {text: soc != null ? soc.default_value : ""}), but.name);
+				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : ""}), but.name);
 				if (soc != null) soc.default_value = but.default_value;
 			}
 			else if (but.type == 'ENUM') {
@@ -492,7 +492,7 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				ui.check(nhandle.nest(0, {selected: but.default_value}), but.name);
+				ui.check(nhandle.nest(buti, {selected: but.default_value}), but.name);
 			}
 			else if (but.type == 'RAMP') {
 				ny += lineh;
@@ -509,7 +509,7 @@ class Nodes {
 				}
 				ui._y += lineh;
 				// Edit
-				var ihandle = nhandle.nest(2);
+				var ihandle = nhandle.nest(buti).nest(2);
 				ui.row([1/4, 1/4, 2/4]);
 				if (ui.button("+")) {
 					var last = vals[vals.length - 1];
@@ -520,13 +520,13 @@ class Nodes {
 					vals.pop();
 					ihandle.value -= 1;
 				}
-				but.data = ui.combo(nhandle.nest(1, {position: but.data}), ["Linear", "Constant"], "Interpolate");
+				but.data = ui.combo(nhandle.nest(buti).nest(1, {position: but.data}), ["Linear", "Constant"], "Interpolate");
 				ui.row([1/2, 1/2]);
 				var i = Std.int(ui.slider(ihandle, "Index", 0, vals.length - 1, false, 1, true, Left));
 				var val = vals[i];
-				nhandle.nest(3).value = val[4];
-				val[4] = ui.slider(nhandle.nest(3), "Pos", 0, 1, true, 100, true, Left);
-				var chandle = nhandle.nest(4);
+				nhandle.nest(buti).nest(3).value = val[4];
+				val[4] = ui.slider(nhandle.nest(buti).nest(3), "Pos", 0, 1, true, 100, true, Left);
+				var chandle = nhandle.nest(buti).nest(4);
 				chandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				Ext.colorWheel(ui, chandle, false);
 				val[0] = chandle.color.R;
@@ -540,11 +540,11 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				ui.row([1/3, 1/3, 1/3]);
-				ui.radio(nhandle.nest(1), 0, "X");
-				ui.radio(nhandle.nest(1), 1, "Y");
-				ui.radio(nhandle.nest(1), 2, "Z");
+				ui.radio(nhandle.nest(buti).nest(1), 0, "X");
+				ui.radio(nhandle.nest(buti).nest(1), 1, "Y");
+				ui.radio(nhandle.nest(buti).nest(1), 2, "Z");
 				// Preview
-				var axis = nhandle.nest(1).position;
+				var axis = nhandle.nest(buti).nest(1).position;
 				var val:Array<Float> = but.default_value[axis]; // [[x, y, x, y,..], [x, y], ..]
 				var num = Std.int(val.length / 2);
 				// for (i in 0...num) { ui.line(); }
@@ -557,12 +557,12 @@ class Nodes {
 				if (ui.button("-")) {
 					if (val.length > 4) { val.pop(); val.pop(); }
 				}
-				var i = Std.int(ui.slider(nhandle.nest(2).nest(axis, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
+				var i = Std.int(ui.slider(nhandle.nest(buti).nest(2).nest(axis, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
 				ui.row([1/2, 1/2]);
-				nhandle.nest(3).value = val[i * 2    ];
-				nhandle.nest(4).value = val[i * 2 + 1];
-				val[i * 2    ] = ui.slider(nhandle.nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
-				val[i * 2 + 1] = ui.slider(nhandle.nest(4, {value: 0}), "Y", -1, 1, true, 100, true, Left);
+				nhandle.nest(buti).nest(3).value = val[i * 2    ];
+				nhandle.nest(buti).nest(4).value = val[i * 2 + 1];
+				val[i * 2    ] = ui.slider(nhandle.nest(buti).nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
+				val[i * 2 + 1] = ui.slider(nhandle.nest(buti).nest(4, {value: 0}), "Y", -1, 1, true, 100, true, Left);
 				ny += lineh * 7;
 			}
 		}
@@ -587,7 +587,8 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
-				soc.default_value = ui.slider(nhandle.nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
+				var maxButtons = 9;
+				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
 				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
 			}
