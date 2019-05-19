@@ -673,7 +673,7 @@ class Zui {
 					 key != KeyCode.Alt) { // Write
 				if (char != null && char != "" && char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
 					text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
-					cursorX++;
+					cursorX = cursorX + 1 > text.length ? text.length : cursorX + 1;
 				}
 			}
 			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Shift);
