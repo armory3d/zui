@@ -231,6 +231,7 @@ class Zui {
 		if (!windowEnded) endWindow();
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
 		if (tooltipText != "" || tooltipImg != null) {
+			if (inputDown || inputDownR || isEscapeDown) tooltipShown = false;
 			if (!tooltipShown) {
 				tooltipShown = true;
 				tooltipX = inputX;
