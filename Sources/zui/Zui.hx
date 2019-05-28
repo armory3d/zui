@@ -668,14 +668,17 @@ class Zui {
 			else if (key == KeyCode.End) {
 				cursorX = text.length;
 			}
-			else if (key != KeyCode.Shift &&
+			else if (key != KeyCode.Shift && // Write
 					 key != KeyCode.CapsLock &&
 					 key != KeyCode.Control &&
-					 key != KeyCode.Alt) { // Write
-				if (char != null && char != "" && char.charCodeAt(0) >= 32 && char.charCodeAt(0) != 127) { // 127=DEL
-					text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
-					cursorX = cursorX + 1 > text.length ? text.length : cursorX + 1;
-				}
+					 key != KeyCode.Alt &&
+					 key != KeyCode.Up &&
+					 key != KeyCode.Down &&
+					 char != null &&
+					 char != "" &&
+					 char.charCodeAt(0) >= 32) {
+				text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
+				cursorX = cursorX + 1 > text.length ? text.length : cursorX + 1;
 			}
 			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Shift);
 			if (!selecting && !isCtrlDown) highlightAnchor = cursorX;
