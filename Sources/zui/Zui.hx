@@ -27,9 +27,10 @@ class Zui {
 	public var isHovered = false;
 	public var isReleased = false;
 	public var changed = false; // Global elements change check
-	public var alwaysRedraw = false; // Hurts performance
 	public var imageInvertY = false;
 	public var scrollEnabled = true;
+	public var alwaysRedraw = false; // Hurts performance
+	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -353,6 +354,7 @@ class Zui {
 	public function endWindow(bindGlobalG = true) {
 		var handle = currentWindow;
 		if (handle == null) return;
+		var redraws = handle.redraws;
 		if (handle.redraws > 0 || isScrolling || isTyping) {
 
 			if (tabNames != null) drawTabs();
@@ -424,11 +426,13 @@ class Zui {
 		windowEnded = true;
 
 		// Draw window texture
-		if (bindGlobalG) globalG.begin(false);
-		globalG.color = t.WINDOW_TINT_COL;
-		// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
-		globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
-		if (bindGlobalG) globalG.end();
+		if (alwaysRedrawWindow || redraws > 0) {
+			if (bindGlobalG) globalG.begin(false);
+			globalG.color = t.WINDOW_TINT_COL;
+			// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
+			globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
+			if (bindGlobalG) globalG.end();
+		}
 	}
 
 	function scroll(delta: Float, fullHeight: Float) {
