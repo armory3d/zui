@@ -1091,7 +1091,7 @@ class Zui {
 			}
 		}
 		text(comboSelectedLabel);
-		if (inputReleased && !comboFirst) {
+		if ((inputReleased || isEscapeDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
 		}
