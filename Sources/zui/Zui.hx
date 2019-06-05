@@ -427,13 +427,13 @@ class Zui {
 		windowEnded = true;
 
 		// Draw window texture
-		if (alwaysRedrawWindow || handle.redraws > -1) {
+		if (alwaysRedrawWindow || handle.redraws > -2) {
 			if (bindGlobalG) globalG.begin(false);
 			globalG.color = t.WINDOW_TINT_COL;
 			// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 			globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
 			if (bindGlobalG) globalG.end();
-			if (handle.redraws == 0) handle.redraws--;
+			if (handle.redraws <= 0) handle.redraws--;
 		}
 	}
 
