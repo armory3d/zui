@@ -232,7 +232,7 @@ class Zui {
 		if (!windowEnded) endWindow();
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
 		if (tooltipText != "" || tooltipImg != null) {
-			if (inputDown || inputDownR || isEscapeDown) tooltipShown = false;
+			if (inputChanged()) tooltipShown = false;
 			if (!tooltipShown) {
 				tooltipShown = true;
 				tooltipX = inputX;
@@ -383,9 +383,9 @@ class Zui {
 				var totalScrollableArea = _windowH - barH;
 				var e = amountToScroll / totalScrollableArea;
 				var barY = totalScrollableArea * ratio;
+				var barFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), barY + _windowY, SCROLL_W(), barH);
 
-				if ((inputStarted) && // Start scrolling
-					 getInputInRect(_windowX + _windowW - SCROLL_W(), barY + _windowY, SCROLL_W(), barH)) {
+				if (inputStarted && barFocus) { // Start scrolling
 					handle.scrolling = true;
 					scrollingHandle = handle;
 					isScrolling = true;
@@ -410,7 +410,9 @@ class Zui {
 				g.color = t.WINDOW_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = t.ACCENT_COL; // Bar
-				g.fillRect(_windowW - SCROLL_W() - scrollAlign, barY, SCROLL_W(), barH);
+				var scrollbarFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
+				var barW = (scrollbarFocus || handle.scrolling) ? SCROLL_W() : SCROLL_W() / 3;
+				g.fillRect(_windowW - barW - scrollAlign, barY, barW, barH);
 			}
 
 			handle.lastMaxX = _x;
