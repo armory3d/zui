@@ -427,7 +427,7 @@ class Zui {
 		windowEnded = true;
 
 		// Draw window texture
-		if (alwaysRedrawWindow || handle.redraws > -2) {
+		if (alwaysRedrawWindow || handle.redraws > -4) {
 			if (bindGlobalG) globalG.begin(false);
 			globalG.color = t.WINDOW_TINT_COL;
 			// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
