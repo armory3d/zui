@@ -134,6 +134,7 @@ class Zui {
 	var tooltipX = 0.0;
 	var tooltipY = 0.0;
 	var tooltipShown = false;
+	var tooltipWait = false;
 	var tooltipTime = 0.0;
 	var tabNames: Array<String> = null; // Number of tab calls since window begin
 	var tabHandle: Handle = null;
@@ -232,13 +233,16 @@ class Zui {
 		if (!windowEnded) endWindow();
 		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
 		if (tooltipText != "" || tooltipImg != null) {
-			if (inputChanged()) tooltipShown = false;
+			if (inputChanged()) {
+				tooltipShown = false;
+				tooltipWait = inputDX == 0 && inputDY == 0; // Wait for movement before showing up again
+			}
 			if (!tooltipShown) {
 				tooltipShown = true;
 				tooltipX = inputX;
 				tooltipTime = kha.Scheduler.time();
 			}
-			if (kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
+			if (!tooltipWait && kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
 				tooltipText != "" ? drawTooltip() : drawTooltipImage();
 			}
 		}
