@@ -22,7 +22,8 @@ typedef ZuiOptions = {
 class Zui {
 	public var isScrolling = false; // Use to limit other activities
 	public var isTyping = false;
-	public var isStarted = false; // Current element state
+	public var enabled = true; // Current element state
+	public var isStarted = false;
 	public var isPushed = false;
 	public var isHovered = false;
 	public var isReleased = false;
@@ -571,6 +572,7 @@ class Zui {
 		var released = getReleased(h);
 		var hover = getHover(h);
 		g.color = tint;
+		if (!enabled) fadeColor();
 		var h_float:Float = h; // TODO: hashlink fix
 		if (sw > 0) { // Source rect specified
 			imageInvertY ?
@@ -1072,7 +1074,7 @@ class Zui {
 		var sliderX = filled ? x : x + (w - barW) * offset;
 		var sliderW = filled ? w * offset : barW; 
 		sliderW = Math.max(Math.min(sliderW, w), 0);
-		g.fillRect(sliderX, y, sliderW, BUTTON_H());
+		drawRect(g, true, sliderX, y, sliderW, BUTTON_H());
 	}
 
 	static var comboFirst = true;
@@ -1156,6 +1158,7 @@ class Zui {
 		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
 		else if (align == Right) xOffset = _w - ops.font.width(fontSize, text) - TEXT_OFFSET();
 
+		if (!enabled) fadeColor();
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 	}
 
@@ -1200,21 +1203,28 @@ class Zui {
 		_x -= TAB_W();
 		_w += TAB_W();
 	}
+
+	function fadeColor() {
+		g.color = kha.Color.fromFloats(g.color.R, g.color.G, g.color.B, 0.25);
+	}
 	
 	public function fill(x: Float, y: Float, w: Float, h: Float, color: kha.Color) {
 		g.color = color;
+		if (!enabled) fadeColor();
 		g.fillRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE);
 		g.color = 0xffffffff;
 	}
 
 	public function rect(x: Float, y: Float, w: Float, h: Float, color: kha.Color, strength = 1.0) {
 		g.color = color;
+		if (!enabled) fadeColor();
 		g.drawRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE, strength);
 		g.color = 0xffffffff;
 	}
 
 	inline function drawRect(g: Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
 		if (strength == 0.0) strength = LINE_STRENGTH();
+		if (!enabled) fadeColor();
 		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, strength);
 	}
 
@@ -1225,37 +1235,37 @@ class Zui {
 	}
 
 	function getReleased(elemH = -1.0): Bool { // Input selection
-		isReleased = inputEnabled && inputReleased && getHover(elemH) && getInitialHover(elemH);
+		isReleased = enabled && inputEnabled && inputReleased && getHover(elemH) && getInitialHover(elemH);
 		return isReleased;
 	}
 
 	function getPushed(elemH = -1.0): Bool {
-		isPushed = inputEnabled && inputDown && getHover(elemH) && getInitialHover(elemH);
+		isPushed = enabled && inputEnabled && inputDown && getHover(elemH) && getInitialHover(elemH);
 		return isPushed;
 	}
 	
 	function getStarted(elemH = -1.0): Bool {
-		isStarted = inputEnabled && inputStarted && getHover(elemH);
+		isStarted = enabled && inputEnabled && inputStarted && getHover(elemH);
 		return isStarted;
 	}
 
 	function getInitialHover(elemH = -1.0): Bool {
 		if (elemH == -1.0) elemH = ELEMENT_H();
-		return inputEnabled &&
+		return enabled && inputEnabled &&
 			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
 			inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + elemH);
 	}
 
 	function getHover(elemH = -1.0): Bool {
 		if (elemH == -1.0) elemH = ELEMENT_H();
-		isHovered = inputEnabled &&
+		isHovered = enabled && inputEnabled &&
 			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
 			inputY >= _windowY + _y && inputY < (_windowY + _y + elemH);
 		return isHovered;
 	}
 
 	function getInputInRect(x: Float, y: Float, w: Float, h: Float, scale = 1.0): Bool {
-		return inputEnabled &&
+		return enabled && inputEnabled &&
 			inputX >= x * scale && inputX < (x + w) * scale &&
 			inputY >= y * scale && inputY < (y + h) * scale;
 	}
