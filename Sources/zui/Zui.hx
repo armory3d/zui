@@ -1031,6 +1031,7 @@ class Zui {
 
 		if (selected) { // Check
 			g.color = kha.Color.White;
+			if (!enabled) fadeColor();
 			g.drawImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY);
 		}
 	}
@@ -1043,6 +1044,7 @@ class Zui {
 
 		if (selected) { // Check
 			g.color = t.ACCENT_SELECT_COL;
+			if (!enabled) fadeColor();
 			g.fillRect(x + radioSelectOffsetX, y + radioSelectOffsetY, CHECK_SELECT_SIZE(), CHECK_SELECT_SIZE());
 		}
 	}
@@ -1054,6 +1056,7 @@ class Zui {
 		}
 		else {
 			g.color = t.ACCENT_COL;
+			if (!enabled) fadeColor();
 			g.drawRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 		}
 		g.color = t.TEXT_COL; // Text
