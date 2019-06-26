@@ -63,6 +63,7 @@ class Zui {
 	static var isCopy = false;
 	static var isPaste = false;
 	static var copyReceiver: Zui = null;
+	static var copyFrame = 0;
 
 	var cursorX = 0; // Text input
 	var cursorY = 0;
@@ -158,7 +159,7 @@ class Zui {
 			kha.System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 			kha.System.notifyOnFrames(function(frames: Array<kha.Framebuffer>) {
 				// Set isCopy to false on next frame
-				isCopy = isCut = isPaste = false;
+				if ((isCopy || isPaste) && ++copyFrame > 1) { isCopy = isCut = isPaste = false; copyFrame = 0; }
 			});
 		}
 	}
