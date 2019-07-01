@@ -589,10 +589,12 @@ class Zui {
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
 
-	public function text(text: String, align:Align = Left, bg = 0x00000000) {
-		if (!isVisible(ELEMENT_H())) { endElement(); return; }
-		getReleased();
-		getHover();
+	public function text(text: String, align:Align = Left, bg = 0x00000000): State {
+		if (!isVisible(ELEMENT_H())) { endElement(); return State.Idle; }
+		var started = getStarted();
+		var down = getPushed();
+		var released = getReleased();
+		var hover = getHover();
 		if (bg != 0x0000000) {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
@@ -601,6 +603,7 @@ class Zui {
 		drawString(g, text, TEXT_OFFSET(), 0, align);
 
 		endElement();
+		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
 
 	function startTextEdit(handle: Handle) {
