@@ -1109,8 +1109,9 @@ class Zui {
 		var BUTTON_COL = t.BUTTON_COL;
 		t.BUTTON_COL = t.SEPARATOR_COL;
 		for (i in 0...comboSelectedTexts.length) {
-			if (button(comboSelectedTexts[i], comboSelectedAlign)) {
-				comboToSubmit = i;
+			var j = outOfScreen ? comboSelectedTexts.length - 1 - i : i;
+			if (button(comboSelectedTexts[j], comboSelectedAlign)) {
+				comboToSubmit = j;
 				submitComboHandle = comboSelectedHandle;
 				if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
 				break;
