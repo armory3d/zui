@@ -808,7 +808,10 @@ class Zui {
 
 		g.color = t.BUTTON_TEXT_COL;
 		drawString(g, text, TEXT_OFFSET(), 0, align);
-		if (label != "") drawString(g, label, TEXT_OFFSET(), 0, align == Right ? Left : Right);
+		if (label != "") {
+			g.color = t.LABEL_COL;
+			drawString(g, label, TEXT_OFFSET(), 0, align == Right ? Left : Right);
+		}
 
 		endElement();
 
@@ -1095,7 +1098,16 @@ class Zui {
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
 		beginLayout(globalG, comboSelectedX, comboY, comboSelectedW);
 
+		if (outOfScreen) {
+			g.color = t.LABEL_COL;
+			drawString(g, comboSelectedLabel, null, 0, Right);
+			_y += elementSize;
+			fill(0, 0, _w, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
+		}
+
 		inputEnabled = true;
+		var BUTTON_COL = t.BUTTON_COL;
+		t.BUTTON_COL = t.SEPARATOR_COL;
 		for (i in 0...comboSelectedTexts.length) {
 			if (button(comboSelectedTexts[i], comboSelectedAlign)) {
 				comboToSubmit = i;
@@ -1104,7 +1116,14 @@ class Zui {
 				break;
 			}
 		}
-		text(comboSelectedLabel);
+		t.BUTTON_COL = BUTTON_COL;
+
+		if (!outOfScreen) {
+			fill(0, 0, _w, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
+			g.color = t.LABEL_COL;
+			drawString(g, comboSelectedLabel, null, 0, Right);
+		}
+
 		if ((inputReleased || isEscapeDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
