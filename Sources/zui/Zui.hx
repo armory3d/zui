@@ -882,7 +882,7 @@ class Zui {
 				comboSelectedTexts = texts;
 				comboSelectedLabel = label;
 				comboSelectedX = Std.int(_x + _windowX);
-				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H() + ELEMENT_OFFSET());
+				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H());
 				comboSelectedW = Std.int(_w);
 			}
 		}
@@ -1094,7 +1094,7 @@ class Zui {
 		var comboH = (comboSelectedTexts.length + 1) * elementSize;
 		globalG.begin(false);
 		var outOfScreen = comboSelectedY + comboH > kha.System.windowHeight();
-		var comboY = outOfScreen ? comboSelectedY - comboH - elementSize : comboSelectedY;
+		var comboY = outOfScreen ? comboSelectedY - comboH - Std.int(ELEMENT_H()) : comboSelectedY;
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
 		beginLayout(globalG, comboSelectedX, comboY, comboSelectedW);
 
