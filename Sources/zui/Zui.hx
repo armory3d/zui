@@ -1107,9 +1107,9 @@ class Zui {
 
 		inputEnabled = true;
 		var BUTTON_COL = t.BUTTON_COL;
-		t.BUTTON_COL = t.SEPARATOR_COL;
 		for (i in 0...comboSelectedTexts.length) {
 			var j = outOfScreen ? comboSelectedTexts.length - 1 - i : i;
+			t.BUTTON_COL = j == comboSelectedHandle.position ? t.PANEL_BG_COL : t.SEPARATOR_COL;
 			if (button(comboSelectedTexts[j], comboSelectedAlign)) {
 				comboToSubmit = j;
 				submitComboHandle = comboSelectedHandle;
