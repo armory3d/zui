@@ -332,6 +332,14 @@ class Nodes {
 				// Assign unique node id
 				var old_id = n.id;
 				n.id = getNodeId(canvas.nodes);
+				for (soc in n.inputs) {
+					soc.id = getSocketId(canvas.nodes);
+					soc.node_id = n.id;
+				}
+				for (soc in n.outputs) {
+					soc.id = getSocketId(canvas.nodes);
+					soc.node_id = n.id;
+				}
 				for (l in pasteCanvas.links) {
 					if (l.from_id == old_id) l.from_id = n.id;
 					else if (l.to_id == old_id) l.to_id = n.id;
