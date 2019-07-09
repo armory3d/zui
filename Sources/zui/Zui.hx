@@ -1038,7 +1038,8 @@ class Zui {
 		if (selected) { // Check
 			g.color = kha.Color.White;
 			if (!enabled) fadeColor();
-			g.drawImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY);
+			var size = Std.int(CHECK_SELECT_SIZE());
+			g.drawScaledImage(checkSelectImage, x + checkSelectOffsetX, y + checkSelectOffsetY, size, size);
 		}
 	}
 
