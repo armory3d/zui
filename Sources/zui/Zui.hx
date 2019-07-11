@@ -1428,7 +1428,7 @@ class Handle {
 	public var dragX = 0;
 	public var dragY = 0;
 	public var changed = false;
-	var children: Array<Handle>;
+	var children: Map<Int, Handle>;
 
 	public function new(ops: HandleOptions = null) {
 		if (ops != null) {
@@ -1443,9 +1443,11 @@ class Handle {
 
 	public function nest(i: Int, ops: HandleOptions = null): Handle {
 		if (children == null) children = [];
-		while (children.length <= i) children.push(null);
-		if (children[i] == null) children[i] = new Handle(ops);
-		return children[i];
+		var c = children.get(i);
+		if (c == null) {
+			children.set(i, c = new Handle(ops));
+		}
+		return c;
 	}
 
 	public static var global = new Handle();
