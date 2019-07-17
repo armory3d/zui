@@ -76,6 +76,7 @@ class Zui {
 
 	public var g: Graphics; // Drawing
 	var globalG: Graphics;
+	var rtTextPipeline: kha.graphics4.PipelineState; // rendering text into rendertargets
 
 	var t: zui.Themes.TTheme;
 	var SCALE: Float;
@@ -162,6 +163,10 @@ class Zui {
 				if ((isCopy || isPaste) && ++copyFrame > 1) { isCopy = isCut = isPaste = false; copyFrame = 0; }
 			});
 		}
+		var rtTextVS = kha.graphics4.Graphics2.createTextVertexStructure();
+		rtTextPipeline = kha.graphics4.Graphics2.createTextPipeline(rtTextVS);
+		rtTextPipeline.alphaBlendSource = BlendOne;
+		rtTextPipeline.compile();
 	}
 
 	public function setScale(factor: Float) {
@@ -1186,7 +1191,9 @@ class Zui {
 		else if (align == Right) xOffset = _w - ops.font.width(fontSize, text) - TEXT_OFFSET();
 
 		if (!enabled) fadeColor();
+		g.pipeline = rtTextPipeline;
 		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
+		g.pipeline = null;
 	}
 
 	function endElement(elementSize: Null<Float> = null) {
