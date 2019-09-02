@@ -14,6 +14,7 @@ class Nodes {
 	var dragged = false;
 	var moveOnTop: TNode = null;
 	var linkDrag: TNodeLink = null;
+	var isNewLink = false;
 	var snapFromId = -1;
 	var snapToId = -1;
 	var snapSocket = 0;
@@ -26,6 +27,7 @@ class Nodes {
 	static var clipboard = "";
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
+	public static var onLinkDrag: TNodeLink->Bool->Void = null;
 
 	public function new() {}
 
@@ -229,6 +231,7 @@ class Nodes {
 						var l = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
 						canvas.links.push(l);
 						linkDrag = l;
+						isNewLink = true;
 						break;
 					}
 				}
@@ -242,6 +245,7 @@ class Nodes {
 								if (l.to_id == node.id && l.to_socket == i) {
 									l.to_id = l.to_socket = -1;
 									linkDrag = l;
+									isNewLink = false;
 									break;
 								}
 							}
@@ -250,6 +254,7 @@ class Nodes {
 							var l = { id: getLinkId(canvas.links), from_id: -1, from_socket: -1, to_id: node.id, to_socket: i };
 							canvas.links.push(l);
 							linkDrag = l;
+							isNewLink = true;
 							break;
 						}
 					}
@@ -279,6 +284,9 @@ class Nodes {
 				else if (linkDrag != null) {
 					canvas.links.remove(linkDrag);
 					ui.changed = true;
+					if (onLinkDrag != null) {
+						onLinkDrag(linkDrag, isNewLink);
+					}
 				}
 				snapToId = snapFromId = -1;
 				linkDrag = null;
