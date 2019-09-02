@@ -31,6 +31,8 @@ class Zui {
 	public var imageInvertY = false;
 	public var scrollEnabled = true;
 	public var alwaysRedraw = false; // Hurts performance
+	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
+	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 
 	public var inputRegistered = false;
@@ -254,9 +256,7 @@ class Zui {
 		}
 		else tooltipShown = false;
 		if (last) endInput();
-		if (tabPressedHandle != null) {
-			tabPressedHandle = null;
-		}
+		tabPressedHandle = null;
 	}
 
 	function endInput() {
@@ -317,6 +317,21 @@ class Zui {
 
 		if (windowDirty(handle, x, y, w, h)) {
 			handle.redraws = 2;
+		}
+
+		if (onBorderHover != null) {
+			if (getInputInRect(_windowX - 4, _windowY, 8, _windowH)) {
+				onBorderHover(handle, 0);
+			}
+			else if (getInputInRect(_windowX + _windowW - 4, _windowY, 8, _windowH)) {
+				onBorderHover(handle, 1);
+			}
+			else if (getInputInRect(_windowX, _windowY - 4, _windowW, 8)) {
+				onBorderHover(handle, 2);
+			}
+			else if (getInputInRect(_windowX, _windowY + _windowH - 4, _windowW, 8)) {
+				onBorderHover(handle, 3);
+			}
 		}
 
 		if (handle.redraws <= 0) {
@@ -764,6 +779,7 @@ class Zui {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
+		if (hover && onTextHover != null) onTextHover();
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
 		drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
