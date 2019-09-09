@@ -86,7 +86,7 @@ class Canvas {
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
-			ui.t.TEXT_COL = element.color;
+			ui.t.TEXT_COL = element.color[1];
 			ui.text(getText(canvas, element));
 
 			ui.ops.font = font;
@@ -96,6 +96,10 @@ class Canvas {
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
+			ui.t.BUTTON_COL = element.color[0];
+			ui.t.BUTTON_TEXT_COL = element.color[1];
+			ui.t.BUTTON_HOVER_COL = element.color[2];
+			ui.t.BUTTON_PRESSED_COL = element.color[3];
 			if (ui.button(getText(canvas, element))) {
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
@@ -107,7 +111,7 @@ class Canvas {
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
 			if (image != null && !fontAsset) {
 				ui.imageScrollAlign = false;
-				var tint = element.color != null ? element.color : 0xffffffff;
+				var tint = element.color != null ? element.color[0] : 0xffffffff;
 				if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
 					var e = element.event;
 					if (e != null && e != "") events.push(e);
@@ -117,23 +121,41 @@ class Canvas {
 
 		case Shape:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = element.color[0];
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
 			ui.g.color = col;
 
 		case Check:
+			ui.t.TEXT_COL = element.color[1];
+			ui.t.ACCENT_COL = element.color[0];
+			ui.t.ACCENT_HOVER_COL = element.color[2];
 			ui.check(h.nest(element.id), getText(canvas, element));
 
 		case Radio:
+			ui.t.TEXT_COL = element.color[1];
+			ui.t.ACCENT_COL = element.color[0];
+			ui.t.ACCENT_HOVER_COL = element.color[2];
 			ui.inlineRadio(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Combo:
+			ui.t.TEXT_COL = element.color[1];
+			ui.t.LABEL_COL = element.color[1];
+			ui.t.ACCENT_COL = element.color[0];
+			ui.t.ACCENT_HOVER_COL = element.color[2];
 			ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Slider:
+			ui.t.TEXT_COL = element.color[1];
+			ui.t.LABEL_COL = element.color[1];
+			ui.t.ACCENT_COL = element.color[0];
+			ui.t.ACCENT_HOVER_COL = element.color[2];
 			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true);
 
 		case Input:
+			ui.t.TEXT_COL = element.color[1];
+			ui.t.LABEL_COL = element.color[1];
+			ui.t.ACCENT_COL = element.color[0];
+			ui.t.ACCENT_HOVER_COL = element.color[2];
 			ui.textInput(h.nest(element.id), getText(canvas, element));
 
 		case Empty:
@@ -199,7 +221,7 @@ typedef TElement = {
 	@:optional var rotation: Null<kha.FastFloat>;
 	@:optional var text: String;
 	@:optional var event: String;
-	@:optional var color: Null<Int>;
+	@:optional var color: Array<Int>;//[bg color, text color, hover color, pressed color]
 	@:optional var anchor: Null<Int>;
 	@:optional var parent: Null<Int>; // id
 	@:optional var children: Array<Int>; // ids
