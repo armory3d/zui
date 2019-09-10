@@ -132,19 +132,33 @@ class Canvas {
 		case FCircle:
 			var col = ui.g.color;
 			ui.g.color = element.color[0];
-			gE.fillCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), scaled(element.width)/2);
+			gE.fillCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2);
 			ui.g.color = col;
 
 		case Rectangle:
 			var col = ui.g.color;
 			ui.g.color = element.color[0];
-			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height));
+			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
 		
 		case Circle:
 			var col = ui.g.color;
 			ui.g.color = element.color[0];
-			gE.drawCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), scaled(element.width)/2);
+			gE.drawCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, element.strength);
+			ui.g.color = col;
+		
+		case FTriangle:
+			var col = ui.g.color;
+			ui.g.color = element.color[0];
+			ui.g.fillTriangle(ui._x+(ui._w/2), ui._y, ui._x, ui._y+scaled(element.height), ui._x+ui._w, ui._y+scaled(element.height));
+			ui.g.color = col;
+
+		case Triangle:
+			var col = ui.g.color;
+			ui.g.color = element.color[0];
+			ui.g.drawLine(ui._x+(ui._w/2), ui._y, ui._x, ui._y+scaled(element.height), element.strength);
+			ui.g.drawLine(ui._x, ui._y+scaled(element.height), ui._x+ui._w, ui._y+scaled(element.height), element.strength);
+			ui.g.drawLine(ui._x+ui._w, ui._y+scaled(element.height), ui._x+(ui._w/2), ui._y, element.strength);
 			ui.g.color = col;
 
 		case Check:
@@ -163,6 +177,7 @@ class Canvas {
 			ui.t.TEXT_COL = element.color[1];
 			ui.t.LABEL_COL = element.color[1];
 			ui.t.ACCENT_COL = element.color[0];
+			ui.t.SEPARATOR_COL = element.color[0];
 			ui.t.ACCENT_HOVER_COL = element.color[2];
 			ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
 
@@ -244,6 +259,7 @@ typedef TElement = {
 	@:optional var text: String;
 	@:optional var event: String;
 	@:optional var color: Array<Int>;//[bg color, text color, hover color, pressed color]
+	@:optional var strength: Null<Int>;
 	@:optional var anchor: Null<Int>;
 	@:optional var parent: Null<Int>; // id
 	@:optional var children: Array<Int>; // ids
@@ -283,6 +299,8 @@ typedef TTranslatedText = {
 	var Rectangle = 12;
 	var FCircle = 13;
 	var Circle = 14;
+	var FTriangle = 15;
+	var Triangle = 16;
 }
 
 @:enum abstract Anchor(Int) from Int {
