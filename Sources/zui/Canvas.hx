@@ -1,5 +1,7 @@
 package zui;
 
+import kha.graphics2.GraphicsExtension;
+
 @:access(zui.Zui)
 class Canvas {
 
@@ -46,6 +48,8 @@ class Canvas {
 
 		var cw = scaled(canvas.width);
 		var ch = scaled(canvas.height);
+
+		var gE = GraphicsExtension;
 
 		switch (element.anchor) {
 		case Top:
@@ -119,10 +123,28 @@ class Canvas {
 				ui.imageScrollAlign = true;
 			}
 
-		case Shape:
+		case FRectangle:
 			var col = ui.g.color;
 			ui.g.color = element.color[0];
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
+			ui.g.color = col;
+		
+		case FCircle:
+			var col = ui.g.color;
+			ui.g.color = element.color[0];
+			gE.fillCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), scaled(element.width)/2);
+			ui.g.color = col;
+
+		case Rectangle:
+			var col = ui.g.color;
+			ui.g.color = element.color[0];
+			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height));
+			ui.g.color = col;
+		
+		case Circle:
+			var col = ui.g.color;
+			ui.g.color = element.color[0];
+			gE.drawCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), scaled(element.width)/2);
 			ui.g.color = col;
 
 		case Check:
@@ -255,9 +277,12 @@ typedef TTranslatedText = {
 	var Check = 6;
 	var Radio = 7;
 	var Combo = 8;
-	var Shape = 9;
-	var Slider = 10;
-	var Input = 11;
+	var Slider = 9;
+	var Input = 10;
+	var FRectangle = 11;
+	var Rectangle = 12;
+	var FCircle = 13;
+	var Circle = 14;
 }
 
 @:enum abstract Anchor(Int) from Int {
