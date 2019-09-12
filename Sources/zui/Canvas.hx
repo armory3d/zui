@@ -49,8 +49,6 @@ class Canvas {
 		var cw = scaled(canvas.width);
 		var ch = scaled(canvas.height);
 
-		var gE = GraphicsExtension;
-
 		switch (element.anchor) {
 		case Top:
 			px -= (cw - screenW) / 2;
@@ -132,7 +130,7 @@ class Canvas {
 		case FCircle:
 			var col = ui.g.color;
 			ui.g.color = element.color_bg;
-			gE.fillCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2);
+			ui.g.fillCircle(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2);
 			ui.g.color = col;
 
 		case Rectangle:
@@ -144,7 +142,7 @@ class Canvas {
 		case Circle:
 			var col = ui.g.color;
 			ui.g.color = element.color_bg;
-			gE.drawCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, element.strength);
+			ui.g.drawCircle(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, element.strength);
 			ui.g.color = col;
 		
 		case FTriangle:
@@ -209,9 +207,9 @@ class Canvas {
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
 			ui.g.color = element.color_bg;
-			gE.drawArc(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, (0*3.14/180)-(90*3.14/180), ((360/totalprogress * progress)*3.14/180)-(90*3.14/180), element.strength);
+			ui.g.drawArc(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, (0*3.14/180)-(90*3.14/180), ((360/totalprogress * progress)*3.14/180)-(90*3.14/180), element.strength);
 			ui.g.color = 0xffe8e7e5;
-			gE.fillCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), (ui._w/2)-10);
+			ui.g.fillCircle(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), (ui._w/2)-10);
 			ui.g.color = col;
 		case Empty:
 		}
