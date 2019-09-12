@@ -209,7 +209,7 @@ class Canvas {
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
 			ui.g.color = element.color_bg;
-			gE.drawArc(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, 0*3.14/180, (360/totalprogress * progress)*3.14/180, element.strength);
+			gE.drawArc(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, (0*3.14/180)-(90*3.14/180), ((360/totalprogress * progress)*3.14/180)-(90*3.14/180), element.strength);
 			ui.g.color = 0xffe8e7e5;
 			gE.fillCircle(ui.g, ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), (ui._w/2)-10);
 			ui.g.color = col;
