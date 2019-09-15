@@ -130,7 +130,7 @@ class Canvas {
 		case FCircle:
 			var col = ui.g.color;
 			ui.g.color = element.color_bg;
-			ui.g.fillCircle(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2);
+			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2);
 			ui.g.color = col;
 
 		case Rectangle:
@@ -142,21 +142,21 @@ class Canvas {
 		case Circle:
 			var col = ui.g.color;
 			ui.g.color = element.color_bg;
-			ui.g.drawCircle(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, element.strength);
+			ui.g.drawCircle(ui._x+(scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, element.strength);
 			ui.g.color = col;
 		
 		case FTriangle:
 			var col = ui.g.color;
 			ui.g.color = element.color_bg;
-			ui.g.fillTriangle(ui._x+(ui._w/2), ui._y, ui._x, ui._y+scaled(element.height), ui._x+ui._w, ui._y+scaled(element.height));
+			ui.g.fillTriangle(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height));
 			ui.g.color = col;
 
 		case Triangle:
 			var col = ui.g.color;
 			ui.g.color = element.color_bg;
-			ui.g.drawLine(ui._x+(ui._w/2), ui._y, ui._x, ui._y+scaled(element.height), element.strength);
-			ui.g.drawLine(ui._x, ui._y+scaled(element.height), ui._x+ui._w, ui._y+scaled(element.height), element.strength);
-			ui.g.drawLine(ui._x+ui._w, ui._y+scaled(element.height), ui._x+(ui._w/2), ui._y, element.strength);
+			ui.g.drawLine(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), element.strength);
+			ui.g.drawLine(ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height), element.strength);
+			ui.g.drawLine(ui._x + ui._w, ui._y + scaled(element.height), ui._x + (ui._w / 2), ui._y, element.strength);
 			ui.g.color = col;
 
 		case Check:
@@ -207,9 +207,9 @@ class Canvas {
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
 			ui.g.color = element.color_bg;
-			ui.g.drawArc(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), ui._w/2, (0*3.14/180)-(90*3.14/180), ((360/totalprogress * progress)*3.14/180)-(90*3.14/180), element.strength);
+			ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
 			ui.g.color = 0xffe8e7e5;
-			ui.g.fillCircle(ui._x+(scaled(element.width)/2), ui._y+(scaled(element.height)/2), (ui._w/2)-10);
+			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
 			ui.g.color = col;
 		case Empty:
 		}
@@ -274,7 +274,6 @@ typedef TElement = {
 	@:optional var rotation: Null<kha.FastFloat>;
 	@:optional var text: String;
 	@:optional var event: String;
-	//@:optional var color: Array<Int>;//[bg color, text color, hover color, pressed color]
 	@:optional var color_bg: Null<Int>;
 	@:optional var color_text: Null<Int>;
 	@:optional var color_hover: Null<Int>;
@@ -305,7 +304,7 @@ typedef TTranslatedText = {
 	var text: String;
 }
 
-@:enum abstract ElementType(Int) from Int {
+@:enum abstract ElementType(Int) from Int to Int {
 	var Text = 0;
 	var Image = 1;
 	var Button = 2;
@@ -327,7 +326,7 @@ typedef TTranslatedText = {
 	var CProgressBar = 18;
 }
 
-@:enum abstract Anchor(Int) from Int {
+@:enum abstract Anchor(Int) from Int to Int {
 	var TopLeft = 0;
 	var Top = 1;
 	var TopRight = 2;
