@@ -98,7 +98,7 @@ class Canvas {
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
-			ui.t.BUTTON_COL = element.color_bg;
+			ui.t.BUTTON_COL = element.color;
 			ui.t.BUTTON_TEXT_COL = element.color_text;
 			ui.t.BUTTON_HOVER_COL = element.color_hover;
 			ui.t.BUTTON_PRESSED_COL = element.color_press;
@@ -113,7 +113,7 @@ class Canvas {
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
 			if (image != null && !fontAsset) {
 				ui.imageScrollAlign = false;
-				var tint = element.color_bg != null ? element.color_bg : 0xffffffff;
+				var tint = element.color != null ? element.color : 0xffffffff;
 				if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
 					var e = element.event;
 					if (e != null && e != "") events.push(e);
@@ -123,37 +123,37 @@ class Canvas {
 
 		case FRectangle:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
 			ui.g.color = col;
 		
 		case FCircle:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2);
 			ui.g.color = col;
 
 		case Rectangle:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
 		
 		case Circle:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.drawCircle(ui._x+(scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, element.strength);
 			ui.g.color = col;
 		
 		case FTriangle:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.fillTriangle(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height));
 			ui.g.color = col;
 
 		case Triangle:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.drawLine(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), element.strength);
 			ui.g.drawLine(ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height), element.strength);
 			ui.g.drawLine(ui._x + ui._w, ui._y + scaled(element.height), ui._x + (ui._w / 2), ui._y, element.strength);
@@ -161,41 +161,41 @@ class Canvas {
 
 		case Check:
 			ui.t.TEXT_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color_bg;
+			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.check(h.nest(element.id), getText(canvas, element));
 
 		case Radio:
 			ui.t.TEXT_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color_bg;
+			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.inlineRadio(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Combo:
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color_bg;
-			ui.t.SEPARATOR_COL = element.color_bg;
+			ui.t.ACCENT_COL = element.color;
+			ui.t.SEPARATOR_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Slider:
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color_bg;
+			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true);
 
 		case Input:
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color_bg;
+			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.textInput(h.nest(element.id), getText(canvas, element));
 
 		case ProgressBar:
 			var col = ui.g.color;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
 			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
@@ -206,7 +206,7 @@ class Canvas {
 			var col = ui.g.color;
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
-			ui.g.color = element.color_bg;
+			ui.g.color = element.color;
 			ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
 			ui.g.color = 0xffe8e7e5;
 			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
@@ -274,7 +274,7 @@ typedef TElement = {
 	@:optional var rotation: Null<kha.FastFloat>;
 	@:optional var text: String;
 	@:optional var event: String;
-	@:optional var color_bg: Null<Int>;
+	@:optional var color: Null<Int>;
 	@:optional var color_text: Null<Int>;
 	@:optional var color_hover: Null<Int>;
 	@:optional var color_press: Null<Int>;
