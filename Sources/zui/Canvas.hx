@@ -195,11 +195,12 @@ class Canvas {
 
 		case ProgressBar:
 			var col = ui.g.color;
-			ui.g.color = element.color;
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
-			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
+			ui.g.color = element.color_progress;
 			ui.g.fillRect(ui._x, ui._y, ui._w / totalprogress * Math.min(progress, totalprogress), scaled(element.height));
+			ui.g.color = element.color;
+			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
 		
 		case CProgressBar:
@@ -208,7 +209,7 @@ class Canvas {
 			var totalprogress = element.progress_total;
 			ui.g.color = element.color;
 			ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
-			ui.g.color = 0xffe8e7e5;
+			ui.g.color = element.color;
 			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
 			ui.g.color = col;
 		case Empty:
@@ -278,6 +279,7 @@ typedef TElement = {
 	@:optional var color_text: Null<Int>;
 	@:optional var color_hover: Null<Int>;
 	@:optional var color_press: Null<Int>;
+	@:optional var color_progress: Null<Int>;
 	@:optional var progress_at: Null<Int>;
 	@:optional var progress_total: Null<Int>;
 	@:optional var strength: Null<Int>;
