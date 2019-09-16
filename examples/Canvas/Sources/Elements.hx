@@ -23,7 +23,7 @@ class Elements {
 				width: 200,
 				height: 50,
 				text: "Label",
-				color: 0xffff0000
+				color_text: 0xffe8e7e5
 			},
 			{
 				id: 1,
@@ -33,7 +33,11 @@ class Elements {
 				y: 100,
 				width: 100,
 				height: 50,
-				text: "Button"
+				text: "Button",
+				color: 0xff484848,
+				color_text: 0xffe8e7e5,
+				color_hover: 0xff3b3b3b,
+				color_press: 0xff1b1b1b
 			},
 			{
 				id: 2,
@@ -43,7 +47,8 @@ class Elements {
 				y: 100,
 				width: 140,
 				height: 140,
-				asset: "kode"
+				asset: "kode",
+				color: 0xffffffff
 			}
 		],
 		assets: [
