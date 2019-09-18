@@ -207,7 +207,7 @@ class Canvas {
 			var col = ui.g.color;
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
-			ui.g.color = element.color;
+			ui.g.color = element.color_progress;
 			ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
 			ui.g.color = element.color;
 			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
