@@ -51,6 +51,7 @@ class Zui {
 	var inputDown: Bool;
 	var inputDownR: Bool;
 	var isKeyDown = false; // Keys
+	var isKeyPressed = false;
 	var isShiftDown = false;
 	var isCtrlDown = false;
 	var isAltDown = false;
@@ -1365,6 +1366,7 @@ class Zui {
 	public function onKeyDown(code: KeyCode) {
 		this.key = code;
 		isKeyDown = true;
+		isKeyPressed = true;
 		switch code {
 		case KeyCode.Shift: isShiftDown = true;
 		case KeyCode.Control: isCtrlDown = true;
@@ -1378,6 +1380,7 @@ class Zui {
 	}
 
 	public function onKeyUp(code: KeyCode) {
+		isKeyPressed = false;
 		switch code {
 		case KeyCode.Shift: isShiftDown = false;
 		case KeyCode.Control: isCtrlDown = false;
