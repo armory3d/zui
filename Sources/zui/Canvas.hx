@@ -193,6 +193,13 @@ class Canvas {
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.textInput(h.nest(element.id), getText(canvas, element));
 
+		case KeyInput:
+			ui.t.TEXT_COL = element.color_text;
+			ui.t.LABEL_COL = element.color_text;
+			ui.t.ACCENT_COL = element.color;
+			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.keyInput(h.nest(element.id), getText(canvas, element));
+
 		case ProgressBar:
 			var col = ui.g.color;
 			var progress = element.progress_at;
@@ -318,14 +325,15 @@ typedef TTranslatedText = {
 	var Combo = 8;
 	var Slider = 9;
 	var Input = 10;
-	var FRectangle = 11;
-	var Rectangle = 12;
-	var FCircle = 13;
-	var Circle = 14;
-	var FTriangle = 15;
-	var Triangle = 16;
-	var ProgressBar = 17;
-	var CProgressBar = 18;
+	var KeyInput = 11;
+	var FRectangle = 12;
+	var Rectangle = 13;
+	var FCircle = 14;
+	var Circle = 15;
+	var FTriangle = 16;
+	var Triangle = 17;
+	var ProgressBar = 18;
+	var CProgressBar = 19;
 }
 
 @:enum abstract Anchor(Int) from Int to Int {
