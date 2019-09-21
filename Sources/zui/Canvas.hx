@@ -186,7 +186,7 @@ class Canvas {
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true);
 
-		case Input:
+		case TextInput:
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.LABEL_COL = element.color_text;
 			ui.t.ACCENT_COL = element.color;
@@ -324,7 +324,7 @@ typedef TTranslatedText = {
 	var Radio = 7;
 	var Combo = 8;
 	var Slider = 9;
-	var Input = 10;
+	var TextInput = 10;
 	var KeyInput = 11;
 	var FRectangle = 12;
 	var Rectangle = 13;
