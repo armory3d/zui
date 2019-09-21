@@ -848,9 +848,12 @@ class Zui {
 	function listenToKey(handle: Handle) {
 		if (isKeyDown) {
 			handle.value = key;
-			handle.changed = true;
+			handle.changed = changed = true;
 
 			textSelectedHandle = null;
+			isTyping = false;
+
+			if (Keyboard.get() != null) Keyboard.get().hide();
 		} else {
 			textSelectedCurrentText = "Press a key...";
 		}
