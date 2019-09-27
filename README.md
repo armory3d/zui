@@ -36,7 +36,8 @@ function tab(id: Handle, text: String): Bool;
 function panel(id: Handle, text: String, accent = 1): Bool;
 function image(image: Image): State;
 function text(text: String, align = Left, bg = 0);
-function textInput(id: Handle, label = ""): String;
+function textInput(handle: Handle, label = ""): String;
+function keyInput(handle: Handle, label = ""): Int; // Int -> kha.input.KeyCode
 function button(text: String, align = Center, label = ""): Bool;
 function check(id: Handle, text: String): Bool;
 function radio(groupId: Handle, pos: Int, text: String): Bool;
