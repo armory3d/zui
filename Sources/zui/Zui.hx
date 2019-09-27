@@ -50,7 +50,8 @@ class Zui {
 	var inputReleasedR: Bool;
 	var inputDown: Bool;
 	var inputDownR: Bool;
-	var isKeyDown = false; // Keys
+	var isKeyPressed = false; // Keys
+	var isKeyDown = false;
 	var isShiftDown = false;
 	var isCtrlDown = false;
 	var isAltDown = false;
@@ -260,7 +261,7 @@ class Zui {
 	}
 
 	function endInput() {
-		isKeyDown = false; // Reset input - only one char for now
+		isKeyPressed = false; // Reset input - only one char for now
 		inputStarted = false;
 		inputStartedR = false;
 		inputReleased = false;
@@ -288,7 +289,7 @@ class Zui {
 	}
 
 	function inputChanged(): Bool {
-		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputStartedR || inputReleased || inputReleasedR || inputDown || inputDownR || isKeyDown;
+		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputStartedR || inputReleased || inputReleasedR || inputDown || inputDownR || isKeyPressed;
 	}
 
 	public function windowDirty(handle: Handle, x: Int, y: Int, w: Int, h: Int) {
@@ -634,7 +635,7 @@ class Zui {
 		textSelectedCurrentText = handle.text;
 		if (tabPressed) {
 			tabPressed = false;
-			isKeyDown = false; // Prevent text deselect after tab press
+			isKeyPressed = false; // Prevent text deselect after tab press
 		}
 		tabPressedHandle = handle;
 		cursorX = handle.text.length;
@@ -653,7 +654,7 @@ class Zui {
 
 	function updateTextEdit(align: Align = Left) {
 		var text = textSelectedCurrentText;
-		if (isKeyDown) { // Process input
+		if (isKeyPressed) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
 			}
@@ -1364,6 +1365,7 @@ class Zui {
 
 	public function onKeyDown(code: KeyCode) {
 		this.key = code;
+		isKeyPressed = true;
 		isKeyDown = true;
 		switch code {
 		case KeyCode.Shift: isShiftDown = true;
@@ -1378,6 +1380,7 @@ class Zui {
 	}
 
 	public function onKeyUp(code: KeyCode) {
+		isKeyDown = false;
 		switch code {
 		case KeyCode.Shift: isShiftDown = false;
 		case KeyCode.Control: isCtrlDown = false;
@@ -1391,7 +1394,7 @@ class Zui {
 
 	public function onKeyPress(char: String) {
 		this.char = char;
-		isKeyDown = true;
+		isKeyPressed = true;
 	}
 
 	public function onCut(): String { isCut = true; return onCopy(); }
