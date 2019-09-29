@@ -1125,7 +1125,7 @@ class Zui {
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Right);
 			_y += elementSize;
-			fill(0, 0, _w, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
+			fill(0, 0, _w / SCALE, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
 		}
 
 		inputEnabled = true;
@@ -1143,7 +1143,7 @@ class Zui {
 		t.BUTTON_COL = BUTTON_COL;
 
 		if (!outOfScreen) {
-			fill(0, 0, _w, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
+			fill(0, 0, _w / SCALE, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Right);
 		}
