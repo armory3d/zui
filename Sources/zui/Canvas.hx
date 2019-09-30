@@ -198,7 +198,7 @@ class Canvas {
 			ui.t.LABEL_COL = element.color_text;
 			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
-			ui.keyInput(h.nest(element.id), getText(canvas, element));
+			Ext.keyInput(ui, h.nest(element.id), getText(canvas, element));
 
 		case ProgressBar:
 			var col = ui.g.color;

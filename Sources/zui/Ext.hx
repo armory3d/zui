@@ -1,6 +1,8 @@
 package zui;
 
 import zui.Zui;
+import kha.input.Keyboard;
+import kha.input.KeyCode;
 
 typedef ListOpts = {
 	?addCb: String->Void,
@@ -22,6 +24,51 @@ class Ext {
 		var text = ui.textInput(handle, label, align);
 		handle.value = Std.parseFloat(text);
 		return handle.value;
+	}
+
+	public static function keyInput(ui: Zui, handle: Handle, label = "", align: Align = Left): Int {
+		if (!ui.isVisible(ui.ELEMENT_H())) { ui.endElement(); return Std.int(handle.value); }
+
+		var hover = ui.getHover();
+		if (hover && Zui.onTextHover != null) Zui.onTextHover();
+		ui.g.color = hover ? ui.t.ACCENT_HOVER_COL : ui.t.ACCENT_COL; // Text bg
+		ui.drawRect(ui.g, ui.t.FILL_ACCENT_BG, ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, ui.BUTTON_H());
+
+		var startEdit = ui.getReleased() || ui.tabPressed;
+		if (ui.textSelectedHandle != handle && startEdit) ui.startTextEdit(handle);
+		if (ui.textSelectedHandle == handle) Ext.listenToKey(ui, handle);
+		else handle.changed = false;
+
+		if (label != "") {
+			ui.g.color = ui.t.LABEL_COL; // Label
+			var labelAlign = align == Align.Right ? Align.Left : Align.Right;
+			var xOffset = labelAlign == Align.Left ? 7 : 0;
+			ui.drawString(ui.g, label, xOffset, 0, labelAlign);
+		}
+
+		handle.text = Ext.keycodeToString(Std.int(handle.value));
+
+		ui.g.color = ui.t.TEXT_COL; // Text
+		ui.textSelectedHandle != handle ? ui.drawString(ui.g, handle.text, null, 0, align) : ui.drawString(ui.g, ui.textSelectedCurrentText, null, 0, align);
+
+		ui.endElement();
+
+		return Std.int(handle.value);
+		return 0;
+	}
+
+	static function listenToKey(ui: Zui, handle: Handle) {
+		if (ui.isKeyDown) {
+			handle.value = ui.key;
+			handle.changed = ui.changed = true;
+
+			ui.textSelectedHandle = null;
+			ui.isTyping = false;
+
+			if (Keyboard.get() != null) Keyboard.get().hide();
+		} else {
+			ui.textSelectedCurrentText = "Press a key...";
+		}
 	}
 
 	public static function list(ui: Zui, handle: Handle, ar: Array<Dynamic>, ?opts: ListOpts ): Int {
@@ -251,6 +298,167 @@ class Ext {
 		handle.color = kha.Color.fromFloats(ar[0], ar[1], ar[2], calpha);
 		ui.text("", Right, handle.color);
 		return handle.color;
+	}
+
+	/*
+	Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
+	*/
+	public static function keycodeToString(keycode:Int): String {
+		switch(keycode) {
+			case -1: return "None";
+			case KeyCode.Unknown: return "Unknown";
+			case KeyCode.Back: return "Back";
+			case KeyCode.Cancel: return "Cancel";
+			case KeyCode.Help: return "Help";
+			case KeyCode.Backspace: return "Backspace";
+			case KeyCode.Tab: return "Tab";
+			case KeyCode.Clear: return "Clear";
+			case KeyCode.Return: return "Return";
+			case KeyCode.Shift: return "Shift";
+			case KeyCode.Control: return "Ctrl";
+			case KeyCode.Alt: return "Alt";
+			case KeyCode.Pause: return "Pause";
+			case KeyCode.CapsLock: return "CapsLock";
+			case KeyCode.Kana: return "Kana";
+			case KeyCode.Hangul: return "Hangul";
+			case KeyCode.Eisu: return "Eisu";
+			case KeyCode.Junja: return "Junja";
+			case KeyCode.Final: return "Final";
+			case KeyCode.Hanja: return "Hanja";
+			case KeyCode.Kanji: return "Kanji";
+			case KeyCode.Escape: return "Esc";
+			case KeyCode.Convert: return "Convert";
+			case KeyCode.NonConvert: return "NonConvert";
+			case KeyCode.Accept: return "Accept";
+			case KeyCode.ModeChange: return "ModeChange";
+			case KeyCode.Space: return "Space";
+			case KeyCode.PageUp: return "PageUp";
+			case KeyCode.PageDown: return "PageDown";
+			case KeyCode.End: return "End";
+			case KeyCode.Home: return "Home";
+			case KeyCode.Left: return "Left";
+			case KeyCode.Up: return "Up";
+			case KeyCode.Right: return "Right";
+			case KeyCode.Down: return "Down";
+			case KeyCode.Select: return "Select";
+			case KeyCode.Print: return "Print";
+			case KeyCode.Execute: return "Execute";
+			case KeyCode.PrintScreen: return "PrintScreen";
+			case KeyCode.Insert: return "Insert";
+			case KeyCode.Delete: return "Delete";
+			case KeyCode.Colon: return "Colon";
+			case KeyCode.Semicolon: return "Semicolon";
+			case KeyCode.LessThan: return "LessThan";
+			case KeyCode.Equals: return "Equals";
+			case KeyCode.GreaterThan: return "GreaterThan";
+			case KeyCode.QuestionMark: return "QuestionMark";
+			case KeyCode.At: return "At";
+			case KeyCode.Win: return "Win";
+			case KeyCode.ContextMenu: return "ContextMenu";
+			case KeyCode.Sleep: return "Sleep";
+			case KeyCode.Numpad0: return "Numpad0";
+			case KeyCode.Numpad1: return "Numpad1";
+			case KeyCode.Numpad2: return "Numpad2";
+			case KeyCode.Numpad3: return "Numpad3";
+			case KeyCode.Numpad4: return "Numpad4";
+			case KeyCode.Numpad5: return "Numpad5";
+			case KeyCode.Numpad6: return "Numpad6";
+			case KeyCode.Numpad7: return "Numpad7";
+			case KeyCode.Numpad8: return "Numpad8";
+			case KeyCode.Numpad9: return "Numpad9";
+			case KeyCode.Multiply: return "Multiply";
+			case KeyCode.Add: return "Add";
+			case KeyCode.Separator: return "Separator";
+			case KeyCode.Subtract: return "Subtract";
+			case KeyCode.Decimal: return "Decimal";
+			case KeyCode.Divide: return "Divide";
+			case KeyCode.F1: return "F1";
+			case KeyCode.F2: return "F2";
+			case KeyCode.F3: return "F3";
+			case KeyCode.F4: return "F4";
+			case KeyCode.F5: return "F5";
+			case KeyCode.F6: return "F6";
+			case KeyCode.F7: return "F7";
+			case KeyCode.F8: return "F8";
+			case KeyCode.F9: return "F9";
+			case KeyCode.F10: return "F10";
+			case KeyCode.F11: return "F11";
+			case KeyCode.F12: return "F12";
+			case KeyCode.F13: return "F13";
+			case KeyCode.F14: return "F14";
+			case KeyCode.F15: return "F15";
+			case KeyCode.F16: return "F16";
+			case KeyCode.F17: return "F17";
+			case KeyCode.F18: return "F18";
+			case KeyCode.F19: return "F19";
+			case KeyCode.F20: return "F20";
+			case KeyCode.F21: return "F21";
+			case KeyCode.F22: return "F22";
+			case KeyCode.F23: return "F23";
+			case KeyCode.F24: return "F24";
+			case KeyCode.NumLock: return "NumLock";
+			case KeyCode.ScrollLock: return "ScrollLock";
+			case KeyCode.WinOemFjJisho: return "WinOemFjJisho";
+			case KeyCode.WinOemFjMasshou: return "WinOemFjMasshou";
+			case KeyCode.WinOemFjTouroku: return "WinOemFjTouroku";
+			case KeyCode.WinOemFjLoya: return "WinOemFjLoya";
+			case KeyCode.WinOemFjRoya: return "WinOemFjRoya";
+			case KeyCode.Circumflex: return "Circumflex";
+			case KeyCode.Exclamation: return "Exclamation";
+			case KeyCode.DoubleQuote: return "DoubleQuote";
+			case KeyCode.Hash: return "Hash";
+			case KeyCode.Dollar: return "Dollar";
+			case KeyCode.Percent: return "Percent";
+			case KeyCode.Ampersand: return "Ampersand";
+			case KeyCode.Underscore: return "Underscore";
+			case KeyCode.OpenParen: return "OpenParen";
+			case KeyCode.CloseParen: return "CloseParen";
+			case KeyCode.Asterisk: return "Asterisk";
+			case KeyCode.Plus: return "Plus";
+			case KeyCode.Pipe: return "Pipe";
+			case KeyCode.HyphenMinus: return "HyphenMinus";
+			case KeyCode.OpenCurlyBracket: return "OpenCurlyBracket";
+			case KeyCode.CloseCurlyBracket: return "CloseCurlyBracket";
+			case KeyCode.Tilde: return "Tilde";
+			case KeyCode.VolumeMute: return "VolumeMute";
+			case KeyCode.VolumeDown: return "VolumeDown";
+			case KeyCode.VolumeUp: return "VolumeUp";
+			case KeyCode.Comma: return "Comma";
+			case KeyCode.Period: return "Period";
+			case KeyCode.Slash: return "Slash";
+			case KeyCode.BackQuote: return "BackQuote";
+			case KeyCode.OpenBracket: return "OpenBracket";
+			case KeyCode.BackSlash: return "BackSlash";
+			case KeyCode.CloseBracket: return "CloseBracket";
+			case KeyCode.Quote: return "Quote";
+			case KeyCode.Meta: return "Meta";
+			case KeyCode.AltGr: return "AltGr";
+			case KeyCode.WinIcoHelp: return "WinIcoHelp";
+			case KeyCode.WinIco00: return "WinIco00";
+			case KeyCode.WinIcoClear: return "WinIcoClear";
+			case KeyCode.WinOemReset: return "WinOemReset";
+			case KeyCode.WinOemJump: return "WinOemJump";
+			case KeyCode.WinOemPA1: return "WinOemPA1";
+			case KeyCode.WinOemPA2: return "WinOemPA2";
+			case KeyCode.WinOemPA3: return "WinOemPA3";
+			case KeyCode.WinOemWSCTRL: return "WinOemWSCTRL";
+			case KeyCode.WinOemCUSEL: return "WinOemCUSEL";
+			case KeyCode.WinOemATTN: return "WinOemATTN";
+			case KeyCode.WinOemFinish: return "WinOemFinish";
+			case KeyCode.WinOemCopy: return "WinOemCopy";
+			case KeyCode.WinOemAuto: return "WinOemAuto";
+			case KeyCode.WinOemENLW: return "WinOemENLW";
+			case KeyCode.WinOemBackTab: return "WinOemBackTab";
+			case KeyCode.ATTN: return "ATTN";
+			case KeyCode.CRSEL: return "CRSEL";
+			case KeyCode.EXSEL: return "EXSEL";
+			case KeyCode.EREOF: return "EREOF";
+			case KeyCode.Play: return "Play";
+			case KeyCode.Zoom: return "Zoom";
+			case KeyCode.PA1: return "PA1";
+			case KeyCode.WinOemClear: return "WinOemClear";
+		}
+		return String.fromCharCode(keycode);
 	}
 
 	static inline function dist(x1: Float, y1: Float, x2: Float, y2: Float): Float {
