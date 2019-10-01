@@ -299,8 +299,8 @@ typedef TElement = {
 
 typedef TAsset = {
 	var id: Int;
-	var name:String;
-	var file:String;
+	var name: String;
+	var file: String;
 }
 
 typedef TLocale = {

@@ -54,7 +54,6 @@ class Ext {
 		ui.endElement();
 
 		return Std.int(handle.value);
-		return 0;
 	}
 
 	static function listenToKey(ui: Zui, handle: Handle) {
@@ -66,7 +65,8 @@ class Ext {
 			ui.isTyping = false;
 
 			if (Keyboard.get() != null) Keyboard.get().hide();
-		} else {
+		}
+		else {
 			ui.textSelectedCurrentText = "Press a key...";
 		}
 	}
@@ -303,7 +303,7 @@ class Ext {
 	/*
 	Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
 	*/
-	public static function keycodeToString(keycode:Int): String {
+	static function keycodeToString(keycode: Int): String {
 		switch(keycode) {
 			case -1: return "None";
 			case KeyCode.Unknown: return "Unknown";

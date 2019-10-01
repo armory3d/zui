@@ -32,18 +32,17 @@ Portable immediate mode UI library designed for tools and debug interfaces. Writ
 
 ## Elements
 ``` hx
-function tab(id: Handle, text: String): Bool;
-function panel(id: Handle, text: String, accent = 1): Bool;
+function tab(handle: Handle, text: String): Bool;
+function panel(handle: Handle, text: String, accent = 1): Bool;
 function image(image: Image): State;
 function text(text: String, align = Left, bg = 0);
 function textInput(handle: Handle, label = ""): String;
-function keyInput(handle: Handle, label = ""): Int; // Int -> kha.input.KeyCode
 function button(text: String, align = Center, label = ""): Bool;
-function check(id: Handle, text: String): Bool;
+function check(handle: Handle, text: String): Bool;
 function radio(groupId: Handle, pos: Int, text: String): Bool;
-function inlineRadio(id: Handle, texts: Array<String>): Int;
-function combo(id: Handle, texts: Array<String>, label = ""): Int;
-function slider(id: String, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
+function inlineRadio(handle: Handle, texts: Array<String>): Int;
+function combo(handle: Handle, texts: Array<String>, label = ""): Int;
+function slider(handle: Handle, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
 function tooltip(text: String);
 function tooltipImage(image: Image);
 
@@ -66,6 +65,7 @@ function panelList(...);
 function colorPicker(...);
 function colorWheel(...); 
 function fileBrowser(...);
+function keyInput(handle: Handle, label = ""): kha.input.KeyCode;
 ```
 
 Nodes.hx - drawing node systems
