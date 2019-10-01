@@ -15,7 +15,7 @@ class Canvas {
 	static var h = new zui.Zui.Handle(); // TODO: needs one handle per canvas
 
 	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
-		
+
 		if (screenW == -1) {
 			screenW = kha.System.windowWidth();
 			screenH = kha.System.windowHeight();
@@ -84,7 +84,7 @@ class Canvas {
 			var font = ui.ops.font;
 			var size = ui.fontSize;
 			var tcol = ui.t.TEXT_COL;
-			
+
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
@@ -94,7 +94,7 @@ class Canvas {
 			ui.ops.font = font;
 			ui.fontSize = size;
 			ui.t.TEXT_COL = tcol;
-		
+
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
@@ -107,7 +107,7 @@ class Canvas {
 				if (e != null && e != "") events.push(e);
 			}
 			ui.t.BUTTON_H = bh;
-		
+
 		case Image:
 			var image = getAsset(canvas, element.asset);
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
@@ -126,7 +126,7 @@ class Canvas {
 			ui.g.color = element.color;
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
 			ui.g.color = col;
-		
+
 		case FCircle:
 			var col = ui.g.color;
 			ui.g.color = element.color;
@@ -138,13 +138,13 @@ class Canvas {
 			ui.g.color = element.color;
 			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
-		
+
 		case Circle:
 			var col = ui.g.color;
 			ui.g.color = element.color;
 			ui.g.drawCircle(ui._x+(scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, element.strength);
 			ui.g.color = col;
-		
+
 		case FTriangle:
 			var col = ui.g.color;
 			ui.g.color = element.color;
@@ -186,12 +186,19 @@ class Canvas {
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true);
 
-		case Input:
+		case TextInput:
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.LABEL_COL = element.color_text;
 			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
 			ui.textInput(h.nest(element.id), getText(canvas, element));
+
+		case KeyInput:
+			ui.t.TEXT_COL = element.color_text;
+			ui.t.LABEL_COL = element.color_text;
+			ui.t.ACCENT_COL = element.color;
+			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			Ext.keyInput(ui, h.nest(element.id), getText(canvas, element));
 
 		case ProgressBar:
 			var col = ui.g.color;
@@ -202,7 +209,7 @@ class Canvas {
 			ui.g.color = element.color;
 			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
-		
+
 		case CProgressBar:
 			var col = ui.g.color;
 			var progress = element.progress_at;
@@ -317,15 +324,16 @@ typedef TTranslatedText = {
 	var Radio = 7;
 	var Combo = 8;
 	var Slider = 9;
-	var Input = 10;
-	var FRectangle = 11;
-	var Rectangle = 12;
-	var FCircle = 13;
-	var Circle = 14;
-	var FTriangle = 15;
-	var Triangle = 16;
-	var ProgressBar = 17;
-	var CProgressBar = 18;
+	var TextInput = 10;
+	var KeyInput = 11;
+	var FRectangle = 12;
+	var Rectangle = 13;
+	var FCircle = 14;
+	var Circle = 15;
+	var FTriangle = 16;
+	var Triangle = 17;
+	var ProgressBar = 18;
+	var CProgressBar = 19;
 }
 
 @:enum abstract Anchor(Int) from Int to Int {

@@ -192,7 +192,7 @@ class Zui {
 		radioSelectOffsetX = radioSelectOffsetY;
 		elementsBaked = false;
 	}
-	
+
 	function bakeElements() {
 		if (checkSelectImage != null) {
 			checkSelectImage.unload();
@@ -370,7 +370,7 @@ class Zui {
 				handle.dragX += Std.int(inputDX);
 				handle.dragY += Std.int(inputDY);
 			}
-			_y += 15; // Header offset 
+			_y += 15; // Header offset
 			windowHeader += 15;
 		}
 
@@ -405,7 +405,7 @@ class Zui {
 				var ratio = amountScrolled / amountToScroll;
 				var barH = _windowH * Math.abs(_windowH / fullHeight);
 				barH = Math.max(barH, ELEMENT_H());
-				
+
 				var totalScrollableArea = _windowH - barH;
 				var e = amountToScroll / totalScrollableArea;
 				var barY = totalScrollableArea * ratio;
@@ -416,7 +416,7 @@ class Zui {
 					scrollingHandle = handle;
 					isScrolling = true;
 				}
-				
+
 				if (handle.scrolling) { // Scroll
 					scroll(inputDY * e, fullHeight);
 				}
@@ -424,7 +424,7 @@ class Zui {
 						 getInputInRect(_windowX, _windowY, _windowW, _windowH)) { // Wheel
 					scroll(inputWheelDelta * ELEMENT_H(), fullHeight);
 				}
-				
+
 				//Stay in bounds
 				if (handle.scrollOffset > 0) {
 					handle.scrollOffset = 0;
@@ -432,7 +432,7 @@ class Zui {
 				else if (fullHeight + handle.scrollOffset < _windowH) {
 					handle.scrollOffset = _windowH - fullHeight;
 				}
-				
+
 				g.color = t.WINDOW_BG_COL; // Bg
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = t.ACCENT_COL; // Bar
@@ -476,7 +476,7 @@ class Zui {
 			windowHeader += buttonOffsetY + BUTTON_H();
 			restoreX = inputX; // Mouse in tab header, disable clicks for tab content
 			restoreY = inputY;
-			if (getInputInRect(_windowX, _windowY, _windowW, windowHeader)) { 
+			if (getInputInRect(_windowX, _windowY, _windowW, windowHeader)) {
 				inputX = inputY = -1;
 			}
 		}
@@ -500,7 +500,7 @@ class Zui {
 		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH + 2);
 		g.color = t.ACCENT_COL; // Underline tab buttons
 		g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH + 2, _windowW - buttonOffsetY * 2, LINE_STRENGTH());
-		
+
 		_y += 2;
 
 		for (i in 0...tabNames.length) {
@@ -559,7 +559,7 @@ class Zui {
 
 		return handle.selected;
 	}
-	
+
 	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null, sx = 0, sy = 0, sw = 0, sh = 0): State {
 		var iw = (sw > 0 ? sw : image.width) * SCALE;
 		var ih = (sh > 0 ? sh : image.height) * SCALE;
@@ -569,7 +569,7 @@ class Zui {
 			w = Math.min(iw, _w - buttonOffsetY * 2);
 			x += buttonOffsetY;
 			var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
-			if (!scroll) { 
+			if (!scroll) {
 				var r = curRatio == -1 ? 1.0 : ratios[curRatio];
 				w -= SCROLL_W() * r;
 				x += SCROLL_W() * r / 2;
@@ -605,7 +605,7 @@ class Zui {
 				g.drawScaledImage(image, x, _y + h_float, w, -h_float) :
 				g.drawScaledImage(image, x, _y, w, h_float);
 		}
-		
+
 		endElement(h);
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
@@ -935,7 +935,7 @@ class Zui {
 			drawString(g, label, null, 0, align == Left ? Right : Left);
 			if (align == Left) _x += 15;
 		}
-		
+
 		if (align == Right) _x -= 15;
 		g.color = t.TEXT_COL; // Value
 		drawString(g, texts[handle.position], null, 0, align);
@@ -953,7 +953,7 @@ class Zui {
 			scrollingHandle = handle;
 			isScrolling = true;
 		}
-		
+
 		handle.changed = false;
 		if (handle.scrolling) { // Scroll
 			var range = to - from;
@@ -984,13 +984,13 @@ class Zui {
 			submitTextEdit();
 			handle.value = Std.parseFloat(handle.text);
 		}
-		
+
 		g.color = t.LABEL_COL;// Text
 		drawString(g, text, null, 0, align);
 
 		if (displayValue) {
 			g.color = t.TEXT_COL; // Value
-			textSelectedHandle != handle ? 
+			textSelectedHandle != handle ?
 				drawString(g, handle.value + "", null, 0, lalign) :
 				drawString(g, textSelectedCurrentText, null, 0, lalign);
 		}
@@ -1091,7 +1091,7 @@ class Zui {
 		g.color = t.TEXT_COL; // Text
 		drawString(g, text, titleOffsetX, 0, Align.Center);
 	}
-	
+
 	function drawSlider(value: Float, from: Float, to: Float, filled: Bool, hover: Bool) {
 		var x = _x + buttonOffsetY;
 		var y = _y + buttonOffsetY;
@@ -1099,12 +1099,12 @@ class Zui {
 
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL;
 		drawRect(g, t.FILL_ACCENT_BG, x, y, w, BUTTON_H()); // Bg
-		
+
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL;
 		var offset = (value - from) / (to - from);
 		var barW = 8 * SCALE; // Unfilled bar
 		var sliderX = filled ? x : x + (w - barW) * offset;
-		var sliderW = filled ? w * offset : barW; 
+		var sliderW = filled ? w * offset : barW;
 		sliderW = Math.max(Math.min(sliderW, w), 0);
 		drawRect(g, true, sliderX, y, sliderW, BUTTON_H());
 	}
@@ -1199,7 +1199,7 @@ class Zui {
 						xOffset: Null<Float> = null, yOffset: Float = 0, align: Align = Left) {
 		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
 		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
-		
+
 		if (xOffset == null) xOffset = t.TEXT_OFFSET;
 		xOffset *= SCALE;
 		g.font = ops.font;
@@ -1245,7 +1245,7 @@ class Zui {
 		wBeforeSplit = _w;
 		_w = Std.int(_w * ratios[curRatio]);
 	}
-	
+
 	public function indent() {
 		_x += TAB_W();
 		_w -= TAB_W();
@@ -1258,7 +1258,7 @@ class Zui {
 	function fadeColor() {
 		g.color = kha.Color.fromFloats(g.color.R, g.color.G, g.color.B, 0.25);
 	}
-	
+
 	public function fill(x: Float, y: Float, w: Float, h: Float, color: kha.Color) {
 		g.color = color;
 		if (!enabled) fadeColor();
@@ -1294,7 +1294,7 @@ class Zui {
 		isPushed = enabled && inputEnabled && inputDown && getHover(elemH) && getInitialHover(elemH);
 		return isPushed;
 	}
-	
+
 	function getStarted(elemH = -1.0): Bool {
 		isStarted = enabled && inputEnabled && inputStarted && getHover(elemH);
 		return isStarted;
@@ -1400,7 +1400,7 @@ class Zui {
 	public function onCut(): String { isCut = true; return onCopy(); }
 	public function onCopy(): String { isCopy = true; return textToCopy; }
 	public function onPaste(s: String) { isPaste = true; textToPaste = s; }
-	
+
 	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
 	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
 	public inline function ELEMENT_OFFSET() { return t.ELEMENT_OFFSET * SCALE; }
