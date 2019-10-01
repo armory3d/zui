@@ -320,12 +320,12 @@ class Ext {
 			case KeyCode.Pause: return "Pause";
 			case KeyCode.CapsLock: return "CapsLock";
 			case KeyCode.Kana: return "Kana";
-			case KeyCode.Hangul: return "Hangul";
+			// case KeyCode.Hangul: return "Hangul"; // Hangul == Kana
 			case KeyCode.Eisu: return "Eisu";
 			case KeyCode.Junja: return "Junja";
 			case KeyCode.Final: return "Final";
 			case KeyCode.Hanja: return "Hanja";
-			case KeyCode.Kanji: return "Kanji";
+			// case KeyCode.Kanji: return "Kanji"; // Kanji == Hanja
 			case KeyCode.Escape: return "Esc";
 			case KeyCode.Convert: return "Convert";
 			case KeyCode.NonConvert: return "NonConvert";
