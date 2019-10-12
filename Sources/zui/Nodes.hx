@@ -25,6 +25,9 @@ class Nodes {
 	static var elementsBaked = false;
 	static var socketImage: kha.Image = null;
 	static var clipboard = "";
+	static var boxSelect = false;
+	static var boxSelectX = 0;
+	static var boxSelectY = 0;
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
@@ -303,6 +306,36 @@ class Nodes {
 			drawNode(ui, node, canvas);
 		}
 
+		if (boxSelect) {
+			ui.g.color = 0x223333dd;
+			ui.g.fillRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
+			ui.g.color = 0x773333dd;
+			ui.g.drawRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
+			ui.g.color = 0xffffffff;
+		}
+		if (ui.inputStarted && linkDrag == null && !nodesDrag && !ui.changed) {
+			boxSelect = true;
+			boxSelectX = Std.int(ui.inputX - ui._windowX);
+			boxSelectY = Std.int(ui.inputY - ui._windowY);
+		}
+		else if (boxSelect && ui.inputReleased) {
+			boxSelect = false;
+			var nodes:Array<TNode> = [];
+			var left = boxSelectX;
+			var top = boxSelectY;
+			var right = Std.int(ui.inputX - ui._windowX);
+			var bottom = Std.int(ui.inputY - ui._windowY);
+			if (left > right) { var t = left; left = right; right = t; }
+			if (top > bottom) { var t = top; top = bottom; bottom = t; }
+			for (n in canvas.nodes) {
+				if (NODE_X(n) + NODE_W() > left && NODE_X(n) < right &&
+					NODE_Y(n) + NODE_H(n) > top && NODE_Y(n) < bottom) {
+					nodes.push(n);
+				}
+			}
+			ui.isShiftDown ? for (n in nodes) nodesSelected.push(n) : nodesSelected = nodes;
+		}
+
 		// Place selected node on top
 		if (moveOnTop != null) {
 			canvas.nodes.remove(moveOnTop);
@@ -383,7 +416,7 @@ class Nodes {
 	// Global enum mapping for now..
 	public static var getEnumTexts: Void->Array<String> = null;
 	public static var mapEnum: String->String = null;
-	
+
 	inline function isSelected(node: TNode) { return nodesSelected.indexOf(node) >= 0; }
 
 	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
