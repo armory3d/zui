@@ -135,6 +135,14 @@ class Nodes {
 			var toX = to == null ? ui.inputX : wx + NODE_X(to);
 			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length) + BUTTONS_H(to);
 
+			// Cull
+			var left = toX > fromX ? fromX : toX;
+			var right = toX > fromX ? toX : fromX;
+			var top = toY > fromY ? fromY : toY;
+			var bottom = toY > fromY ? toY : fromY;
+			if (right < 0 || left > wx + ui._windowW ||
+				bottom < 0 || top > wy + ui._windowH) continue;
+
 			// Snap to nearest socket
 			if (linkDrag == link) {
 				if (snapFromId != -1) { fromX = snapX; fromY = snapY; }
@@ -198,6 +206,10 @@ class Nodes {
 		}
 
 		for (node in canvas.nodes) {
+			// Cull
+			if (NODE_X(node) > ui._windowW || NODE_X(node) + NODE_W() < 0 ||
+				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(node) < 0) continue;
+
 			var inps = node.inputs;
 			var outs = node.outputs;
 
