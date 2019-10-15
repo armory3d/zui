@@ -37,29 +37,30 @@ class Zui {
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
-	var inputX: Float; // Input position
-	var inputY: Float;
-	var inputInitialX: Float;
-	var inputInitialY: Float;
-	var inputDX: Float; // Delta
-	var inputDY: Float;
-	var inputWheelDelta = 0;
-	var inputStarted: Bool; // Buttons
-	var inputStartedR: Bool;
-	var inputReleased: Bool;
-	var inputReleasedR: Bool;
-	var inputDown: Bool;
-	var inputDownR: Bool;
-	var isKeyPressed = false; // Keys
-	var isKeyDown = false;
-	var isShiftDown = false;
-	var isCtrlDown = false;
-	var isAltDown = false;
-	var isBackspaceDown = false;
-	var isDeleteDown = false;
-	var isEscapeDown = false;
-	var key: Null<KeyCode> = null;
-	var char: String;
+	public var inputX: Float; // Input position
+	public var inputY: Float;
+	public var inputInitialX: Float;
+	public var inputInitialY: Float;
+	public var inputDX: Float; // Delta
+	public var inputDY: Float;
+	public var inputWheelDelta = 0;
+	public var inputStarted: Bool; // Buttons
+	public var inputStartedR: Bool;
+	public var inputReleased: Bool;
+	public var inputReleasedR: Bool;
+	public var inputDown: Bool;
+	public var inputDownR: Bool;
+	public var isKeyPressed = false; // Keys
+	public var isKeyDown = false;
+	public var isShiftDown = false;
+	public var isCtrlDown = false;
+	public var isAltDown = false;
+	public var isBackspaceDown = false;
+	public var isDeleteDown = false;
+	public var isEscapeDown = false;
+	public var isReturnDown = false;
+	public var key: Null<KeyCode> = null;
+	public var char: String;
 	static var textToPaste = "";
 	static var textToCopy = "";
 	static var isCut = false;
@@ -79,7 +80,7 @@ class Zui {
 
 	public var g: Graphics; // Drawing
 	var globalG: Graphics;
-	var rtTextPipeline: kha.graphics4.PipelineState; // rendering text into rendertargets
+	var rtTextPipeline: kha.graphics4.PipelineState; // Rendering text into rendertargets
 
 	var t: zui.Themes.TTheme;
 	var SCALE: Float;
@@ -1374,6 +1375,7 @@ class Zui {
 		case KeyCode.Backspace: isBackspaceDown = true;
 		case KeyCode.Delete: isDeleteDown = true;
 		case KeyCode.Escape: isEscapeDown = true;
+		case KeyCode.Return: isReturnDown = true;
 		case KeyCode.Space: char = " ";
 		default:
 		}
@@ -1388,6 +1390,7 @@ class Zui {
 		case KeyCode.Backspace: isBackspaceDown = false;
 		case KeyCode.Delete: isDeleteDown = false;
 		case KeyCode.Escape: isEscapeDown = false;
+		case KeyCode.Return: isReturnDown = false;
 		default:
 		}
 	}
