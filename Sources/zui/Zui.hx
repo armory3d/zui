@@ -754,11 +754,11 @@ class Zui {
 				iend = cursorX;
 			}
 			var hlstr = text.substr(istart, iend - istart);
-			var hlstrw = g.font.width(g.fontSize, hlstr);
-			var startoff = g.font.width(g.fontSize, text.substr(0, istart));
+			var hlstrw = ops.font.width(fontSize, hlstr);
+			var startoff = ops.font.width(fontSize, text.substr(0, istart));
 			var hlStart = align == Left ? _x + startoff + off : _x + _w - hlstrw - off;
 			if (align == Right) {
-				hlStart -= g.font.width(g.fontSize, text.substr(iend, text.length));
+				hlStart -= ops.font.width(fontSize, text.substr(iend, text.length));
 			}
 			g.color = t.ACCENT_SELECT_COL;
 			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
@@ -768,7 +768,7 @@ class Zui {
 		var time = kha.Scheduler.time();
 		if (time % (FLASH_SPEED() * 2.0) < FLASH_SPEED()) {
 			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
-			var strw = g.font.width(g.fontSize, str);
+			var strw = ops.font.width(fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.color = t.TEXT_COL; // Cursor
 			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
