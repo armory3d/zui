@@ -17,7 +17,7 @@ Portable immediate mode UI library designed for tools and debug interfaces. Writ
 		g.begin();
 		// Draw your stuff...
 		g.end();
-		
+
 		ui.begin(g);
 		if (ui.window(Id.handle(), x, y, w, h, drag)) {
 			if (ui.button("Hello")) {
@@ -63,7 +63,7 @@ Ext.hx - prebuilt elements:
 function list(...); // See examples
 function panelList(...);
 function colorPicker(...);
-function colorWheel(...); 
+function colorWheel(...);
 function fileBrowser(...);
 function keyInput(handle: Handle, label = ""): kha.input.KeyCode;
 ```
