@@ -16,10 +16,8 @@ class Canvas {
 
 	public static function draw(ui: Zui, canvas: TCanvas, g: kha.graphics2.Graphics): Array<String> {
 
-		if (screenW == -1) {
-			screenW = kha.System.windowWidth();
-			screenH = kha.System.windowHeight();
-		}
+		screenW = kha.System.windowWidth();
+		screenH = kha.System.windowHeight();
 
 		events = [];
 
