@@ -87,7 +87,7 @@ class Canvas {
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
 			ui.t.TEXT_COL = element.color_text;
-			ui.text(getText(canvas, element));
+			ui.text(getText(canvas, element), element.alignment);
 
 			ui.ops.font = font;
 			ui.fontSize = size;
@@ -100,7 +100,7 @@ class Canvas {
 			ui.t.BUTTON_TEXT_COL = element.color_text;
 			ui.t.BUTTON_HOVER_COL = element.color_hover;
 			ui.t.BUTTON_PRESSED_COL = element.color_press;
-			if (ui.button(getText(canvas, element))) {
+			if (ui.button(getText(canvas, element), element.alignment)) {
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
@@ -182,14 +182,14 @@ class Canvas {
 			ui.t.LABEL_COL = element.color_text;
 			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
-			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true);
+			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true, 100, true, element.alignment);
 
 		case TextInput:
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.LABEL_COL = element.color_text;
 			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
-			ui.textInput(h.nest(element.id), getText(canvas, element));
+			ui.textInput(h.nest(element.id), getText(canvas, element), element.alignment);
 
 		case KeyInput:
 			ui.t.TEXT_COL = element.color_text;
@@ -288,6 +288,7 @@ typedef TElement = {
 	@:optional var progress_at: Null<Int>;
 	@:optional var progress_total: Null<Int>;
 	@:optional var strength: Null<Int>;
+	@:optional var alignment: Null<Int>;
 	@:optional var anchor: Null<Int>;
 	@:optional var parent: Null<Int>; // id
 	@:optional var children: Array<Int>; // ids
