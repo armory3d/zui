@@ -218,7 +218,9 @@ class Ext {
 		var nested =
 			(i1 > -1 && handle.text.length - 1 > i1) ||
 			(i2 > -1 && handle.text.length - 1 > i2);
+		handle.changed = false;
 		if (nested && ui.button("..", Align.Left)) {
+			handle.changed = ui.changed = true;
 			handle.text = handle.text.substring(0, handle.text.lastIndexOf(sep));
 			// Drive root
 			if (handle.text.length == 2 && handle.text.charAt(1) == ":") handle.text += sep;
@@ -228,6 +230,7 @@ class Ext {
 		for (f in files) {
 			if (f == "" || f.charAt(0) == ".") continue; // Skip hidden
 			if (ui.button(f, Align.Left)) {
+				handle.changed = ui.changed = true;
 				if (handle.text.charAt(handle.text.length - 1) != sep) handle.text += sep;
 				handle.text += f;
 			}
