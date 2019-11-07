@@ -38,8 +38,8 @@ class Zui {
 	public var inputEnabled = true;
 	public var inputX: Float; // Input position
 	public var inputY: Float;
-	public var inputInitialX: Float;
-	public var inputInitialY: Float;
+	public var inputStartedX: Float;
+	public var inputStartedY: Float;
 	public var inputDX: Float; // Delta
 	public var inputDY: Float;
 	public var inputWheelDelta = 0;
@@ -1300,8 +1300,8 @@ class Zui {
 	function getInitialHover(elemH = -1.0): Bool {
 		if (elemH == -1.0) elemH = ELEMENT_H();
 		return enabled && inputEnabled &&
-			inputInitialX >= _windowX + _x && inputInitialX < (_windowX + _x + _w) &&
-			inputInitialY >= _windowY + _y && inputInitialY < (_windowY + _y + elemH);
+			inputStartedX >= _windowX + _x && inputStartedX < (_windowX + _x + _w) &&
+			inputStartedY >= _windowY + _y && inputStartedY < (_windowY + _y + elemH);
 	}
 
 	function getHover(elemH = -1.0): Bool {
@@ -1322,8 +1322,8 @@ class Zui {
 		button == 0 ? inputStarted = true : inputStartedR = true;
 		button == 0 ? inputDown = true : inputDownR = true;
 		setInputPosition(x, y);
-		inputInitialX = x;
-		inputInitialY = y;
+		inputStartedX = x;
+		inputStartedY = y;
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
@@ -1331,7 +1331,7 @@ class Zui {
 			if (isScrolling) {
 				isScrolling = false;
 				if (scrollingHandle != null) scrollingHandle.scrolling = false;
-				if (x == inputInitialX && y == inputInitialY) inputReleased = true; // Mouse not moved
+				if (x == inputStartedX && y == inputStartedY) inputReleased = true; // Mouse not moved
 			}
 			else { // To prevent action when scrolling is active
 				inputReleased = true;
