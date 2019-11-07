@@ -41,7 +41,7 @@ private class ExampleWindow {
     function render( fb : kha.Framebuffer ) {
 		ui.begin(fb.g2);
 			if (ui.window(zui.Id.handle(), 8, 8, 240, 240)) {
-				panelExpanded = ui.panel(zui.Id.handle(), panelExpanded ? 'close me' : 'open me', 1);
+				panelExpanded = ui.panel(zui.Id.handle(), panelExpanded ? 'close me' : 'open me');
 
 				if (panelExpanded) {
 					if (ui.button(buttonText)) {

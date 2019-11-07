@@ -533,19 +533,14 @@ class Zui {
 		_w = Std.int(!currentWindow.scrollEnabled ? _windowW : _windowW - SCROLL_W());
 	}
 
-	public function panel(handle: Handle, text: String, accent = 0, isTree = false): Bool {
+	public function panel(handle: Handle, text: String, isTree = false): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
 		if (getReleased()) handle.selected = !handle.selected;
 		// var hover = getHover();
 
-		if (accent > 0) { // Bg
-			g.color = t.PANEL_BG_COL;
-			g.fillRect(_x, _y, _w, ELEMENT_H());
-		}
-
 		isTree ? drawTree(handle.selected) : drawArrow(handle.selected);
 
-		g.color = t.PANEL_TEXT_COL; // Title
+		g.color = t.LABEL_COL; // Title
 		g.opacity = 1.0;
 		drawString(g, text, titleOffsetX, 0);
 
@@ -1126,7 +1121,7 @@ class Zui {
 		var BUTTON_COL = t.BUTTON_COL;
 		for (i in 0...comboSelectedTexts.length) {
 			var j = outOfScreen ? comboSelectedTexts.length - 1 - i : i;
-			t.BUTTON_COL = j == comboSelectedHandle.position ? t.PANEL_BG_COL : t.SEPARATOR_COL;
+			t.BUTTON_COL = j == comboSelectedHandle.position ? t.WINDOW_BG_COL : t.SEPARATOR_COL;
 			if (button(comboSelectedTexts[j], comboSelectedAlign)) {
 				comboToSubmit = j;
 				submitComboHandle = comboSelectedHandle;

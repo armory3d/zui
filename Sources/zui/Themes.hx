@@ -24,8 +24,6 @@ class Themes {
 		ACCENT_COL: 0xff444444,
 		ACCENT_HOVER_COL: 0xff484848,
 		ACCENT_SELECT_COL: 0xff606060,
-		PANEL_BG_COL: 0xff333333,
-		PANEL_TEXT_COL: 0xffe8e7e5,
 		BUTTON_COL: 0xff484848,
 		BUTTON_TEXT_COL: 0xffe8e7e5,
 		BUTTON_HOVER_COL: 0xff3b3b3b,
@@ -35,6 +33,7 @@ class Themes {
 		ARROW_COL: 0xffe8e7e5,
 		SEPARATOR_COL: 0xff272727,
 		HIGHLIGHT_COL: 0xff205d9c,
+		CONTEXT_COL: 0xff222222,
 	};
 
 	// 2x scaled, for games
@@ -60,8 +59,6 @@ class Themes {
 		ACCENT_COL: 0xffeeeeee,
 		ACCENT_HOVER_COL: 0xffbbbbbb,
 		ACCENT_SELECT_COL: 0xffaaaaaa,
-		PANEL_BG_COL: 0xffffffff,
-		PANEL_TEXT_COL: 0xff222222,
 		BUTTON_COL: 0xffcccccc,
 		BUTTON_TEXT_COL: 0xff222222,
 		BUTTON_HOVER_COL: 0xffb3b3b3,
@@ -71,6 +68,7 @@ class Themes {
 		ARROW_COL: 0xffcac9c7,
 		SEPARATOR_COL: 0xff999999,
 		HIGHLIGHT_COL: 0xff205d9c,
+		CONTEXT_COL: 0xffaaaaaa,
 	};
 }
 
@@ -96,8 +94,6 @@ typedef TTheme = {
 	var ACCENT_COL: Int;
 	var ACCENT_HOVER_COL: Int;
 	var ACCENT_SELECT_COL: Int;
-	var PANEL_BG_COL: Int;
-	var PANEL_TEXT_COL: Int;
 	var BUTTON_COL: Int;
 	var BUTTON_TEXT_COL: Int;
 	var BUTTON_HOVER_COL: Int;
@@ -107,4 +103,5 @@ typedef TTheme = {
 	var ARROW_COL: Int;
 	var SEPARATOR_COL: Int;
 	var HIGHLIGHT_COL: Int;
+	var CONTEXT_COL: Int;
 }

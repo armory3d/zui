@@ -127,7 +127,7 @@ class Ext {
 		var i = 0;
 		while (i < ar.length) {
 			ui.row([0.12, 0.68, 0.2]);
-			var expanded = ui.panel(handle.nest(i), "", 0);
+			var expanded = ui.panel(handle.nest(i), "");
 
 			var itemHandle = handle.nest(i);
 			editable ? setNameCb(i, ui.textInput(itemHandle, getNameCb(i))) : ui.text(getNameCb(i));
