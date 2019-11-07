@@ -14,7 +14,6 @@ typedef ZuiOptions = {
 	?theme: zui.Themes.TTheme,
 	?khaWindowId: Int,
 	?scaleFactor: Float,
-	?scaleTexture: Float,
 	?autoNotifyInput: Bool,
 	?color_wheel: kha.Image
 }
@@ -154,7 +153,6 @@ class Zui {
 		t = ops.theme;
 		if (ops.khaWindowId == null) ops.khaWindowId = 0;
 		if (ops.scaleFactor == null) ops.scaleFactor = 1.0;
-		if (ops.scaleTexture == null) ops.scaleTexture = 1.0;
 		if (ops.autoNotifyInput == null) ops.autoNotifyInput = true;
 		this.ops = ops;
 		setScale(ops.scaleFactor);
@@ -174,8 +172,7 @@ class Zui {
 	}
 
 	public function setScale(factor: Float) {
-		ops.scaleFactor = factor;
-		SCALE = ops.scaleFactor * ops.scaleTexture;
+		SCALE = ops.scaleFactor = factor;
 		fontSize = Std.int(t.FONT_SIZE * ops.scaleFactor);
 		var fontHeight = ops.font.height(fontSize);
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
@@ -457,8 +454,7 @@ class Zui {
 		if (alwaysRedrawWindow || handle.redraws > -4) {
 			if (bindGlobalG) globalG.begin(false);
 			globalG.color = t.WINDOW_TINT_COL;
-			// if (scaleTexture != 1.0) globalG.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
-			globalG.drawScaledImage(handle.texture, _windowX, _windowY, handle.texture.width / ops.scaleTexture, handle.texture.height / ops.scaleTexture);
+			globalG.drawImage(handle.texture, _windowX, _windowY);
 			if (bindGlobalG) globalG.end();
 			if (handle.redraws <= 0) handle.redraws--;
 		}
@@ -1325,11 +1321,9 @@ class Zui {
 	public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
 		button == 0 ? inputStarted = true : inputStartedR = true;
 		button == 0 ? inputDown = true : inputDownR = true;
-		var sx = Std.int(x * ops.scaleTexture);
-		var sy = Std.int(y * ops.scaleTexture);
-		setInputPosition(sx, sy);
-		inputInitialX = sx;
-		inputInitialY = sy;
+		setInputPosition(x, y);
+		inputInitialX = x;
+		inputInitialY = y;
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
@@ -1345,12 +1339,12 @@ class Zui {
 		}
 		else if (button == 1) inputReleasedR = true;
 		button == 0 ? inputDown = false : inputDownR = false;
-		setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
+		setInputPosition(x, y);
 		deselectText();
 	}
 
 	public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
-		setInputPosition(Std.int(x * ops.scaleTexture), Std.int(y * ops.scaleTexture));
+		setInputPosition(x, y);
 	}
 
 	public function onMouseWheel(delta: Int) {
