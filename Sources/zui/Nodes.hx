@@ -10,7 +10,7 @@ class Nodes {
 	public var zoom = 1.0;
 	public var uiw = 0;
 	public var uih = 0;
-	public var SCALE = 1.0;
+	var scaleFactor = 1.0;
 	var dragged = false;
 	var moveOnTop: TNode = null;
 	var linkDrag: TNodeLink = null;
@@ -34,13 +34,14 @@ class Nodes {
 
 	public function new() {}
 
-	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE + zoomPan; }
-	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE + zoomPan; }
-	inline function LINE_H(): Int { return Std.int(22 * SCALE); }
+	public inline function SCALE(): Float { return scaleFactor * zoom; }
+	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE() + zoomPan; }
+	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE() + zoomPan; }
+	inline function LINE_H(): Int { return Std.int(22 * SCALE()); }
 	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 132 * SCALE;
+			if (but.type == 'RGBA') buttonsH += 132 * SCALE();
 			else if (but.type == 'VECTOR') buttonsH += LINE_H() * 4;
 			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9.5;
 			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
@@ -51,11 +52,11 @@ class Nodes {
 	inline function NODE_H(node: TNode): Int {
 		return Std.int(LINE_H() * 2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + BUTTONS_H(node));
 	}
-	inline function NODE_W(): Int { return Std.int(140 * SCALE); }
-	inline function NODE_X(node: TNode) { return node.x * SCALE + PAN_X(); }
-	inline function NODE_Y(node: TNode) { return node.y * SCALE + PAN_Y(); }
+	inline function NODE_W(): Int { return Std.int(140 * SCALE()); }
+	inline function NODE_X(node: TNode) { return node.x * SCALE() + PAN_X(); }
+	inline function NODE_Y(node: TNode) { return node.y * SCALE() + PAN_Y(); }
 	inline function SOCKET_Y(pos: Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
-	inline function p(f: Float): Float { return f * SCALE; }
+	inline function p(f: Float): Float { return f * SCALE(); }
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -107,8 +108,8 @@ class Nodes {
 
 		// Pan cavas
 		if (ui.inputDownR) {
-			panX += ui.inputDX / SCALE;
-			panY += ui.inputDY / SCALE;
+			panX += ui.inputDX / SCALE();
+			panY += ui.inputDY / SCALE();
 		}
 
 		// Zoom canvas
@@ -120,9 +121,8 @@ class Nodes {
 			uiw = ui._w;
 			uih = ui._h;
 		}
-		SCALE = ui.ops.scaleFactor * zoom;
-		var _SCALE = ui.SCALE;
-		ui.setScale(SCALE); // Apply zoomed scale
+		scaleFactor = ui.SCALE();
+		ui.setScale(SCALE()); // Apply zoomed scale
 		ui.elementsBaked = true;
 		ui.g.font = ui.ops.font;
 		ui.g.fontSize = ui.fontSize;
@@ -310,8 +310,8 @@ class Nodes {
 			if (nodesDrag && isSelected(node) && !ui.inputDownR) {
 				if (ui.inputDX != 0 || ui.inputDY != 0) {
 					dragged = true;
-					node.x += Std.int(ui.inputDX / SCALE);
-					node.y += Std.int(ui.inputDY / SCALE);
+					node.x += Std.int(ui.inputDX / SCALE());
+					node.y += Std.int(ui.inputDY / SCALE());
 				}
 			}
 
@@ -421,7 +421,7 @@ class Nodes {
 			}
 		}
 
-		ui.setScale(_SCALE); // Restore non-zoomed scale
+		ui.setScale(scaleFactor); // Restore non-zoomed scale
 		ui.elementsBaked = true;
 	}
 
@@ -562,11 +562,11 @@ class Nodes {
 				ui._w = w;
 				// Preview
 				var vals:Array<Array<Float>> = but.default_value;
-				var sw = w / SCALE;
+				var sw = w / SCALE();
 				for (val in vals) {
 					var pos = val[4];
 					var col = kha.Color.fromFloats(val[0], val[1], val[2]);
-					ui.fill(pos * sw, 0, (1.0 - pos) * sw, lineh - 2 * SCALE, col);
+					ui.fill(pos * sw, 0, (1.0 - pos) * sw, lineh - 2 * SCALE(), col);
 				}
 				ui._y += lineh;
 				// Edit

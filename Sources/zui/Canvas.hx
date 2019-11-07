@@ -255,7 +255,7 @@ class Canvas {
 		return null;
 	}
 
-	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE); }
+	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE()); }
 }
 
 typedef TCanvas = {

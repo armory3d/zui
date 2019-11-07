@@ -82,7 +82,6 @@ class Zui {
 	var rtTextPipeline: kha.graphics4.PipelineState; // Rendering text into rendertargets
 
 	var t: zui.Themes.TTheme;
-	var SCALE: Float;
 	var ops: ZuiOptions;
 	var fontSize: Int;
 
@@ -172,13 +171,13 @@ class Zui {
 	}
 
 	public function setScale(factor: Float) {
-		SCALE = ops.scaleFactor = factor;
+		ops.scaleFactor = factor;
 		fontSize = Std.int(t.FONT_SIZE * ops.scaleFactor);
 		var fontHeight = ops.font.height(fontSize);
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
 		arrowOffsetY = (ELEMENT_H() - ARROW_SIZE()) / 2;
 		arrowOffsetX = arrowOffsetY;
-		titleOffsetX = (arrowOffsetX * 2 + ARROW_SIZE()) / SCALE;
+		titleOffsetX = (arrowOffsetX * 2 + ARROW_SIZE()) / SCALE();
 		buttonOffsetY = (ELEMENT_H() - BUTTON_H()) / 2;
 		checkOffsetY = (ELEMENT_H() - CHECK_SIZE()) / 2;
 		checkOffsetX = checkOffsetY;
@@ -199,10 +198,8 @@ class Zui {
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = t.ACCENT_SELECT_COL;
-		g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
-		g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE);//LINE_STRENGTH());
-		// g.drawLine(0, checkSelectImage.height / 2, checkSelectImage.width / 3, checkSelectImage.height, 2 * SCALE);
-		// g.drawLine(checkSelectImage.width / 3, checkSelectImage.height, checkSelectImage.width, 0, 2 * SCALE);
+		g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE());//LINE_STRENGTH());
+		g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE());//LINE_STRENGTH());
 		g.end();
 		elementsBaked = true;
 	}
@@ -502,7 +499,7 @@ class Zui {
 
 		for (i in 0...tabNames.length) {
 			_x = tabX;
-			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 14 * SCALE);
+			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 14 * SCALE());
 			var released = getReleased();
 			var pushed = getPushed();
 			var hover = getHover();
@@ -558,8 +555,8 @@ class Zui {
 	}
 
 	public function image(image: kha.Image, tint = 0xffffffff, h: Null<Float> = null, sx = 0, sy = 0, sw = 0, sh = 0): State {
-		var iw = (sw > 0 ? sw : image.width) * SCALE;
-		var ih = (sh > 0 ? sh : image.height) * SCALE;
+		var iw = (sw > 0 ? sw : image.width) * SCALE();
+		var ih = (sh > 0 ? sh : image.height) * SCALE();
 		var w = Math.min(iw, _w);
 		var x = _x;
 		if (imageScrollAlign) {
@@ -757,7 +754,7 @@ class Zui {
 				hlStart -= ops.font.width(fontSize, text.substr(iend, text.length));
 			}
 			g.color = t.ACCENT_SELECT_COL;
-			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE, cursorHeight);
+			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE(), cursorHeight);
 		}
 
 		// Flash cursor
@@ -767,7 +764,7 @@ class Zui {
 			var strw = ops.font.width(fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
 			g.color = t.TEXT_COL; // Cursor
-			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE, cursorHeight);
+			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE(), cursorHeight);
 		}
 
 		textSelectedCurrentText = text;
@@ -997,12 +994,12 @@ class Zui {
 	}
 
 	public function separator(h = 4, fill = true) {
-		if (!isVisible(ELEMENT_H())) { _y += h * SCALE; return; }
+		if (!isVisible(ELEMENT_H())) { _y += h * SCALE(); return; }
 		if (fill) {
 			g.color = t.SEPARATOR_COL;
-			g.fillRect(_x, _y, _w, h * SCALE);
+			g.fillRect(_x, _y, _w, h * SCALE());
 		}
-		_y += h * SCALE;
+		_y += h * SCALE();
 	}
 
 	public function tooltip(text: String) {
@@ -1034,7 +1031,7 @@ class Zui {
 	}
 
 	function drawTree(selected: Bool) {
-		var SIGN_W = 7 * SCALE;
+		var SIGN_W = 7 * SCALE();
 		var x = _x + arrowOffsetX + 1;
 		var y = _y + arrowOffsetY + 1;
 		g.color = t.ARROW_COL;
@@ -1099,7 +1096,7 @@ class Zui {
 
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL;
 		var offset = (value - from) / (to - from);
-		var barW = 8 * SCALE; // Unfilled bar
+		var barW = 8 * SCALE(); // Unfilled bar
 		var sliderX = filled ? x : x + (w - barW) * offset;
 		var sliderW = filled ? w * offset : barW;
 		sliderW = Math.max(Math.min(sliderW, w), 0);
@@ -1122,7 +1119,7 @@ class Zui {
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Right);
 			_y += elementSize;
-			fill(0, 0, _w / SCALE, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
+			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 		}
 
 		inputEnabled = true;
@@ -1140,7 +1137,7 @@ class Zui {
 		t.BUTTON_COL = BUTTON_COL;
 
 		if (!outOfScreen) {
-			fill(0, 0, _w / SCALE, 1 * SCALE, t.ACCENT_SELECT_COL); // Separator
+			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Right);
 		}
@@ -1198,7 +1195,7 @@ class Zui {
 		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
 
 		if (xOffset == null) xOffset = t.TEXT_OFFSET;
-		xOffset *= SCALE;
+		xOffset *= SCALE();
 		g.font = ops.font;
 		g.fontSize = fontSize;
 		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
@@ -1259,14 +1256,14 @@ class Zui {
 	public function fill(x: Float, y: Float, w: Float, h: Float, color: kha.Color) {
 		g.color = color;
 		if (!enabled) fadeColor();
-		g.fillRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE);
+		g.fillRect(_x + x * SCALE(), _y + y * SCALE(), w * SCALE(), h * SCALE());
 		g.color = 0xffffffff;
 	}
 
 	public function rect(x: Float, y: Float, w: Float, h: Float, color: kha.Color, strength = 1.0) {
 		g.color = color;
 		if (!enabled) fadeColor();
-		g.drawRect(_x + x * SCALE, _y + y * SCALE, w * SCALE, h * SCALE, strength);
+		g.drawRect(_x + x * SCALE(), _y + y * SCALE(), w * SCALE(), h * SCALE(), strength);
 		g.color = 0xffffffff;
 	}
 
@@ -1398,17 +1395,18 @@ class Zui {
 	public function onCopy(): String { isCopy = true; return textToCopy; }
 	public function onPaste(s: String) { isPaste = true; textToPaste = s; }
 
-	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE; }
-	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE; }
-	public inline function ELEMENT_OFFSET() { return t.ELEMENT_OFFSET * SCALE; }
-	public inline function ARROW_SIZE() { return t.ARROW_SIZE * SCALE; }
-	public inline function BUTTON_H() { return t.BUTTON_H * SCALE; }
-	public inline function CHECK_SIZE() { return t.CHECK_SIZE * SCALE; }
-	public inline function CHECK_SELECT_SIZE() { return t.CHECK_SELECT_SIZE * SCALE; }
-	public inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE); }
+	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE(); }
+	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE(); }
+	public inline function ELEMENT_OFFSET() { return t.ELEMENT_OFFSET * SCALE(); }
+	public inline function ARROW_SIZE() { return t.ARROW_SIZE * SCALE(); }
+	public inline function BUTTON_H() { return t.BUTTON_H * SCALE(); }
+	public inline function CHECK_SIZE() { return t.CHECK_SIZE * SCALE(); }
+	public inline function CHECK_SELECT_SIZE() { return t.CHECK_SELECT_SIZE * SCALE(); }
+	public inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE()); }
 	public inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
-	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE); }
-	public inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE; }
+	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE()); }
+	public inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE(); }
+	public inline function SCALE() { return ops.scaleFactor; }
 	inline function FLASH_SPEED() { return 0.5; }
 	inline function TOOLTIP_DELAY() { return 1.0; }
 

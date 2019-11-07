@@ -269,9 +269,9 @@ class Ext {
 		cy = cy2;
 
 		ui.g.color = 0xff000000;
-		ui.g.fillRect(cx - 3 * ui.SCALE, cy - 3 * ui.SCALE, 6 * ui.SCALE, 6 * ui.SCALE);
+		ui.g.fillRect(cx - 3 * ui.SCALE(), cy - 3 * ui.SCALE(), 6 * ui.SCALE(), 6 * ui.SCALE());
 		ui.g.color = 0xffffffff;
-		ui.g.fillRect(cx - 2 * ui.SCALE, cy - 2 * ui.SCALE, 4 * ui.SCALE, 4 * ui.SCALE);
+		ui.g.fillRect(cx - 2 * ui.SCALE(), cy - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE());
 		// Val slider
 		if (rowAlign) alpha ? ui.row([1/3, 1/3, 1/3]) : ui.row([1/2, 1/2]);
 		var valHandle = handle.nest(0);
