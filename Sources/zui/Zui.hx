@@ -476,7 +476,7 @@ class Zui {
 		}
 		tabNames.push(text);
 		var selected = handle.position == tabNames.length - 1;
-		if (selected) endElement();
+		if (selected) { endElement(); _y += 2; }
 		return selected;
 	}
 
@@ -499,7 +499,7 @@ class Zui {
 
 		for (i in 0...tabNames.length) {
 			_x = tabX;
-			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 14 * SCALE());
+			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 18 * SCALE());
 			var released = getReleased();
 			var pushed = getPushed();
 			var hover = getHover();
@@ -1256,7 +1256,7 @@ class Zui {
 	public function fill(x: Float, y: Float, w: Float, h: Float, color: kha.Color) {
 		g.color = color;
 		if (!enabled) fadeColor();
-		g.fillRect(_x + x * SCALE(), _y + y * SCALE(), w * SCALE(), h * SCALE());
+		g.fillRect(_x + x * SCALE(), _y + y * SCALE() - 1, w * SCALE(), h * SCALE());
 		g.color = 0xffffffff;
 	}
 
@@ -1270,7 +1270,7 @@ class Zui {
 	inline function drawRect(g: Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
 		if (strength == 0.0) strength = LINE_STRENGTH();
 		if (!enabled) fadeColor();
-		fill ? g.fillRect(x, y, w, h) : g.drawRect(x, y, w, h, strength);
+		fill ? g.fillRect(x, y - 1, w, h + 1) : g.drawRect(x, y, w, h, strength);
 	}
 
 	function isVisible(elemH: Float): Bool {
