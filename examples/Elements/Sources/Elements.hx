@@ -32,13 +32,13 @@ class Elements {
 				ui.textInput(Id.handle({text: "Hello"}), "Input");
 				ui.button("Button");
 				if (ui.isHovered) ui.tooltip("Tooltip Bubble!\nWith multi-line support!\nWoo!");
-				
+
 				ui.check(Id.handle(), "Check Box");
 				var hradio = Id.handle();
 				ui.radio(hradio, 0, "Radio 1");
 				ui.radio(hradio, 1, "Radio 2");
 				ui.radio(hradio, 2, "Radio 3");
-				ui.inlineRadio(Id.handle(), ["High", "Medium", "Low"]);
+				Ext.inlineRadio(ui, Id.handle(), ["High", "Medium", "Low"]);
 				ui.combo(Id.handle(), ["Item 1", "Item 2", "Item 3"], "Combo", true);
 				if (ui.panel(Id.handle({selected: false}), "Nested Panel")) {
 					ui.indent();
@@ -100,7 +100,7 @@ class Elements {
 			}
 		}
 
-		ui.end();	
+		ui.end();
 
 		// Draw more of your stuff...
 	}

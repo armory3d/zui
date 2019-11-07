@@ -167,7 +167,7 @@ class Canvas {
 			ui.t.TEXT_COL = element.color_text;
 			ui.t.ACCENT_COL = element.color;
 			ui.t.ACCENT_HOVER_COL = element.color_hover;
-			ui.inlineRadio(h.nest(element.id), getText(canvas, element).split(";"));
+			Ext.inlineRadio(ui, h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Combo:
 			ui.t.TEXT_COL = element.color_text;

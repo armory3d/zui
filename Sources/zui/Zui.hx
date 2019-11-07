@@ -867,21 +867,6 @@ class Zui {
 		return handle.position == position;
 	}
 
-	public function inlineRadio(handle: Handle, texts: Array<String>): Int {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
-		if (getReleased()) {
-			if (++handle.position >= texts.length) handle.position = 0;
-			handle.changed = changed = true;
-		}
-		else handle.changed = false;
-
-		var hover = getHover();
-		drawInlineRadio(texts[handle.position], hover); // Radio
-
-		endElement();
-		return handle.position;
-	}
-
 	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align: Align = Left): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
 		if (getReleased()) {
@@ -1065,20 +1050,6 @@ class Zui {
 			if (!enabled) fadeColor();
 			g.fillRect(x + radioSelectOffsetX, y + radioSelectOffsetY, CHECK_SELECT_SIZE(), CHECK_SELECT_SIZE());
 		}
-	}
-
-	function drawInlineRadio(text: String, hover: Bool) {
-		if (hover) { // Bg
-			g.color = t.ACCENT_HOVER_COL;
-			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
-		}
-		else {
-			g.color = t.ACCENT_COL;
-			if (!enabled) fadeColor();
-			g.drawRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
-		}
-		g.color = t.TEXT_COL; // Text
-		drawString(g, text, titleOffsetX, 0, Align.Center);
 	}
 
 	function drawSlider(value: Float, from: Float, to: Float, filled: Bool, hover: Bool) {

@@ -40,7 +40,6 @@ function textInput(handle: Handle, label = ""): String;
 function button(text: String, align = Center, label = ""): Bool;
 function check(handle: Handle, text: String): Bool;
 function radio(groupId: Handle, pos: Int, text: String): Bool;
-function inlineRadio(handle: Handle, texts: Array<String>): Int;
 function combo(handle: Handle, texts: Array<String>, label = ""): Int;
 function slider(handle: Handle, text: String, from: Float, to: Float, filled = false, precision = 100, displayValue = true): Float;
 function tooltip(text: String);
@@ -66,6 +65,7 @@ function colorPicker(...);
 function colorWheel(...);
 function fileBrowser(...);
 function keyInput(handle: Handle, label = ""): kha.input.KeyCode;
+function inlineRadio(handle: Handle, texts: Array<String>): Int;
 ```
 
 Nodes.hx - drawing node systems
