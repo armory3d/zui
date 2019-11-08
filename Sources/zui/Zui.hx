@@ -198,8 +198,8 @@ class Zui {
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = t.ACCENT_SELECT_COL;
-		g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE());//LINE_STRENGTH());
-		g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE());//LINE_STRENGTH());
+		g.drawLine(0, 0, checkSelectImage.width, checkSelectImage.height, 2 * SCALE());
+		g.drawLine(checkSelectImage.width, 0, 0, checkSelectImage.height, 2 * SCALE());
 		g.end();
 		elementsBaked = true;
 	}
@@ -493,7 +493,7 @@ class Zui {
 		g.color = t.SEPARATOR_COL;
 		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH + 2);
 		g.color = t.ACCENT_COL; // Underline tab buttons
-		g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH + 2, _windowW - buttonOffsetY * 2, LINE_STRENGTH());
+		g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH + 2, _windowW - buttonOffsetY * 2, 1);
 
 		_y += 2;
 
@@ -524,7 +524,7 @@ class Zui {
 
 			if (selected) { // Hide underline for active tab
 				g.color = t.WINDOW_BG_COL;
-				g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY + tabH, _w - 1, LINE_STRENGTH());
+				g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY + tabH, _w - 1, 1);
 			}
 		}
 
@@ -997,7 +997,7 @@ class Zui {
 	function drawArrow(selected: Bool) {
 		var x = _x + arrowOffsetX;
 		var y = _y + arrowOffsetY;
-		g.color = t.ARROW_COL;
+		g.color = t.TEXT_COL;
 		if (selected) {
 			g.fillTriangle(x, y,
 						   x + ARROW_SIZE(), y,
@@ -1014,7 +1014,7 @@ class Zui {
 		var SIGN_W = 7 * SCALE();
 		var x = _x + arrowOffsetX + 1;
 		var y = _y + arrowOffsetY + 1;
-		g.color = t.ARROW_COL;
+		g.color = t.TEXT_COL;
 		if (selected) {
 			g.fillRect(x, y + SIGN_W / 2 - 1, SIGN_W, SIGN_W / 8);
 		}
@@ -1234,7 +1234,7 @@ class Zui {
 	}
 
 	inline function drawRect(g: Graphics, fill: Bool, x: Float, y: Float, w: Float, h: Float, strength = 0.0) {
-		if (strength == 0.0) strength = LINE_STRENGTH();
+		if (strength == 0.0) strength = 1;
 		if (!enabled) fadeColor();
 		fill ? g.fillRect(x, y - 1, w, h + 1) : g.drawRect(x, y, w, h, strength);
 	}
@@ -1371,7 +1371,6 @@ class Zui {
 	public inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE()); }
 	public inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
 	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE()); }
-	public inline function LINE_STRENGTH() { return t.LINE_STRENGTH * SCALE(); }
 	public inline function SCALE() { return ops.scaleFactor; }
 	inline function FLASH_SPEED() { return 0.5; }
 	inline function TOOLTIP_DELAY() { return 1.0; }

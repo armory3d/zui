@@ -14,7 +14,6 @@ class Themes {
 		SCROLL_W: 6,
 		TEXT_OFFSET: 8,
 		TAB_W: 12,
-		LINE_STRENGTH: 1,
 		FILL_WINDOW_BG: false,
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
@@ -30,7 +29,6 @@ class Themes {
 		BUTTON_PRESSED_COL: 0xff1b1b1b,
 		TEXT_COL: 0xffe8e7e5,
 		LABEL_COL: 0xffc8c8c8,
-		ARROW_COL: 0xffe8e7e5,
 		SEPARATOR_COL: 0xff272727,
 		HIGHLIGHT_COL: 0xff205d9c,
 		CONTEXT_COL: 0xff222222,
@@ -49,7 +47,6 @@ class Themes {
 		SCROLL_W: 6 * 2,
 		TEXT_OFFSET: 8 * 2,
 		TAB_W: 12 * 2,
-		LINE_STRENGTH: 1 * 2,
 		FILL_WINDOW_BG: false,
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
@@ -65,7 +62,6 @@ class Themes {
 		BUTTON_PRESSED_COL: 0xffb1b1b1,
 		TEXT_COL: 0xff999999,
 		LABEL_COL: 0xffaaaaaa,
-		ARROW_COL: 0xffcac9c7,
 		SEPARATOR_COL: 0xff999999,
 		HIGHLIGHT_COL: 0xff205d9c,
 		CONTEXT_COL: 0xffaaaaaa,
@@ -84,7 +80,6 @@ typedef TTheme = {
 	var SCROLL_W: Int;
 	var TEXT_OFFSET: Int;
 	var TAB_W: Int;
-	var LINE_STRENGTH: Int;
 	var FILL_WINDOW_BG: Bool;
 	var FILL_BUTTON_BG: Bool;
 	var FILL_ACCENT_BG: Bool;
@@ -100,7 +95,6 @@ typedef TTheme = {
 	var BUTTON_PRESSED_COL: Int;
 	var TEXT_COL: Int;
 	var LABEL_COL: Int;
-	var ARROW_COL: Int;
 	var SEPARATOR_COL: Int;
 	var HIGHLIGHT_COL: Int;
 	var CONTEXT_COL: Int;
