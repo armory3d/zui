@@ -11,6 +11,7 @@ class Nodes {
 	public var uiw = 0;
 	public var uih = 0;
 	var scaleFactor = 1.0;
+	var ELEMENT_H = 25;
 	var dragged = false;
 	var moveOnTop: TNode = null;
 	var linkDrag: TNodeLink = null;
@@ -37,11 +38,11 @@ class Nodes {
 	public inline function SCALE(): Float { return scaleFactor * zoom; }
 	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE() + zoomPan; }
 	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE() + zoomPan; }
-	inline function LINE_H(): Int { return Std.int(22 * SCALE()); }
+	inline function LINE_H(): Int { return Std.int(ELEMENT_H * SCALE()); }
 	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 132 * SCALE();
+			if (but.type == 'RGBA') buttonsH += 142 * SCALE();
 			else if (but.type == 'VECTOR') buttonsH += LINE_H() * 4;
 			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9.5;
 			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
@@ -50,12 +51,12 @@ class Nodes {
 		return Std.int(buttonsH);
 	}
 	inline function NODE_H(node: TNode): Int {
-		return Std.int(LINE_H() * 2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + BUTTONS_H(node));
+		return Std.int(LINE_H() * 1.2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + BUTTONS_H(node));
 	}
 	inline function NODE_W(): Int { return Std.int(140 * SCALE()); }
 	inline function NODE_X(node: TNode) { return node.x * SCALE() + PAN_X(); }
 	inline function NODE_Y(node: TNode) { return node.y * SCALE() + PAN_Y(); }
-	inline function SOCKET_Y(pos: Int): Int { return LINE_H() * 2 + pos * LINE_H(); }
+	inline function SOCKET_Y(pos: Int): Int { return Std.int(LINE_H() * 1.62) + pos * LINE_H(); }
 	inline function p(f: Float): Float { return f * SCALE(); }
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
@@ -122,6 +123,7 @@ class Nodes {
 			uih = ui._h;
 		}
 		scaleFactor = ui.SCALE();
+		ELEMENT_H = ui.t.ELEMENT_H + 2;
 		ui.setScale(SCALE()); // Apply zoomed scale
 		ui.elementsBaked = true;
 		ui.g.font = ui.ops.font;
@@ -460,21 +462,21 @@ class Nodes {
 		// Title
 		g.color = 0xffa0e0e0;
 		var textw = g.font.width(ui.fontSize, text);
-		g.drawString(text, nx + w / 2 - textw / 2, ny + p(4));
-		ny += lineh;
+		g.drawString(text, nx + w / 2 - textw / 2, ny + p(6));
+		ny += lineh * 0.5;
 
 		// Outputs
 		for (out in node.outputs) {
 			ny += lineh;
 			g.color = out.color;
-			g.drawScaledImage(socketImage, nx + w - p(5), ny - p(5), p(10), p(10));
+			g.drawScaledImage(socketImage, nx + w - p(5), ny - p(2), p(10), p(10));
 		}
 		ny -= lineh * node.outputs.length;
 		g.color = 0xffa0e0e0;
 		for (out in node.outputs) {
 			ny += lineh;
 			var strw = ui.ops.font.width(ui.fontSize, out.name);
-			g.drawString(out.name, nx + w - strw - p(12), ny - p(7));
+			g.drawString(out.name, nx + w - strw - p(12), ny - p(3));
 		}
 
 		// Buttons
@@ -634,7 +636,7 @@ class Nodes {
 			var inp = node.inputs[i];
 			ny += lineh;
 			g.color = inp.color;
-			g.drawScaledImage(socketImage, nx - p(5), ny - p(5), p(10), p(10));
+			g.drawScaledImage(socketImage, nx - p(5), ny - p(2), p(10), p(10));
 			var isLinked = false;
 			for (l in canvas.links) if (l.to_id == node.id && l.to_socket == i) { isLinked = true; break; }
 			if (!isLinked && inp.type == 'VALUE') {
@@ -655,7 +657,7 @@ class Nodes {
 			}
 			else {
 				g.color = 0xffa0e0e0;
-				g.drawString(inp.name, nx + p(12), ny - p(7));
+				g.drawString(inp.name, nx + p(12), ny - p(3));
 			}
 		}
 
