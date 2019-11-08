@@ -42,7 +42,7 @@ class Nodes {
 	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 142 * SCALE();
+			if (but.type == 'RGBA') buttonsH += 150 * SCALE();
 			else if (but.type == 'VECTOR') buttonsH += LINE_H() * 4;
 			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9.5;
 			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
@@ -448,7 +448,7 @@ class Nodes {
 		var lineh = LINE_H();
 
 		// Outline
-		g.color = isSelected(node) ? 0xffaaaaaa : 0xff202020;
+		g.color = isSelected(node) ? ui.t.LABEL_COL : ui.t.CONTEXT_COL;
 		g.fillRect(nx - 1, ny - 1, w + 2, h + 2);
 
 		// Header
@@ -460,7 +460,7 @@ class Nodes {
 		g.fillRect(nx, ny + lineh, w, h - lineh);
 
 		// Title
-		g.color = 0xffa0e0e0;
+		g.color = ui.t.LABEL_COL;
 		var textw = g.font.width(ui.fontSize, text);
 		g.drawString(text, nx + w / 2 - textw / 2, ny + p(6));
 		ny += lineh * 0.5;
@@ -472,7 +472,7 @@ class Nodes {
 			g.drawScaledImage(socketImage, nx + w - p(5), ny - p(2), p(10), p(10));
 		}
 		ny -= lineh * node.outputs.length;
-		g.color = 0xffa0e0e0;
+		g.color = ui.t.LABEL_COL;
 		for (out in node.outputs) {
 			ny += lineh;
 			var strw = ui.ops.font.width(ui.fontSize, out.name);
@@ -502,15 +502,12 @@ class Nodes {
 				ui._w = w;
 				var min = but.min != null ? but.min : 0.0;
 				var max = but.max != null ? but.max : 1.0;
-				var labelCol = ui.t.LABEL_COL;
 				var textOff = ui.t.TEXT_OFFSET;
-				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
 				ui.text(but.name);
 				but.default_value[0] = ui.slider(nhandle.nest(buti).nest(0, {value: but.default_value[0]}), "X", min, max, true, 100, true, Left);
 				but.default_value[1] = ui.slider(nhandle.nest(buti).nest(1, {value: but.default_value[1]}), "Y", min, max, true, 100, true, Left);
 				but.default_value[2] = ui.slider(nhandle.nest(buti).nest(2, {value: but.default_value[2]}), "Z", min, max, true, 100, true, Left);
-				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
 				if (but.output != null) node.outputs[but.output].default_value = but.default_value;
 				ny += lineh * 3;
@@ -523,12 +520,9 @@ class Nodes {
 				var soc = node.outputs[but.output];
 				var min = but.min != null ? but.min : 0.0;
 				var max = but.max != null ? but.max : 1.0;
-				var labelCol = ui.t.LABEL_COL;
 				var textOff = ui.t.TEXT_OFFSET;
-				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(buti, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
-				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (but.type == 'STRING') {
@@ -646,17 +640,14 @@ class Nodes {
 				var soc = inp;
 				var min = soc.min != null ? soc.min : 0.0;
 				var max = soc.max != null ? soc.max : 1.0;
-				var labelCol = ui.t.LABEL_COL;
 				var textOff = ui.t.TEXT_OFFSET;
-				ui.t.LABEL_COL = 0xffa0e0e0;
 				ui.t.TEXT_OFFSET = 6;
 				var maxButtons = 9;
 				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
-				ui.t.LABEL_COL = labelCol;
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else {
-				g.color = 0xffa0e0e0;
+				g.color = ui.t.LABEL_COL;
 				g.drawString(inp.name, nx + p(12), ny - p(3));
 			}
 		}
@@ -668,20 +659,15 @@ class Nodes {
 
 	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false) {
 		var g = ui.g;
-		g.color = highlight ? 0xccadadad : 0xcc777777;
-		// var curve = Math.min(Math.abs(y2 - y1) / 6.0, 40.0);
-		// kha.graphics2.GraphicsExtension.drawCubicBezier(g, [x1, x1 + curve, x2 - curve, x2], [y1, y1 + curve, y2 - curve, y2], 20, 2.0);
+		var c1: kha.Color = ui.t.LABEL_COL;
+		var c2: kha.Color = ui.t.ACCENT_SELECT_COL;
+		g.color = highlight ? kha.Color.fromBytes(c1.Rb, c1.Gb, c1.Bb, 210) : kha.Color.fromBytes(c2.Rb, c2.Gb, c2.Bb, 210);
 		g.drawLine(x1, y1, x2, y2, 1.0);
-		g.color = highlight ? 0x99adadad : 0x99777777;
+		g.color = highlight ? kha.Color.fromBytes(c1.Rb, c1.Gb, c1.Bb, 150) : kha.Color.fromBytes(c2.Rb, c2.Gb, c2.Bb, 150); // AA
 		g.drawLine(x1 + 0.5, y1, x2 + 0.5, y2, 1.0);
 		g.drawLine(x1 - 0.5, y1, x2 - 0.5, y2, 1.0);
 		g.drawLine(x1, y1 + 0.5, x2, y2 + 0.5, 1.0);
 		g.drawLine(x1, y1 - 0.5, x2, y2 - 0.5, 1.0);
-		// g.color = 0x66adadad;
-		// g.drawLine(x1 + 1.0, y1, x2 + 1.0, y2, 1.0);
-		// g.drawLine(x1 - 1.0, y1, x2 - 1.0, y2, 1.0);
-		// g.drawLine(x1, y1 + 1.0, x2, y2 + 1.0, 1.0);
-		// g.drawLine(x1, y1 - 1.0, x2, y2 - 1.0, 1.0);
 	}
 
 	public function removeNode(n: TNode, canvas: TNodeCanvas) {
