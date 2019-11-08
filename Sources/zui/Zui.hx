@@ -112,7 +112,8 @@ class Zui {
 	var _windowH: Float;
 	var currentWindow: Handle;
 	var windowEnded = true;
-	var scrollingHandle: Handle = null; // Window or slider being scrolled
+	var scrollHandle: Handle = null; // Window or slider being scrolled
+	var dragHandle: Handle = null; // Window being dragged
 	var windowHeader = 0.0;
 
 	var textSelectedHandle: Handle = null;
@@ -355,12 +356,12 @@ class Zui {
 		handle.dragEnabled = drag;
 		if (drag) {
 			if (inputStarted && getInputInRect(_windowX, _windowY, _windowW, 15)) {
-				handle.dragging = true;
+				dragHandle = handle;
 			}
 			else if (inputReleased) {
-				handle.dragging = false;
+				dragHandle = null;
 			}
-			if (handle.dragging) {
+			if (handle == dragHandle) {
 				handle.redraws = 2;
 				handle.dragX += Std.int(inputDX);
 				handle.dragY += Std.int(inputDY);
@@ -407,12 +408,11 @@ class Zui {
 				var barFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), barY + _windowY, SCROLL_W(), barH);
 
 				if (inputStarted && barFocus) { // Start scrolling
-					handle.scrolling = true;
-					scrollingHandle = handle;
+					scrollHandle = handle;
 					isScrolling = true;
 				}
 
-				if (handle.scrolling) { // Scroll
+				if (handle == scrollHandle) { // Scroll
 					scroll(inputDY * e, fullHeight);
 				}
 				else if (inputWheelDelta != 0 && comboSelectedHandle == null &&
@@ -432,7 +432,7 @@ class Zui {
 				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
 				g.color = t.ACCENT_COL; // Bar
 				var scrollbarFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
-				var barW = (scrollbarFocus || handle.scrolling) ? SCROLL_W() : SCROLL_W() / 3;
+				var barW = (scrollbarFocus || handle == scrollHandle) ? SCROLL_W() : SCROLL_W() / 3;
 				g.fillRect(_windowW - barW - scrollAlign, barY, barW, barH);
 			}
 
@@ -921,15 +921,13 @@ class Zui {
 
 	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true, align: Align = Right, textEdit = true): Float {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
-		// if (getPushed() && inputDX != 0) {
 		if (getStarted()) {
-			handle.scrolling = true;
-			scrollingHandle = handle;
+			scrollHandle = handle;
 			isScrolling = true;
 		}
 
 		handle.changed = false;
-		if (handle.scrolling) { // Scroll
+		if (handle == scrollHandle) { // Scroll
 			var range = to - from;
 			var sliderX = _x + _windowX + buttonOffsetY;
 			var sliderW = _w - buttonOffsetY * 2;
@@ -1293,7 +1291,7 @@ class Zui {
 		if (button == 0) {
 			if (isScrolling) {
 				isScrolling = false;
-				if (scrollingHandle != null) scrollingHandle.scrolling = false;
+				scrollHandle = null;
 				if (x == inputStartedX && y == inputStartedY) inputReleased = true; // Mouse not moved
 			}
 			else { // To prevent action when scrolling is active
@@ -1403,13 +1401,11 @@ class Handle {
 	public var text = "";
 	public var texture: kha.Image = null;
 	public var redraws = 2;
-	public var scrolling = false;
 	public var scrollOffset = 0.0;
 	public var scrollEnabled = false;
 	public var layout: Layout = 0;
 	public var lastMaxX = 0.0;
 	public var lastMaxY = 0.0;
-	public var dragging = false;
 	public var dragEnabled = false;
 	public var dragX = 0;
 	public var dragY = 0;
