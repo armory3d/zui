@@ -78,13 +78,12 @@ class Zui {
 	var wBeforeSplit: Int;
 
 	public var g: Graphics; // Drawing
+	public var t: zui.Themes.TTheme;
+	public var ops: ZuiOptions;
 	var globalG: Graphics;
 	var rtTextPipeline: kha.graphics4.PipelineState; // Rendering text into rendertargets
 
-	var t: zui.Themes.TTheme;
-	var ops: ZuiOptions;
 	var fontSize: Int;
-
 	var fontOffsetY: Float; // Precalculated offsets
 	var arrowOffsetX: Float;
 	var arrowOffsetY: Float;
