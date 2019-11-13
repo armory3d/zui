@@ -332,7 +332,7 @@ class Nodes {
 			boxSelectX = Std.int(ui.inputX - ui._windowX);
 			boxSelectY = Std.int(ui.inputY - ui._windowY);
 		}
-		else if (boxSelect && ui.inputReleased) {
+		else if (boxSelect && !ui.inputDown) {
 			boxSelect = false;
 			var nodes:Array<TNode> = [];
 			var left = boxSelectX;
