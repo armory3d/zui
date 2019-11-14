@@ -255,6 +255,24 @@ class Zui {
 		tabPressedHandle = null;
 	}
 
+	public function beginRegion(g: Graphics, x: Int, y: Int, w: Int) {
+		if (!elementsBaked) { g.end(); bakeElements(); g.begin(false); }
+		changed = false;
+		globalG = g;
+		this.g = g;
+		currentWindow = null;
+		_windowX = 0;
+		_windowY = 0;
+		_windowW = w;
+		_x = x;
+		_y = y;
+		_w = w;
+	}
+
+	public function endRegion(last = true) {
+		if (last) endInput();
+	}
+
 	function endInput() {
 		isKeyPressed = false; // Reset input - only one char for now
 		inputStarted = false;
@@ -265,22 +283,6 @@ class Zui {
 		inputDY = 0;
 		inputWheelDelta = 0;
 		textToPaste = "";
-	}
-
-	public function beginLayout(g: Graphics, x: Int, y: Int, w: Int) {
-		if (!elementsBaked) bakeElements();
-		currentWindow = null;
-		this.g = g;
-		_windowX = 0;
-		_windowY = 0;
-		_windowW = w;
-		_x = x;
-		_y = y;
-		_w = w;
-	}
-
-	public function endLayout(last = true) {
-		if (last) endInput();
 	}
 
 	function inputChanged(): Bool {
@@ -1076,7 +1078,7 @@ class Zui {
 		var outOfScreen = comboSelectedY + comboH > kha.System.windowHeight();
 		var comboY = outOfScreen ? comboSelectedY - comboH - Std.int(ELEMENT_H()) : comboSelectedY;
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
-		beginLayout(globalG, comboSelectedX, comboY, comboSelectedW);
+		beginRegion(globalG, comboSelectedX, comboY, comboSelectedW);
 
 		if (outOfScreen) {
 			g.color = t.LABEL_COL;
@@ -1111,7 +1113,7 @@ class Zui {
 		}
 		else comboFirst = false;
 		inputEnabled = comboSelectedHandle == null;
-		endLayout(false);
+		endRegion(false);
 		globalG.end();
 		g = _g; // Restore
 	}
