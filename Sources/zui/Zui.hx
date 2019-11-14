@@ -536,8 +536,10 @@ class Zui {
 
 	public function panel(handle: Handle, text: String, isTree = false): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
-		if (getReleased()) handle.selected = !handle.selected;
-		// var hover = getHover();
+		if (getReleased()) {
+			handle.selected = !handle.selected;
+			handle.changed = changed = true;
+		}
 
 		isTree ? drawTree(handle.selected) : drawArrow(handle.selected);
 
