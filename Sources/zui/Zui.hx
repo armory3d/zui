@@ -1173,12 +1173,11 @@ class Zui {
 	}
 
 	function endElement(elementSize: Null<Float> = null) {
-		if (currentWindow == null) { _y += ELEMENT_H() + ELEMENT_OFFSET(); return; }
+		if (elementSize == null) elementSize = ELEMENT_H() + ELEMENT_OFFSET();
+		if (currentWindow == null) { _y += elementSize; return; }
 		if (currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
-				if (elementSize == null) elementSize = ELEMENT_H() + ELEMENT_OFFSET();
 				_y += elementSize;
-
 				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
 					curRatio = -1;
 					ratios = null;
@@ -1192,7 +1191,7 @@ class Zui {
 				_w = Std.int(wBeforeSplit * ratios[curRatio]);
 			}
 		}
-		else { // HORIZONTAL
+		else { // Horizontal
 			_x += _w + ELEMENT_OFFSET();
 		}
 	}
