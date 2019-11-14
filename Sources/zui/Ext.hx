@@ -307,6 +307,7 @@ class Ext {
 		valHandle.value = Math.round(cval * 100) / 100;
 		cval = ui.slider(valHandle, "Value", 0.0, 1.0, true);
 		if (valHandle.changed) handle.changed = ui.changed = true;
+		else handle.changed = false;
 		if (alpha) {
 			var alphaHandle = handle.nest(1, {value: Math.round(calpha * 100) / 100});
 			calpha = ui.slider(alphaHandle, "Alpha", 0.0, 1.0, true);
