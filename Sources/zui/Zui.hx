@@ -235,24 +235,10 @@ class Zui {
 
 	public function end(last = true) { // End drawing
 		if (!windowEnded) endWindow();
-		if (comboSelectedHandle != null) drawCombo(); // Handle active combo
-		if (tooltipText != "" || tooltipImg != null) {
-			if (inputChanged()) {
-				tooltipShown = false;
-				tooltipWait = inputDX == 0 && inputDY == 0; // Wait for movement before showing up again
-			}
-			if (!tooltipShown) {
-				tooltipShown = true;
-				tooltipX = inputX;
-				tooltipTime = kha.Scheduler.time();
-			}
-			if (!tooltipWait && kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
-				tooltipText != "" ? drawTooltip() : drawTooltipImage();
-			}
-		}
-		else tooltipShown = false;
-		if (last) endInput();
+		drawCombo(); // Handle active combo
+		drawTooltip();
 		tabPressedHandle = null;
+		if (last) endInput();
 	}
 
 	public function beginRegion(g: Graphics, x: Int, y: Int, w: Int) {
@@ -261,6 +247,8 @@ class Zui {
 		globalG = g;
 		this.g = g;
 		currentWindow = null;
+		tooltipText = "";
+		tooltipImg = null;
 		_windowX = 0;
 		_windowY = 0;
 		_windowW = w;
@@ -270,6 +258,8 @@ class Zui {
 	}
 
 	public function endRegion(last = true) {
+		drawTooltip();
+		tabPressedHandle = null;
 		if (last) endInput();
 	}
 
@@ -950,6 +940,7 @@ class Zui {
 		if (startEdit) { // Mouse did not move
 			handle.text = handle.value + "";
 			startTextEdit(handle);
+			handle.changed = changed = true;
 		}
 		var lalign = align == Left ? Right : Left;
 		if (textSelectedHandle == handle) {
@@ -958,6 +949,7 @@ class Zui {
 		if (submitTextHandle == handle) {
 			submitTextEdit();
 			handle.value = Std.parseFloat(handle.text);
+			handle.changed = changed = true;
 		}
 
 		g.color = t.LABEL_COL;// Text
@@ -1072,6 +1064,7 @@ class Zui {
 
 	static var comboFirst = true;
 	function drawCombo() {
+		if (comboSelectedHandle == null) return;
 		var _g = g;
 		globalG.color = t.SEPARATOR_COL;
 		var elementSize = Std.int(ELEMENT_H() + ELEMENT_OFFSET());
@@ -1121,6 +1114,24 @@ class Zui {
 	}
 
 	function drawTooltip() {
+		if (tooltipText != "" || tooltipImg != null) {
+			if (inputChanged()) {
+				tooltipShown = false;
+				tooltipWait = inputDX == 0 && inputDY == 0; // Wait for movement before showing up again
+			}
+			if (!tooltipShown) {
+				tooltipShown = true;
+				tooltipX = inputX;
+				tooltipTime = kha.Scheduler.time();
+			}
+			if (!tooltipWait && kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
+				tooltipText != "" ? drawTooltipText() : drawTooltipImage();
+			}
+		}
+		else tooltipShown = false;
+	}
+
+	function drawTooltipText() {
 		globalG.color = t.TEXT_COL;
 		var lines = tooltipText.split("\n");
 		var tooltipW = 0.0;
