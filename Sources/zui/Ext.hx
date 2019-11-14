@@ -239,7 +239,7 @@ class Ext {
 		return handle.text;
 	}
 
-	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>): Int {
+	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Center): Int {
 		if (!ui.isVisible(ui.ELEMENT_H())) { ui.endElement(); return handle.position; }
 		if (ui.getReleased()) {
 			if (++handle.position >= texts.length) handle.position = 0;
@@ -248,13 +248,13 @@ class Ext {
 		else handle.changed = false;
 
 		var hover = ui.getHover();
-		drawInlineRadio(ui, texts[handle.position], hover); // Radio
+		drawInlineRadio(ui, texts[handle.position], hover, align); // Radio
 
 		ui.endElement();
 		return handle.position;
 	}
 
-	static function drawInlineRadio(ui: Zui, text: String, hover: Bool) {
+	static function drawInlineRadio(ui: Zui, text: String, hover: Bool, align: Align = Center) {
 		if (hover) { // Bg
 			ui.g.color = ui.t.ACCENT_HOVER_COL;
 			ui.g.fillRect(ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, ui.BUTTON_H());
@@ -265,7 +265,7 @@ class Ext {
 			ui.g.drawRect(ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, ui.BUTTON_H());
 		}
 		ui.g.color = ui.t.TEXT_COL; // Text
-		ui.drawString(ui.g, text, ui.titleOffsetX, 0, Align.Center);
+		ui.drawString(ui.g, text, ui.TEXT_OFFSET(), 0, align);
 	}
 
 	static var wheelSelectedHande: Handle = null;
