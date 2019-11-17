@@ -1070,12 +1070,14 @@ class Zui {
 		var elementSize = Std.int(ELEMENT_H() + ELEMENT_OFFSET());
 		var comboH = (comboSelectedTexts.length + 1) * elementSize;
 		globalG.begin(false);
-		var outOfScreen = comboSelectedY + comboH > kha.System.windowHeight();
+		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H());
+		var distBottom = kha.System.windowHeight() - (comboSelectedY + comboH);
+		var outOfScreen = distBottom < 0 && distBottom < distTop;
 		var comboY = outOfScreen ? comboSelectedY - comboH - Std.int(ELEMENT_H()) : comboSelectedY;
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
 		beginRegion(globalG, comboSelectedX, comboY, comboSelectedW);
 
-		if (outOfScreen) {
+		if (outOfScreen) { // Unroll up
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Right);
 			_y += elementSize;
@@ -1096,7 +1098,7 @@ class Zui {
 		}
 		t.BUTTON_COL = BUTTON_COL;
 
-		if (!outOfScreen) {
+		if (!outOfScreen) { // Unroll down
 			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Right);
