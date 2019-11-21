@@ -427,9 +427,8 @@ class Nodes {
 		ui.elementsBaked = true;
 	}
 
-	// Global enum mapping for now..
-	public static var getEnumTexts: Void->Array<String> = null;
-	public static var mapEnum: String->String = null;
+	// Retrieve combo items for buttons of type ENUM
+	public static var enumTexts: String->Array<String> = null;
 
 	inline function isSelected(node: TNode) { return nodesSelected.indexOf(node) >= 0; }
 
@@ -539,10 +538,8 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				var arrayData = Std.is(but.data, Array);
-				var texts = arrayData ? but.data : getEnumTexts();
+				var texts = Std.is(but.data, Array) ? but.data : enumTexts(node.type);
 				but.default_value = ui.combo(nhandle.nest(buti, {position: but.default_value}), texts, but.name);
-				if (!arrayData) but.data = mapEnum(texts[but.default_value]);
 			}
 			else if (but.type == 'BOOL') {
 				ny += lineh;
