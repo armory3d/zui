@@ -33,6 +33,8 @@ class Zui {
 	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
+	public static var keyRepeat = true; // Emulate key repeat for non-character keys
+	static var keyRepeatTime = 0.0;
 
 	public var inputRegistered = false;
 	public var inputEnabled = true;
@@ -264,7 +266,7 @@ class Zui {
 	}
 
 	function endInput() {
-		isKeyPressed = false; // Reset input - only one char for now
+		isKeyPressed = false;
 		inputStarted = false;
 		inputStartedR = false;
 		inputReleased = false;
@@ -273,6 +275,12 @@ class Zui {
 		inputDY = 0;
 		inputWheelDelta = 0;
 		textToPaste = "";
+		if (keyRepeat && isKeyDown && kha.Scheduler.time() - keyRepeatTime > 0.05) {
+			if (key == KeyCode.Backspace || key == KeyCode.Delete || key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Up || key == KeyCode.Down) {
+				keyRepeatTime = kha.Scheduler.time();
+				isKeyPressed = true;
+			}
+		}
 	}
 
 	function inputChanged(): Bool {
@@ -747,7 +755,7 @@ class Zui {
 
 		// Flash cursor
 		var time = kha.Scheduler.time();
-		if (time % (FLASH_SPEED() * 2.0) < FLASH_SPEED()) {
+		if (isKeyDown || time % (FLASH_SPEED() * 2.0) < FLASH_SPEED()) {
 			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
 			var strw = ops.font.width(fontSize, str);
 			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
@@ -1338,6 +1346,7 @@ class Zui {
 		this.key = code;
 		isKeyPressed = true;
 		isKeyDown = true;
+		keyRepeatTime = kha.Scheduler.time() + 0.4;
 		switch code {
 		case KeyCode.Shift: isShiftDown = true;
 		case KeyCode.Control: isCtrlDown = true;
