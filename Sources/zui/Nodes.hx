@@ -106,15 +106,16 @@ class Nodes {
 
 		var wx = ui._windowX;
 		var wy = ui._windowY;
+		ui.inputEnabled = popupCommands == null;
 
 		// Pan cavas
-		if (ui.inputDownR) {
+		if (ui.inputEnabled && ui.inputDownR) {
 			panX += ui.inputDX / SCALE();
 			panY += ui.inputDY / SCALE();
 		}
 
 		// Zoom canvas
-		if (ui.inputWheelDelta != 0) {
+		if (ui.inputEnabled && ui.inputWheelDelta != 0) {
 			zoom += -ui.inputWheelDelta / 10;
 			if (zoom < 0.1) zoom = 0.1;
 			else if (zoom > 1.0) zoom = 1.0;
@@ -217,7 +218,7 @@ class Nodes {
 
 			// Drag node
 			var nodeh = NODE_H(node);
-			if (ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
+			if (ui.inputEnabled && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
 				if (ui.inputStarted) {
 					if (ui.isShiftDown) {
 						// Add to selection or deselect
@@ -327,7 +328,7 @@ class Nodes {
 			ui.g.drawRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
 			ui.g.color = 0xffffffff;
 		}
-		if (ui.inputStarted && linkDrag == null && !nodesDrag && !ui.changed) {
+		if (ui.inputEnabled && ui.inputStarted && linkDrag == null && !nodesDrag && !ui.changed) {
 			boxSelect = true;
 			boxSelectX = Std.int(ui.inputX - ui._windowX);
 			boxSelectY = Std.int(ui.inputY - ui._windowY);
@@ -413,7 +414,7 @@ class Nodes {
 		}
 
 		// Node removal
-		if ((ui.isBackspaceDown || ui.isDeleteDown || cutSelected) && !ui.isTyping) {
+		if (ui.inputEnabled && (ui.isBackspaceDown || ui.isDeleteDown || cutSelected) && !ui.isTyping) {
 			var i = nodesSelected.length - 1;
 			while (i >= 0) {
 				var n = nodesSelected[i--];
@@ -425,6 +426,22 @@ class Nodes {
 
 		ui.setScale(scaleFactor); // Restore non-zoomed scale
 		ui.elementsBaked = true;
+		ui.inputEnabled = true;
+
+		if (popupCommands != null) {
+			ui._x = popupX;
+			ui._y = popupY;
+			ui._w = popupW;
+
+			ui.fill(-6, -6, ui._w / ui.SCALE() + 12, ui.t.ELEMENT_H * 4 + 12, ui.t.ACCENT_SELECT_COL);
+			ui.fill(-5, -5, ui._w / ui.SCALE() + 10, ui.t.ELEMENT_H * 4 + 10, ui.t.SEPARATOR_COL);
+			popupCommands(ui);
+
+			var hide = (ui.inputStarted || ui.inputStartedR) && (ui.inputX - wx < popupX - 6 || ui.inputX - wx > popupX + popupW + 6 || ui.inputY - wy < popupY - 6 || ui.inputY - wy > popupY + popupH * ui.SCALE() + 6);
+			if (hide || ui.isEscapeDown) {
+				popupCommands = null;
+			}
+		}
 	}
 
 	// Retrieve combo items for buttons of type ENUM
@@ -643,6 +660,30 @@ class Nodes {
 				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
+			else if (!isLinked && inp.type == 'RGBA') {
+				g.color = ui.t.LABEL_COL;
+				g.drawString(inp.name, nx + p(12), ny - p(3));
+				var soc = inp;
+				g.color = 0xff000000;
+				g.fillRect(nx + w - p(38), ny - p(6), p(36), p(18));
+				g.color = kha.Color.fromFloats(soc.default_value[0], soc.default_value[1], soc.default_value[2]);
+				var rx = nx + w - p(37);
+				var ry = ny - p(5);
+				var rw = p(34);
+				var rh = p(16);
+				g.fillRect(rx, ry, rw, rh);
+				var ix = ui.inputX - wx;
+				var iy = ui.inputY - wy;
+				if (ui.inputStarted && ix > rx && iy > ry && ix < rx + rw && iy < ry + rh) {
+					ui.inputStarted = false;
+					popup(Std.int(rx), Std.int(ry + ui.ELEMENT_H()), Std.int(100 * scaleFactor), ui.t.ELEMENT_H * 4, function(ui: Zui) {
+						var val = soc.default_value;
+						nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
+						Ext.colorWheel(ui, nhandle, false, null, false, false);
+						val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
+					});
+				}
+			}
 			else {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(inp.name, nx + p(12), ny - p(3));
@@ -678,6 +719,19 @@ class Nodes {
 			else i++;
 		}
 		canvas.nodes.remove(n);
+	}
+
+	var popupX = 0;
+	var popupY = 0;
+	var popupW = 0;
+	var popupH = 0;
+	var popupCommands: Zui->Void = null;
+	function popup(x: Int, y: Int, w: Int, h: Int, commands: Zui->Void) {
+		popupX = x;
+		popupY = y;
+		popupW = w;
+		popupH = h;
+		popupCommands = commands;
 	}
 }
 
