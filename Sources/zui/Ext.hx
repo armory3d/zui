@@ -269,7 +269,7 @@ class Ext {
 	}
 
 	static var wheelSelectedHande: Handle = null;
-	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, rowAlign = false): kha.Color {
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, rowAlign = false, colorPreview = true): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
 		var chue = ar[0];
@@ -329,7 +329,7 @@ class Ext {
 		// Save as rgb
 		hsvToRgb(chue, csat, cval, ar);
 		handle.color = kha.Color.fromFloats(ar[0], ar[1], ar[2], calpha);
-		ui.text("", Right, handle.color);
+		if (colorPreview) ui.text("", Right, handle.color);
 		return handle.color;
 	}
 
