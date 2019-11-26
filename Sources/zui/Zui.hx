@@ -1263,7 +1263,8 @@ class Zui {
 	function isVisible(elemH: Float): Bool {
 		if (currentWindow == null) return true;
 		// Assume vertical layout for now
-		return (_y + elemH > 0 && _y < currentWindow.texture.height);
+		var top = tabNames != null ? ELEMENT_H() + ELEMENT_OFFSET() : 0;
+		return (_y + elemH > top && _y < currentWindow.texture.height);
 	}
 
 	function getReleased(elemH = -1.0): Bool { // Input selection
