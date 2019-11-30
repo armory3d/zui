@@ -1,6 +1,7 @@
 package zui;
 
 import zui.Zui;
+import zui.Popup;
 import kha.input.Keyboard;
 import kha.input.KeyCode;
 
@@ -140,6 +141,25 @@ class Ext {
 		if (showAdd && ui.button(addLabel)) {
 			addCb("untitled");
 		}
+	}
+
+	public static function colorField(ui: Zui, handle:Handle, alpha = false): Int {
+		ui.g.color = handle.color;
+
+		ui.drawRect(ui.g, true, ui._x + 2, ui._y, ui._w - 4, ui.BUTTON_H());
+		ui.g.color = ui.getHover() ? ui.t.ACCENT_HOVER_COL : ui.t.ACCENT_COL;
+		ui.drawRect(ui.g, false, ui._x + 2, ui._y, ui._w - 4, ui.BUTTON_H(), 1.0);
+
+		if (ui.getStarted()) {
+			Popup.showCustom(
+				new Zui(ui.ops),
+				function(ui:Zui) {
+					colorWheel(ui, handle, alpha);},
+				Std.int(ui.inputX), Std.int(ui.inputY), 200, 500);
+		}
+
+		ui.endElement();
+		return handle.color;
 	}
 
 	public static function colorPicker(ui: Zui, handle: Handle, alpha = false): Int {
