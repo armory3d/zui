@@ -97,6 +97,8 @@ class Popup {
 		Popup.ui = ui;
 		init(mx, my, mw, mh);
 
+		boxTitle = "";
+		boxText = "";
 		boxCommands = commands;
 	}
 
