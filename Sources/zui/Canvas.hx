@@ -6,7 +6,8 @@ using kha.graphics2.GraphicsExtension;
 class Canvas {
 
 	public static var assetMap = new Map<Int, Dynamic>(); // kha.Image | kha.Font
-	static var events: Array<String> = [];
+	public static var themes = new Array<zui.Themes.TTheme>();
+	static var events:Array<String> = [];
 
 	public static var screenW = -1;
 	public static var screenH = -1;
@@ -86,7 +87,7 @@ class Canvas {
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
-			ui.t.TEXT_COL = element.color_text;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
 			ui.text(getText(canvas, element), element.alignment);
 
 			ui.ops.font = font;
@@ -96,10 +97,10 @@ class Canvas {
 		case Button:
 			var bh = ui.t.BUTTON_H;
 			ui.t.BUTTON_H = scaled(element.height);
-			ui.t.BUTTON_COL = element.color;
-			ui.t.BUTTON_TEXT_COL = element.color_text;
-			ui.t.BUTTON_HOVER_COL = element.color_hover;
-			ui.t.BUTTON_PRESSED_COL = element.color_press;
+			ui.t.BUTTON_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.BUTTON_TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).BUTTON_TEXT_COL);
+			ui.t.BUTTON_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+			ui.t.BUTTON_PRESSED_COL = getColor(element.color_press, getTheme(canvas.theme).BUTTON_PRESSED_COL);
 			if (ui.button(getText(canvas, element), element.alignment)) {
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
@@ -121,90 +122,90 @@ class Canvas {
 
 		case FRectangle:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
 			ui.g.color = col;
 
 		case FCircle:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2);
 			ui.g.color = col;
 
 		case Rectangle:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
 
 		case Circle:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.drawCircle(ui._x+(scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, element.strength);
 			ui.g.color = col;
 
 		case FTriangle:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.fillTriangle(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height));
 			ui.g.color = col;
 
 		case Triangle:
 			var col = ui.g.color;
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.drawLine(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), element.strength);
 			ui.g.drawLine(ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height), element.strength);
 			ui.g.drawLine(ui._x + ui._w, ui._y + scaled(element.height), ui._x + (ui._w / 2), ui._y, element.strength);
 			ui.g.color = col;
 
 		case Check:
-			ui.t.TEXT_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color;
-			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			ui.check(h.nest(element.id), getText(canvas, element));
 
 		case Radio:
-			ui.t.TEXT_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color;
-			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			Ext.inlineRadio(ui, h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Combo:
-			ui.t.TEXT_COL = element.color_text;
-			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color;
-			ui.t.SEPARATOR_COL = element.color;
-			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.SEPARATOR_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
 
 		case Slider:
-			ui.t.TEXT_COL = element.color_text;
-			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color;
-			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true, 100, true, element.alignment);
 
 		case TextInput:
-			ui.t.TEXT_COL = element.color_text;
-			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color;
-			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			ui.textInput(h.nest(element.id), getText(canvas, element), element.alignment);
 
 		case KeyInput:
-			ui.t.TEXT_COL = element.color_text;
-			ui.t.LABEL_COL = element.color_text;
-			ui.t.ACCENT_COL = element.color;
-			ui.t.ACCENT_HOVER_COL = element.color_hover;
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			Ext.keyInput(ui, h.nest(element.id), getText(canvas, element));
 
 		case ProgressBar:
 			var col = ui.g.color;
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
-			ui.g.color = element.color_progress;
+			ui.g.color = getColor(element.color_progress, getTheme(canvas.theme).TEXT_COL);
 			ui.g.fillRect(ui._x, ui._y, ui._w / totalprogress * Math.min(progress, totalprogress), scaled(element.height));
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
 			ui.g.color = col;
 
@@ -212,9 +213,9 @@ class Canvas {
 			var col = ui.g.color;
 			var progress = element.progress_at;
 			var totalprogress = element.progress_total;
-			ui.g.color = element.color_progress;
+			ui.g.color = getColor(element.color_progress, getTheme(canvas.theme).TEXT_COL);
 			ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
-			ui.g.color = element.color;
+			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
 			ui.g.color = col;
 		case Empty:
@@ -256,6 +257,18 @@ class Canvas {
 	}
 
 	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE()); }
+
+	public static inline function getColor(color: Null<Int>, defaultColor: Int): Int {
+		return color != null ? color : defaultColor;
+	}
+
+	public static function getTheme(theme: String): zui.Themes.TTheme {
+		for (t in Canvas.themes) {
+			if (t.NAME == theme) return t;
+		}
+
+		return null;
+	}
 }
 
 typedef TCanvas = {
@@ -265,6 +278,7 @@ typedef TCanvas = {
 	var width: Int;
 	var height: Int;
 	var elements: Array<TElement>;
+	var theme: String;
 	@:optional var assets: Array<TAsset>;
 	@:optional var locales: Array<TLocale>;
 }
@@ -280,6 +294,7 @@ typedef TElement = {
 	@:optional var rotation: Null<kha.FastFloat>;
 	@:optional var text: String;
 	@:optional var event: String;
+	// null = follow theme settings
 	@:optional var color: Null<Int>;
 	@:optional var color_text: Null<Int>;
 	@:optional var color_hover: Null<Int>;
