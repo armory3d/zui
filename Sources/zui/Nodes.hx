@@ -563,7 +563,7 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				ui.check(nhandle.nest(buti, {selected: but.default_value}), but.name);
+				but.default_value = ui.check(nhandle.nest(buti, {selected: but.default_value}), but.name);
 			}
 			else if (but.type == 'RAMP') {
 				ny += lineh;
