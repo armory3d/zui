@@ -82,7 +82,6 @@ class Canvas {
 		case Text:
 			var font = ui.ops.font;
 			var size = ui.fontSize;
-			var tcol = ui.t.TEXT_COL;
 
 			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
@@ -92,7 +91,6 @@ class Canvas {
 
 			ui.ops.font = font;
 			ui.fontSize = size;
-			ui.t.TEXT_COL = tcol;
 
 		case Button:
 			var bh = ui.t.BUTTON_H;
