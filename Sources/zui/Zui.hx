@@ -287,7 +287,7 @@ class Zui {
 		return inputDX != 0 || inputDY != 0 || inputWheelDelta != 0 || inputStarted || inputStartedR || inputReleased || inputReleasedR || inputDown || inputDownR || isKeyPressed;
 	}
 
-	public function windowDirty(handle: Handle, x: Int, y: Int, w: Int, h: Int) {
+	public function windowDirty(handle: Handle, x: Int, y: Int, w: Int, h: Int): Bool {
 		var wx = x + handle.dragX;
 		var wy = y + handle.dragY;
 		var inputChanged = getInputInRect(wx, wy, w, h) && inputChanged();
@@ -584,7 +584,7 @@ class Zui {
 		var hover = getHover(h);
 		g.color = tint;
 		if (!enabled) fadeColor();
-		var h_float:Float = h; // TODO: hashlink fix
+		var h_float: Float = h; // TODO: hashlink fix
 		if (sw > 0) { // Source rect specified
 			imageInvertY ?
 				g.drawScaledSubImage(image, sx, sy, sw, sh, x, _y + h_float, w, -h_float) :
@@ -600,7 +600,7 @@ class Zui {
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
 
-	public function text(text: String, align:Align = Left, bg = 0x00000000): State {
+	public function text(text: String, align: Align = Left, bg = 0x00000000): State {
 		if (!isVisible(ELEMENT_H())) { endElement(); return State.Idle; }
 		var started = getStarted();
 		var down = getPushed();
@@ -729,7 +729,6 @@ class Zui {
 				text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
 			}
 		}
-
 
 		var off = TEXT_OFFSET();
 		var lineHeight = ELEMENT_H();
@@ -960,7 +959,7 @@ class Zui {
 			handle.changed = changed = true;
 		}
 
-		g.color = t.LABEL_COL;// Text
+		g.color = t.LABEL_COL; // Text
 		drawString(g, text, null, 0, align);
 
 		if (displayValue) {
@@ -1384,19 +1383,19 @@ class Zui {
 	public function onCopy(): String { isCopy = true; return textToCopy; }
 	public function onPaste(s: String) { isPaste = true; textToPaste = s; }
 
-	public inline function ELEMENT_W() { return t.ELEMENT_W * SCALE(); }
-	public inline function ELEMENT_H() { return t.ELEMENT_H * SCALE(); }
-	public inline function ELEMENT_OFFSET() { return t.ELEMENT_OFFSET * SCALE(); }
-	public inline function ARROW_SIZE() { return t.ARROW_SIZE * SCALE(); }
-	public inline function BUTTON_H() { return t.BUTTON_H * SCALE(); }
-	public inline function CHECK_SIZE() { return t.CHECK_SIZE * SCALE(); }
-	public inline function CHECK_SELECT_SIZE() { return t.CHECK_SELECT_SIZE * SCALE(); }
-	public inline function SCROLL_W() { return Std.int(t.SCROLL_W * SCALE()); }
-	public inline function TEXT_OFFSET() { return t.TEXT_OFFSET; }
-	public inline function TAB_W() { return Std.int(t.TAB_W * SCALE()); }
-	public inline function SCALE() { return ops.scaleFactor; }
-	inline function FLASH_SPEED() { return 0.5; }
-	inline function TOOLTIP_DELAY() { return 1.0; }
+	public inline function ELEMENT_W(): Float { return t.ELEMENT_W * SCALE(); }
+	public inline function ELEMENT_H(): Float { return t.ELEMENT_H * SCALE(); }
+	public inline function ELEMENT_OFFSET(): Float { return t.ELEMENT_OFFSET * SCALE(); }
+	public inline function ARROW_SIZE(): Float { return t.ARROW_SIZE * SCALE(); }
+	public inline function BUTTON_H(): Float { return t.BUTTON_H * SCALE(); }
+	public inline function CHECK_SIZE(): Float { return t.CHECK_SIZE * SCALE(); }
+	public inline function CHECK_SELECT_SIZE(): Float { return t.CHECK_SELECT_SIZE * SCALE(); }
+	public inline function SCROLL_W(): Int { return Std.int(t.SCROLL_W * SCALE()); }
+	public inline function TEXT_OFFSET(): Float { return t.TEXT_OFFSET; }
+	public inline function TAB_W(): Int { return Std.int(t.TAB_W * SCALE()); }
+	public inline function SCALE(): Float { return ops.scaleFactor; }
+	inline function FLASH_SPEED(): Float { return 0.5; }
+	inline function TOOLTIP_DELAY(): Float { return 1.0; }
 
 	public function resize(handle: Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;
@@ -1452,7 +1451,8 @@ class Handle {
 		if (children == null) children = [];
 		var c = children.get(i);
 		if (c == null) {
-			children.set(i, c = new Handle(ops));
+			c = new Handle(ops);
+			children.set(i, c);
 		}
 		return c;
 	}

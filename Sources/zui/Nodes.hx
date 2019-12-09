@@ -42,10 +42,10 @@ class Nodes {
 	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == 'RGBA') buttonsH += 150 * SCALE();
-			else if (but.type == 'VECTOR') buttonsH += LINE_H() * 4;
-			else if (but.type == 'RAMP') buttonsH += LINE_H() * 9.5;
-			else if (but.type == 'CURVES') buttonsH += LINE_H() * 8;
+			if (but.type == "RGBA") buttonsH += 150 * SCALE();
+			else if (but.type == "VECTOR") buttonsH += LINE_H() * 4;
+			else if (but.type == "RAMP") buttonsH += LINE_H() * 9.5;
+			else if (but.type == "CURVES") buttonsH += LINE_H() * 8;
 			else buttonsH += LINE_H();
 		}
 		return Std.int(buttonsH);
@@ -54,8 +54,8 @@ class Nodes {
 		return Std.int(LINE_H() * 1.2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + BUTTONS_H(node));
 	}
 	inline function NODE_W(): Int { return Std.int(140 * SCALE()); }
-	inline function NODE_X(node: TNode) { return node.x * SCALE() + PAN_X(); }
-	inline function NODE_Y(node: TNode) { return node.y * SCALE() + PAN_Y(); }
+	inline function NODE_X(node: TNode): Float { return node.x * SCALE() + PAN_X(); }
+	inline function NODE_Y(node: TNode): Float { return node.y * SCALE() + PAN_Y(); }
 	inline function SOCKET_Y(pos: Int): Int { return Std.int(LINE_H() * 1.62) + pos * LINE_H(); }
 	inline function p(f: Float): Float { return f * SCALE(); }
 
@@ -144,7 +144,9 @@ class Nodes {
 			var top = toY > fromY ? fromY : toY;
 			var bottom = toY > fromY ? toY : fromY;
 			if (right < 0 || left > wx + ui._windowW ||
-				bottom < 0 || top > wy + ui._windowH) continue;
+				bottom < 0 || top > wy + ui._windowH) {
+				continue;
+			}
 
 			// Snap to nearest socket
 			if (linkDrag == link) {
@@ -161,8 +163,7 @@ class Nodes {
 					var rw = NODE_W() + LINE_H();
 					var rh = nodeh + LINE_H();
 					if (ui.getInputInRect(rx, ry, rw, rh)) {
-						// Snap to output
-						if (from == null && node.id != to.id) {
+						if (from == null && node.id != to.id) { // Snap to output
 							for (i in 0...outs.length) {
 								var sx = wx + NODE_X(node) + NODE_W();
 								var sy = wy + NODE_Y(node) + SOCKET_Y(i);
@@ -177,10 +178,9 @@ class Nodes {
 								}
 							}
 						}
-						// Snap to input
-						else if (to == null && node.id != from.id) {
+						else if (to == null && node.id != from.id) { // Snap to input
 							for (i in 0...inps.length) {
-								var sx = wx + NODE_X(node) ;
+								var sx = wx + NODE_X(node);
 								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length) + BUTTONS_H(node);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
@@ -211,7 +211,9 @@ class Nodes {
 		for (node in canvas.nodes) {
 			// Cull
 			if (NODE_X(node) > ui._windowW || NODE_X(node) + NODE_W() < 0 ||
-				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(node) < 0) continue;
+				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(node) < 0) {
+				continue;
+			}
 
 			var inps = node.inputs;
 			var outs = node.outputs;
@@ -279,8 +281,7 @@ class Nodes {
 				}
 			}
 			else if (ui.inputReleased) {
-				// Connect to input
-				if (snapToId != -1) {
+				if (snapToId != -1) { // Connect to input
 					// Force single link per input
 					for (l in canvas.links) {
 						if (l.to_id == snapToId && l.to_socket == snapSocket) {
@@ -292,14 +293,12 @@ class Nodes {
 					linkDrag.to_socket = snapSocket;
 					ui.changed = true;
 				}
-				// Connect to output
-				else if (snapFromId != -1) {
+				else if (snapFromId != -1) { // Connect to output
 					linkDrag.from_id = snapFromId;
 					linkDrag.from_socket = snapSocket;
 					ui.changed = true;
 				}
-				// Remove dragged link
-				else if (linkDrag != null) {
+				else if (linkDrag != null) { // Remove dragged link
 					canvas.links.remove(linkDrag);
 					ui.changed = true;
 					if (onLinkDrag != null) {
@@ -335,7 +334,7 @@ class Nodes {
 		}
 		else if (boxSelect && !ui.inputDown) {
 			boxSelect = false;
-			var nodes:Array<TNode> = [];
+			var nodes: Array<TNode> = [];
 			var left = boxSelectX;
 			var top = boxSelectY;
 			var right = Std.int(ui.inputX - ui._windowX);
@@ -447,7 +446,7 @@ class Nodes {
 	// Retrieve combo items for buttons of type ENUM
 	public static var enumTexts: String->Array<String> = null;
 
-	inline function isSelected(node: TNode) { return nodesSelected.indexOf(node) >= 0; }
+	inline function isSelected(node: TNode): Bool { return nodesSelected.indexOf(node) >= 0; }
 
 	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
 		var wx = ui._windowX;
@@ -501,7 +500,7 @@ class Nodes {
 		for (buti in 0...node.buttons.length) {
 			var but = node.buttons[buti];
 
-			if (but.type == 'RGBA') {
+			if (but.type == "RGBA") {
 				ny += lineh; // 18 + 2 separator
 				ui._x = nx;
 				ui._y = ny;
@@ -511,7 +510,7 @@ class Nodes {
 				Ext.colorWheel(ui, nhandle, false);
 				val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
 			}
-			else if (but.type == 'VECTOR') {
+			else if (but.type == "VECTOR") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
@@ -528,7 +527,7 @@ class Nodes {
 				if (but.output != null) node.outputs[but.output].default_value = but.default_value;
 				ny += lineh * 3;
 			}
-			else if (but.type == 'VALUE') {
+			else if (but.type == "VALUE") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
@@ -541,7 +540,7 @@ class Nodes {
 				soc.default_value = ui.slider(nhandle.nest(buti, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
-			else if (but.type == 'STRING') {
+			else if (but.type == "STRING") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
@@ -550,7 +549,7 @@ class Nodes {
 				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : ""}), but.name);
 				if (soc != null) soc.default_value = but.default_value;
 			}
-			else if (but.type == 'ENUM') {
+			else if (but.type == "ENUM") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
@@ -558,20 +557,20 @@ class Nodes {
 				var texts = Std.is(but.data, Array) ? but.data : enumTexts(node.type);
 				but.default_value = ui.combo(nhandle.nest(buti, {position: but.default_value}), texts, but.name);
 			}
-			else if (but.type == 'BOOL') {
+			else if (but.type == "BOOL") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
 				but.default_value = ui.check(nhandle.nest(buti, {selected: but.default_value}), but.name);
 			}
-			else if (but.type == 'RAMP') {
+			else if (but.type == "RAMP") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
 				// Preview
-				var vals:Array<Array<Float>> = but.default_value;
+				var vals: Array<Array<Float>> = but.default_value;
 				var sw = w / SCALE();
 				for (val in vals) {
 					var pos = val[4];
@@ -581,7 +580,7 @@ class Nodes {
 				ui._y += lineh;
 				// Edit
 				var ihandle = nhandle.nest(buti).nest(2);
-				ui.row([1/4, 1/4, 2/4]);
+				ui.row([1 / 4, 1 / 4, 2 / 4]);
 				if (ui.button("+")) {
 					var last = vals[vals.length - 1];
 					vals.push([last[0], last[1], last[2], last[3], 1.0]); // [[r, g, b, a, pos], ..]
@@ -592,7 +591,7 @@ class Nodes {
 					ihandle.value -= 1;
 				}
 				but.data = ui.combo(nhandle.nest(buti).nest(1, {position: but.data}), ["Linear", "Constant"], "Interpolate");
-				ui.row([1/2, 1/2]);
+				ui.row([1 / 2, 1 / 2]);
 				var i = Std.int(ui.slider(ihandle, "Index", 0, vals.length - 1, false, 1, true, Left));
 				var val = vals[i];
 				nhandle.nest(buti).nest(3).value = val[4];
@@ -605,23 +604,23 @@ class Nodes {
 				val[2] = chandle.color.B;
 				ny += lineh * 8 + lineh * 0.5;
 			}
-			else if (but.type == 'CURVES') {
+			else if (but.type == "CURVES") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				ui.row([1/3, 1/3, 1/3]);
+				ui.row([1 / 3, 1 / 3, 1 / 3]);
 				ui.radio(nhandle.nest(buti).nest(1), 0, "X");
 				ui.radio(nhandle.nest(buti).nest(1), 1, "Y");
 				ui.radio(nhandle.nest(buti).nest(1), 2, "Z");
 				// Preview
 				var axis = nhandle.nest(buti).nest(1).position;
-				var val:Array<Float> = but.default_value[axis]; // [[x, y, x, y,..], [x, y], ..]
+				var val: Array<Float> = but.default_value[axis]; // [[x, y, x, y,..], [x, y], ..]
 				var num = Std.int(val.length / 2);
 				// for (i in 0...num) { ui.line(); }
 				ui._y += lineh * 5;
 				// Edit
-				ui.row([1/5, 1/5, 3/5]);
+				ui.row([1 / 5, 1 / 5, 3 / 5]);
 				if (ui.button("+")) {
 					val.push(0); val.push(0);
 				}
@@ -629,7 +628,7 @@ class Nodes {
 					if (val.length > 4) { val.pop(); val.pop(); }
 				}
 				var i = Std.int(ui.slider(nhandle.nest(buti).nest(2).nest(axis, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
-				ui.row([1/2, 1/2]);
+				ui.row([1 / 2, 1 / 2]);
 				nhandle.nest(buti).nest(3).value = val[i * 2    ];
 				nhandle.nest(buti).nest(4).value = val[i * 2 + 1];
 				val[i * 2    ] = ui.slider(nhandle.nest(buti).nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
@@ -647,7 +646,7 @@ class Nodes {
 			g.drawScaledImage(socketImage, nx - p(5), ny - p(2), p(10), p(10));
 			var isLinked = false;
 			for (l in canvas.links) if (l.to_id == node.id && l.to_socket == i) { isLinked = true; break; }
-			if (!isLinked && inp.type == 'VALUE') {
+			if (!isLinked && inp.type == "VALUE") {
 				ui._x = nx + p(6);
 				ui._y = ny - p(9);
 				ui._w = Std.int(w - p(6));
@@ -660,7 +659,7 @@ class Nodes {
 				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
-			else if (!isLinked && inp.type == 'RGBA') {
+			else if (!isLinked && inp.type == "RGBA") {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(inp.name, nx + p(12), ny - p(3));
 				var soc = inp;

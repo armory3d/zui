@@ -19,7 +19,8 @@ typedef ListOpts = {
 
 @:access(zui.Zui)
 class Ext {
-	public static function floatInput(ui: Zui, handle: Handle, label = "", align:Align = Left): Float {
+
+	public static function floatInput(ui: Zui, handle: Handle, label = "", align: Align = Left): Float {
 		handle.text = Std.string(handle.value);
 		var text = ui.textInput(handle, label, align);
 		handle.value = Std.parseFloat(text);
@@ -79,12 +80,12 @@ class Ext {
 		var removeCb = opts.removeCb != null ? opts.removeCb : function(i: Int) ar.splice(i, 1);
 		var getNameCb = opts.getNameCb != null ? opts.getNameCb : function(i: Int) return ar[i];
 		var setNameCb = opts.setNameCb != null ? opts.setNameCb : function(i: Int, name: String) ar[i] = name;
-		var getLabelCb = opts.getLabelCb != null ? opts.getLabelCb : function(i: Int) return '';
+		var getLabelCb = opts.getLabelCb != null ? opts.getLabelCb : function(i: Int) return "";
 		var itemDrawCb = opts.itemDrawCb;
 		var showRadio = opts.showRadio != null ? opts.showRadio : false;
 		var editable = opts.editable != null ? opts.editable : true;
 		var showAdd = opts.showAdd != null ? opts.showAdd : true;
-		var addLabel = opts.addLabel != null ? opts.addLabel : 'Add';
+		var addLabel = opts.addLabel != null ? opts.addLabel : "Add";
 
 		var i = 0;
 		while (i < ar.length) {
@@ -117,12 +118,12 @@ class Ext {
 									 itemDrawCb: Handle->Int->Void = null,
 									 editable = true,
 									 showAdd = true,
-									 addLabel: String = 'Add' ) {
+									 addLabel: String = "Add") {
 
 		if (addCb == null) addCb = function(name: String) { ar.push(name); };
 		if (removeCb == null) removeCb = function(i: Int) { ar.splice(i, 1); };
 		if (getNameCb == null) getNameCb = function(i: Int) { return ar[i]; };
-		if (setNameCb == null) setNameCb = function(i: Int, name:String) { ar[i] = name; };
+		if (setNameCb == null) setNameCb = function(i: Int, name: String) { ar[i] = name; };
 
 		var i = 0;
 		while (i < ar.length) {
@@ -177,7 +178,7 @@ class Ext {
 		if (handle.text == "") initPath(handle, systemId);
 
 		var save = Krom.getFilesLocation() + sep + dataPath + "dir.txt";
-		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + ' > ' + '"' + save + '"');
+		if (handle.text != lastPath) Krom.sysCommand(cmd + '"' + handle.text + '"' + " > " + '"' + save + '"');
 		lastPath = handle.text;
 		var str = haxe.io.Bytes.ofData(Krom.loadBlob(save)).toString();
 		var files = str.split("\n");
@@ -189,26 +190,26 @@ class Ext {
 
 		#elseif kha_webgl
 
-		var files:Array<String> = [];
+		var files: Array<String> = [];
 
 		var userAgent = untyped navigator.userAgent.toLowerCase();
-		if (userAgent.indexOf(' electron/') > -1) {
+		if (userAgent.indexOf(" electron/") > -1) {
 			if (handle.text == "") {
 				var pp = untyped window.process.platform;
 				var systemId = pp == "win32" ? "Windows" : (pp == "darwin" ? "OSX" : "Linux");
 				initPath(handle, systemId);
 			}
 			try {
-				files = untyped require('fs').readdirSync(handle.text);
+				files = untyped require("fs").readdirSync(handle.text);
 			}
-			catch(e:Dynamic) {
+			catch (e: Dynamic) {
 				// Non-directory item selected
 			}
 		}
 
 		#else
 
-		var files:Array<String> = [];
+		var files: Array<String> = [];
 
 		#end
 
@@ -302,7 +303,7 @@ class Ext {
 		ui.g.color = 0xffffffff;
 		ui.g.fillRect(cx - 2 * ui.SCALE(), cy - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE());
 		// Val slider
-		if (rowAlign) alpha ? ui.row([1/3, 1/3, 1/3]) : ui.row([1/2, 1/2]);
+		if (rowAlign) alpha ? ui.row([1 / 3, 1 / 3, 1 / 3]) : ui.row([1 / 2, 1 / 2]);
 		var valHandle = handle.nest(0);
 		valHandle.value = Math.round(cval * 100) / 100;
 		cval = ui.slider(valHandle, "Value", 0.0, 1.0, true);
@@ -333,11 +334,11 @@ class Ext {
 		return handle.color;
 	}
 
-	/*
+	/**
 	Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
-	*/
+	**/
 	static function keycodeToString(keycode: Int): String {
-		switch(keycode) {
+		switch (keycode) {
 			case -1: return "None";
 			case KeyCode.Unknown: return "Unknown";
 			case KeyCode.Back: return "Back";
@@ -502,7 +503,7 @@ class Ext {
 	static inline function fract(f: Float): Float { return f - Std.int(f); }
 	static inline function mix(x: Float, y: Float, a: Float): Float { return x * (1.0 - a) + y * a; }
 	static inline function clamp(x: Float, minVal: Float, maxVal: Float): Float { return Math.min(Math.max(x, minVal), maxVal); }
-	static inline function step(edge: Float, x: Float):Float { return x < edge ? 0.0 : 1.0; }
+	static inline function step(edge: Float, x: Float): Float { return x < edge ? 0.0 : 1.0; }
 	static inline var kx = 1.0;
 	static inline var ky = 2.0 / 3.0;
 	static inline var kz = 1.0 / 3.0;

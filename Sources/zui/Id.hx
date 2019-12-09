@@ -7,10 +7,10 @@ import haxe.macro.ExprTools;
 class Id {
 
 	static var i = 0;
-	macro public static function pos() { return macro $v{i++}; }
+	macro public static function pos(): Expr { return macro $v{i++}; }
 
-	public static macro function handle(ops: Expr = null) {
-		var code = 'zui.Zui.Handle.global.nest(zui.Id.pos(),' + ExprTools.toString(ops) + ')';
+	macro public static function handle(ops: Expr = null): Expr {
+		var code = "zui.Zui.Handle.global.nest(zui.Id.pos()," + ExprTools.toString(ops) + ")";
 	    return Context.parse(code, Context.currentPos());
 	}
 }

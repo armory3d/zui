@@ -6,7 +6,7 @@ using kha.graphics2.GraphicsExtension;
 class Canvas {
 
 	public static var assetMap = new Map<Int, Dynamic>(); // kha.Image | kha.Font
-	static var events:Array<String> = [];
+	static var events: Array<String> = [];
 
 	public static var screenW = -1;
 	public static var screenH = -1;
@@ -83,7 +83,7 @@ class Canvas {
 			var size = ui.fontSize;
 			var tcol = ui.t.TEXT_COL;
 
-			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
+			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
 			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
 			ui.fontSize = scaled(element.height);
 			ui.t.TEXT_COL = element.color_text;
@@ -108,7 +108,7 @@ class Canvas {
 
 		case Image:
 			var image = getAsset(canvas, element.asset);
-			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, '.ttf');
+			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
 			if (image != null && !fontAsset) {
 				ui.imageScrollAlign = false;
 				var tint = element.color != null ? element.color : 0xffffffff;
