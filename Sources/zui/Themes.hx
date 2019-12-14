@@ -3,6 +3,8 @@ package zui;
 class Themes {
 
 	public static var dark: TTheme = {
+		NAME: "Default Dark",
+
 		FONT_SIZE: 13,
 		ELEMENT_W: 100,
 		ELEMENT_H: 24,
@@ -36,6 +38,8 @@ class Themes {
 
 	// 2x scaled, for games
 	public static var light: TTheme = {
+		NAME: "Default Light",
+
 		FONT_SIZE: 13 * 2,
 		ELEMENT_W: 100 * 2,
 		ELEMENT_H: 24 * 2,
@@ -69,6 +73,8 @@ class Themes {
 }
 
 typedef TTheme = {
+	var NAME:String;
+
 	var FONT_SIZE: Int;
 	var ELEMENT_W: Int;
 	var ELEMENT_H: Int;

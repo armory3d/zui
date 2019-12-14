@@ -1457,6 +1457,12 @@ class Handle {
 		return c;
 	}
 
+	public function unnest(i: Int) {
+		if (children != null) {
+			children.remove(i);
+		}
+	}
+
 	public static var global = new Handle();
 }
 
