@@ -93,7 +93,9 @@ class Canvas {
 			ui.fontSize = size;
 
 		case Button:
+			var eh = ui.t.ELEMENT_H;
 			var bh = ui.t.BUTTON_H;
+			ui.t.ELEMENT_H = scaled(element.height);
 			ui.t.BUTTON_H = scaled(element.height);
 			ui.t.BUTTON_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.t.BUTTON_TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).BUTTON_TEXT_COL);
@@ -103,6 +105,7 @@ class Canvas {
 				var e = element.event;
 				if (e != null && e != "") events.push(e);
 			}
+			ui.t.ELEMENT_H = eh;
 			ui.t.BUTTON_H = bh;
 
 		case Image:
