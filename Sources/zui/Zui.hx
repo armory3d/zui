@@ -1196,8 +1196,7 @@ class Zui {
 
 	function endElement(elementSize: Null<Float> = null) {
 		if (elementSize == null) elementSize = ELEMENT_H() + ELEMENT_OFFSET();
-		if (currentWindow == null) { _y += elementSize; return; }
-		if (currentWindow.layout == Vertical) {
+		if (currentWindow == null || currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
 				_y += elementSize;
 				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
