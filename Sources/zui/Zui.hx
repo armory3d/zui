@@ -919,7 +919,7 @@ class Zui {
 		return handle.position;
 	}
 
-	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100, displayValue = true, align: Align = Right, textEdit = true): Float {
+	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100.0, displayValue = true, align: Align = Right, textEdit = true): Float {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
 		if (getStarted()) {
 			scrollHandle = handle;
