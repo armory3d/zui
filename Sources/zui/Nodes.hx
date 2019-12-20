@@ -659,6 +659,17 @@ class Nodes {
 				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
+			if (!isLinked && inp.type == "STRING") {
+				ui._x = nx + p(6);
+				ui._y = ny - p(9);
+				ui._w = Std.int(w - p(6));
+				var soc = inp;
+				var textOff = ui.t.TEXT_OFFSET;
+				ui.t.TEXT_OFFSET = 6;
+				var maxButtons = 9;
+				soc.default_value = ui.textInput(nhandle.nest(maxButtons).nest(i, {text: soc.default_value}), inp.name, Left);
+				ui.t.TEXT_OFFSET = textOff;
+			}
 			else if (!isLinked && inp.type == "RGBA") {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(inp.name, nx + p(12), ny - p(3));
