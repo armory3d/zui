@@ -174,7 +174,7 @@ class Zui {
 
 	public function setScale(factor: Float) {
 		ops.scaleFactor = factor;
-		fontSize = Std.int(t.FONT_SIZE * ops.scaleFactor);
+		fontSize = FONT_SIZE();
 		var fontHeight = ops.font.height(fontSize);
 		fontOffsetY = (ELEMENT_H() - fontHeight) / 2; // Precalculate offsets
 		arrowOffsetY = (ELEMENT_H() - ARROW_SIZE()) / 2;
@@ -1389,8 +1389,9 @@ class Zui {
 	public inline function BUTTON_H(): Float { return t.BUTTON_H * SCALE(); }
 	public inline function CHECK_SIZE(): Float { return t.CHECK_SIZE * SCALE(); }
 	public inline function CHECK_SELECT_SIZE(): Float { return t.CHECK_SELECT_SIZE * SCALE(); }
+	public inline function FONT_SIZE(): Int { return Std.int(t.FONT_SIZE * SCALE()); }
 	public inline function SCROLL_W(): Int { return Std.int(t.SCROLL_W * SCALE()); }
-	public inline function TEXT_OFFSET(): Float { return t.TEXT_OFFSET; }
+	public inline function TEXT_OFFSET(): Float { return t.TEXT_OFFSET * SCALE(); }
 	public inline function TAB_W(): Int { return Std.int(t.TAB_W * SCALE()); }
 	public inline function SCALE(): Float { return ops.scaleFactor; }
 	inline function FLASH_SPEED(): Float { return 0.5; }
