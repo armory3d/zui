@@ -29,6 +29,7 @@ class Nodes {
 	static var boxSelect = false;
 	static var boxSelectX = 0;
 	static var boxSelectY = 0;
+	static inline var maxButtons = 9;
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
@@ -655,18 +656,16 @@ class Nodes {
 				var max = soc.max != null ? soc.max : 1.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				var maxButtons = 9;
 				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
-			if (!isLinked && inp.type == "STRING") {
+			else if (!isLinked && inp.type == "STRING") {
 				ui._x = nx + p(6);
 				ui._y = ny - p(9);
 				ui._w = Std.int(w - p(6));
 				var soc = inp;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				var maxButtons = 9;
 				soc.default_value = ui.textInput(nhandle.nest(maxButtons).nest(i, {text: soc.default_value}), inp.name, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
