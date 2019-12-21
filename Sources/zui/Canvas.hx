@@ -49,30 +49,30 @@ class Canvas {
 		var ch = scaled(canvas.height);
 
 		switch (element.anchor) {
-		case Top:
-			px -= (cw - screenW) / 2;
-		case TopRight:
-			px -= cw - screenW;
-		case CenterLeft:
-			py -= (ch - screenH) / 2;
-		case Center:
-			px -= (cw - screenW) / 2;
-			py -= (ch - screenH) / 2;
-		case CenterRight:
-			px -= cw - screenW;
-			py -= (ch - screenH) / 2;
-		case BottomLeft:
-			py -= ch - screenH;
-		case Bottom:
-			px -= (cw - screenW) / 2;
-			py -= ch - screenH;
-		case BottomRight:
-			px -= cw - screenW;
-			py -= ch - screenH;
+			case Top:
+				px = cw / 2 - scaled(element.width) / 2;
+			case TopRight:
+				px = cw - scaled(element.width);
+			case CenterLeft:
+				py = ch / 2 - scaled(element.height) / 2;
+			case Center:
+				px = cw / 2 - scaled(element.width) / 2;
+				py = ch / 2 - scaled(element.height) / 2;
+			case CenterRight:
+				px = cw - scaled(element.width);
+				py = ch / 2 - scaled(element.height) / 2;
+			case BottomLeft:
+				py = ch - scaled(element.height);
+			case Bottom:
+				px = cw / 2 - scaled(element.width) / 2;
+				py = ch - scaled(element.height);
+			case BottomRight:
+				px = cw - scaled(element.width);
+				py = ch - scaled(element.height);
 		}
 
-		ui._x = canvas.x + scaled(element.x) + scaled(px);
-		ui._y = canvas.y + scaled(element.y) + scaled(py);
+		ui._x = canvas.x + scaled(element.x) + px;
+		ui._y = canvas.y + scaled(element.y) + py;
 		ui._w = scaled(element.width);
 
 		var rotated = element.rotation != null && element.rotation != 0;
