@@ -45,30 +45,38 @@ class Canvas {
 
 		if (element == null || element.visible == false) return;
 
-		var cw = scaled(canvas.width);
-		var ch = scaled(canvas.height);
+		var cw: Float;
+		var ch: Float;
+		if (element.parent == null) {
+			cw = scaled(canvas.width);
+			ch = scaled(canvas.height);
+		} else {
+			var parent = elemById(canvas, element.parent);
+			cw = scaled(parent.width);
+			ch = scaled(parent.height);
+		}
 
 		switch (element.anchor) {
 			case Top:
-				px = cw / 2 - scaled(element.width) / 2;
+				px += cw / 2 - scaled(element.width) / 2;
 			case TopRight:
-				px = cw - scaled(element.width);
+				px += cw - scaled(element.width);
 			case CenterLeft:
-				py = ch / 2 - scaled(element.height) / 2;
+				py += ch / 2 - scaled(element.height) / 2;
 			case Center:
-				px = cw / 2 - scaled(element.width) / 2;
-				py = ch / 2 - scaled(element.height) / 2;
+				px += cw / 2 - scaled(element.width) / 2;
+				py += ch / 2 - scaled(element.height) / 2;
 			case CenterRight:
-				px = cw - scaled(element.width);
-				py = ch / 2 - scaled(element.height) / 2;
+				px += cw - scaled(element.width);
+				py += ch / 2 - scaled(element.height) / 2;
 			case BottomLeft:
-				py = ch - scaled(element.height);
+				py += ch - scaled(element.height);
 			case Bottom:
-				px = cw / 2 - scaled(element.width) / 2;
-				py = ch - scaled(element.height);
+				px += cw / 2 - scaled(element.width) / 2;
+				py += ch - scaled(element.height);
 			case BottomRight:
-				px = cw - scaled(element.width);
-				py = ch - scaled(element.height);
+				px += cw - scaled(element.width);
+				py += ch - scaled(element.height);
 		}
 
 		ui._x = canvas.x + scaled(element.x) + px;
@@ -224,7 +232,7 @@ class Canvas {
 
 		if (element.children != null) {
 			for (id in element.children) {
-				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
+				drawElement(ui, canvas, elemById(canvas, id), scaled(element.x) + px, scaled(element.y) + py);
 			}
 		}
 
