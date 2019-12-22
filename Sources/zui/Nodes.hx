@@ -536,9 +536,10 @@ class Nodes {
 				var soc = node.outputs[but.output];
 				var min = but.min != null ? but.min : 0.0;
 				var max = but.max != null ? but.max : 1.0;
+				var prec = but.precision != null ? but.precision : 100.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				soc.default_value = ui.slider(nhandle.nest(buti, {value: soc.default_value}), "Value", min, max, true, 100, true, Left);
+				soc.default_value = ui.slider(nhandle.nest(buti, {value: soc.default_value}), "Value", min, max, true, prec, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (but.type == "STRING") {
@@ -654,9 +655,10 @@ class Nodes {
 				var soc = inp;
 				var min = soc.min != null ? soc.min : 0.0;
 				var max = soc.max != null ? soc.max : 1.0;
+				var prec = soc.precision != null ? soc.precision : 100.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, 100, true, Left);
+				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, prec, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (!isLinked && inp.type == "STRING") {
@@ -771,6 +773,7 @@ typedef TNodeSocket = {
 	var default_value: Dynamic;
 	@:optional var min: Null<Float>;
 	@:optional var max: Null<Float>;
+	@:optional var precision: Null<Float>;
 }
 
 typedef TNodeLink = {
@@ -789,4 +792,5 @@ typedef TNodeButton = {
 	@:optional var data: Dynamic;
 	@:optional var min: Null<Float>;
 	@:optional var max: Null<Float>;
+	@:optional var precision: Null<Float>;
 }
