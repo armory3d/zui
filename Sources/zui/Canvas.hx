@@ -250,7 +250,7 @@ class Canvas {
 	}
 
 	/**
-	 * Returns the positional offset of the given element based on its anchor setting.
+	 * Returns the positional scaled offset of the given element based on its anchor setting.
 	 * @param canvas The canvas object
 	 * @param element The element
 	 * @return Array<Float> [xOffset, yOffset]
