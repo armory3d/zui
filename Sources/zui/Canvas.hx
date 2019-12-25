@@ -45,34 +45,12 @@ class Canvas {
 
 		if (element == null || element.visible == false) return;
 
-		var cw = scaled(canvas.width);
-		var ch = scaled(canvas.height);
+		var anchorOffset = getAnchorOffset(canvas, element);
+		px += anchorOffset[0];
+		py += anchorOffset[1];
 
-		switch (element.anchor) {
-		case Top:
-			px -= (cw - screenW) / 2;
-		case TopRight:
-			px -= cw - screenW;
-		case CenterLeft:
-			py -= (ch - screenH) / 2;
-		case Center:
-			px -= (cw - screenW) / 2;
-			py -= (ch - screenH) / 2;
-		case CenterRight:
-			px -= cw - screenW;
-			py -= (ch - screenH) / 2;
-		case BottomLeft:
-			py -= ch - screenH;
-		case Bottom:
-			px -= (cw - screenW) / 2;
-			py -= ch - screenH;
-		case BottomRight:
-			px -= cw - screenW;
-			py -= ch - screenH;
-		}
-
-		ui._x = canvas.x + scaled(element.x) + scaled(px);
-		ui._y = canvas.y + scaled(element.y) + scaled(py);
+		ui._x = canvas.x + scaled(element.x) + px;
+		ui._y = canvas.y + scaled(element.y) + py;
 		ui._w = scaled(element.width);
 
 		var rotated = element.rotation != null && element.rotation != 0;
@@ -224,7 +202,7 @@ class Canvas {
 
 		if (element.children != null) {
 			for (id in element.children) {
-				drawElement(ui, canvas, elemById(canvas, id), element.x + px, element.y + py);
+				drawElement(ui, canvas, elemById(canvas, id), scaled(element.x) + px, scaled(element.y) + py);
 			}
 		}
 
@@ -269,6 +247,52 @@ class Canvas {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the positional scaled offset of the given element based on its anchor setting.
+	 * @param canvas The canvas object
+	 * @param element The element
+	 * @return Array<Float> [xOffset, yOffset]
+	 */
+	public static function getAnchorOffset(canvas: TCanvas, element: TElement): Array<Float> {
+		var boxWidth, boxHeight: Float;
+		var offsetX = 0.0;
+		var offsetY = 0.0;
+
+		if (element.parent == null) {
+			boxWidth = scaled(canvas.width);
+			boxHeight = scaled(canvas.height);
+		} else {
+			var parent = elemById(canvas, element.parent);
+			boxWidth = scaled(parent.width);
+			boxHeight = scaled(parent.height);
+		}
+
+		switch (element.anchor) {
+			case Top:
+				offsetX += boxWidth / 2 - scaled(element.width) / 2;
+			case TopRight:
+				offsetX += boxWidth - scaled(element.width);
+			case CenterLeft:
+				offsetY += boxHeight / 2 - scaled(element.height) / 2;
+			case Center:
+				offsetX += boxWidth / 2 - scaled(element.width) / 2;
+				offsetY += boxHeight / 2 - scaled(element.height) / 2;
+			case CenterRight:
+				offsetX += boxWidth - scaled(element.width);
+				offsetY += boxHeight / 2 - scaled(element.height) / 2;
+			case BottomLeft:
+				offsetY += boxHeight - scaled(element.height);
+			case Bottom:
+				offsetX += boxWidth / 2 - scaled(element.width) / 2;
+				offsetY += boxHeight - scaled(element.height);
+			case BottomRight:
+				offsetX += boxWidth - scaled(element.width);
+				offsetY += boxHeight - scaled(element.height);
+		}
+
+		return [offsetX, offsetY];
 	}
 }
 
