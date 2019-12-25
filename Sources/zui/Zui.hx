@@ -519,7 +519,7 @@ class Zui {
 			tabX += _w + 1;
 			drawRect(g, true, _x + buttonOffsetY, _y + buttonOffsetY, _w, tabH);
 			g.color = selected ? t.BUTTON_TEXT_COL : t.LABEL_COL;
-			drawString(g, tabNames[i], TEXT_OFFSET(), 0, Align.Left);
+			drawString(g, tabNames[i], t.TEXT_OFFSET, 0, Align.Left);
 
 			if (selected) { // Hide underline for active tab
 				g.color = t.WINDOW_BG_COL;
