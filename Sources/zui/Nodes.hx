@@ -89,13 +89,13 @@ class Nodes {
 	function bakeElements(ui: Zui) {
 		ui.g.end();
 		elementsBaked = true;
-		socketImage = kha.Image.createRenderTarget(20, 20);
+		socketImage = kha.Image.createRenderTarget(24, 24);
 		var g = socketImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = 0xff000000;
-		kha.graphics2.GraphicsExtension.fillCircle(g, 10, 10, 10);
+		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 12);
 		g.color = 0xffffffff;
-		kha.graphics2.GraphicsExtension.fillCircle(g, 10, 10, 8);
+		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 8);
 		g.end();
 		ui.g.begin(false);
 	}
@@ -485,7 +485,7 @@ class Nodes {
 		for (out in node.outputs) {
 			ny += lineh;
 			g.color = out.color;
-			g.drawScaledImage(socketImage, nx + w - p(5), ny - p(2), p(10), p(10));
+			g.drawScaledImage(socketImage, nx + w - p(6), ny - p(3), p(12), p(12));
 		}
 		ny -= lineh * node.outputs.length;
 		g.color = ui.t.LABEL_COL;
@@ -645,7 +645,7 @@ class Nodes {
 			var inp = node.inputs[i];
 			ny += lineh;
 			g.color = inp.color;
-			g.drawScaledImage(socketImage, nx - p(5), ny - p(2), p(10), p(10));
+			g.drawScaledImage(socketImage, nx - p(6), ny - p(3), p(12), p(12));
 			var isLinked = false;
 			for (l in canvas.links) if (l.to_id == node.id && l.to_socket == i) { isLinked = true; break; }
 			if (!isLinked && inp.type == "VALUE") {
