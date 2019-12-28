@@ -95,7 +95,7 @@ class Nodes {
 		g.color = 0xff000000;
 		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 12);
 		g.color = 0xffffffff;
-		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 8);
+		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 9);
 		g.end();
 		ui.g.begin(false);
 	}
@@ -468,8 +468,10 @@ class Nodes {
 		g.fillRect(nx - 1, ny - 1, w + 2, h + 2);
 
 		// Header
-		g.color = node.color;
+		g.color = ui.t.WINDOW_BG_COL - 0x00060606;
 		g.fillRect(nx, ny, w, lineh);
+		g.color = node.color;
+		g.fillRect(nx, ny + lineh - p(3), w, p(3));
 
 		// Body
 		g.color = ui.t.WINDOW_BG_COL;
@@ -478,7 +480,7 @@ class Nodes {
 		// Title
 		g.color = ui.t.LABEL_COL;
 		var textw = g.font.width(ui.fontSize, text);
-		g.drawString(text, nx + w / 2 - textw / 2, ny + p(6));
+		g.drawString(text, nx + p(10), ny + p(6));
 		ny += lineh * 0.5;
 
 		// Outputs
