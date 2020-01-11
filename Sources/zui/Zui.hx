@@ -850,11 +850,11 @@ class Zui {
 
 	public function radio(handle: Handle, position: Int, text: String): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position == position; }
+		if (position == 0) handle.changed = false;
 		if (getReleased()) {
 			handle.position = position;
 			handle.changed = changed = true;
 		}
-		else handle.changed = false;
 
 		var hover = getHover();
 		drawRadio(handle.position == position, hover); // Radio
