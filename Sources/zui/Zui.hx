@@ -390,8 +390,9 @@ class Zui {
 				g.fillRect(0, 0, _windowW, 15);
 			}
 
-			var fullHeight = _y - handle.scrollOffset;
-			if (fullHeight < _windowH || handle.layout == Horizontal || !scrollEnabled) { // Disable scrollbar
+			var wh = _windowH - windowHeaderH; // Exclude header
+			var fullHeight = _y - handle.scrollOffset - windowHeaderH;
+			if (fullHeight < wh || handle.layout == Horizontal || !scrollEnabled) { // Disable scrollbar
 				handle.scrollEnabled = false;
 				handle.scrollOffset = 0;
 			}
@@ -401,15 +402,16 @@ class Zui {
 					handle.scrollOffset = tabScroll;
 					tabScroll = 0;
 				}
-				var amountToScroll = fullHeight - _windowH;
+				var wy = _windowY + windowHeaderH;
+				var amountToScroll = fullHeight - wh;
 				var amountScrolled = -handle.scrollOffset;
 				var ratio = amountScrolled / amountToScroll;
-				var barH = _windowH * Math.abs(_windowH / fullHeight);
+				var barH = wh * Math.abs(wh / fullHeight);
 				barH = Math.max(barH, ELEMENT_H());
 
-				var totalScrollableArea = _windowH - barH;
+				var totalScrollableArea = wh - barH;
 				var e = amountToScroll / totalScrollableArea;
-				var barY = totalScrollableArea * ratio;
+				var barY = totalScrollableArea * ratio + windowHeaderH;
 				var barFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), barY + _windowY, SCROLL_W(), barH);
 
 				if (inputStarted && barFocus) { // Start scrolling
@@ -421,7 +423,7 @@ class Zui {
 					scroll(inputDY * e, fullHeight);
 				}
 				else if (inputWheelDelta != 0 && comboSelectedHandle == null &&
-						 getInputInRect(_windowX, _windowY, _windowW, _windowH)) { // Wheel
+						 getInputInRect(_windowX, wy, _windowW, wh)) { // Wheel
 					scroll(inputWheelDelta * ELEMENT_H(), fullHeight);
 				}
 
@@ -429,14 +431,14 @@ class Zui {
 				if (handle.scrollOffset > 0) {
 					handle.scrollOffset = 0;
 				}
-				else if (fullHeight + handle.scrollOffset < _windowH) {
-					handle.scrollOffset = _windowH - fullHeight;
+				else if (fullHeight + handle.scrollOffset < wh) {
+					handle.scrollOffset = wh - fullHeight;
 				}
 
 				g.color = t.WINDOW_BG_COL; // Bg
-				g.fillRect(_windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
+				g.fillRect(_windowW - SCROLL_W(), wy, SCROLL_W(), wh);
 				g.color = t.ACCENT_COL; // Bar
-				var scrollbarFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), _windowY, SCROLL_W(), _windowH);
+				var scrollbarFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), wy, SCROLL_W(), wh);
 				var barW = (scrollbarFocus || handle == scrollHandle) ? SCROLL_W() : SCROLL_W() / 3;
 				g.fillRect(_windowW - barW - scrollAlign, barY, barW, barH);
 			}
@@ -474,7 +476,7 @@ class Zui {
 			tabVertical = vertical;
 			vertical ?
 				windowHeaderW += ELEMENT_W() :
-				windowHeaderH += BUTTON_H() + buttonOffsetY;
+				windowHeaderH += BUTTON_H() + buttonOffsetY + ELEMENT_OFFSET();
 			restoreX = inputX; // Mouse in tab header, disable clicks for tab content
 			restoreY = inputY;
 			if (!vertical && getInputInRect(_windowX, _windowY, _windowW, windowHeaderH)) {
@@ -485,7 +487,7 @@ class Zui {
 		tabColors.push(color);
 		var selected = handle.position == tabNames.length - 1;
 		if (tabNames.length == 1) { // Do once
-			vertical ? _x += windowHeaderW + 6 : _y += windowHeaderH + ELEMENT_OFFSET() + 3;
+			vertical ? _x += windowHeaderW + 6 : _y += windowHeaderH + 3;
 		}
 		return selected;
 	}
