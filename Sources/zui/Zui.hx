@@ -146,6 +146,7 @@ class Zui {
 	var tooltipWait = false;
 	var tooltipTime = 0.0;
 	var tabNames: Array<String> = null; // Number of tab calls since window begin
+	var tabColors: Array<Int> = null;
 	var tabHandle: Handle = null;
 	var tabScroll = 0.0;
 	var tabVertical = false;
@@ -465,9 +466,10 @@ class Zui {
 		currentWindow.scrollOffset -= delta;
 	}
 
-	public function tab(handle: Handle, text: String, vertical = false): Bool {
+	public function tab(handle: Handle, text: String, vertical = false, color: Int = -1): Bool {
 		if (tabNames == null) { // First tab
 			tabNames = [];
+			tabColors = [];
 			tabHandle = handle;
 			tabVertical = vertical;
 			vertical ?
@@ -480,6 +482,7 @@ class Zui {
 			}
 		}
 		tabNames.push(text);
+		tabColors.push(color);
 		var selected = handle.position == tabNames.length - 1;
 		if (tabNames.length == 1) { // Do once
 			vertical ? _x += windowHeaderW + 6 : _y += windowHeaderH + ELEMENT_OFFSET() + 3;
@@ -530,7 +533,8 @@ class Zui {
 			}
 			var selected = tabHandle.position == i;
 
-			g.color = selected ? t.WINDOW_BG_COL :
+			g.color = tabColors[i] != -1 ? tabColors[i] :
+					  selected ? t.WINDOW_BG_COL :
 					  (pushed || hover) ? t.BUTTON_HOVER_COL :
 					  t.SEPARATOR_COL;
 			tabVertical ?
