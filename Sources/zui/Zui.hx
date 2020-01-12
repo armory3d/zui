@@ -115,7 +115,10 @@ class Zui {
 	var windowEnded = true;
 	var scrollHandle: Handle = null; // Window or slider being scrolled
 	var dragHandle: Handle = null; // Window being dragged
-	var windowHeader = 0.0;
+	var windowHeaderW = 0.0;
+	var windowHeaderH = 0.0;
+	var restoreX = -1.0;
+	var restoreY = -1.0;
 
 	var textSelectedHandle: Handle = null;
 	var textSelectedCurrentText: String;
@@ -145,6 +148,7 @@ class Zui {
 	var tabNames: Array<String> = null; // Number of tab calls since window begin
 	var tabHandle: Handle = null;
 	var tabScroll = 0.0;
+	var tabVertical = false;
 
 	var elementsBaked = false;
 	var checkSelectImage: kha.Image = null;
@@ -309,7 +313,8 @@ class Zui {
 		_windowY = y + handle.dragY;
 		_windowW = w;
 		_windowH = h;
-		windowHeader = 0;
+		windowHeaderW = 0;
+		windowHeaderH = 0;
 
 		if (windowDirty(handle, x, y, w, h)) {
 			handle.redraws = 2;
@@ -366,7 +371,7 @@ class Zui {
 				handle.dragY += Std.int(inputDY);
 			}
 			_y += 15; // Header offset
-			windowHeader += 15;
+			windowHeaderH += 15;
 		}
 
 		return true;
@@ -460,22 +465,25 @@ class Zui {
 		currentWindow.scrollOffset -= delta;
 	}
 
-	var restoreX = -1.0;
-	var restoreY = -1.0;
-	public function tab(handle: Handle, text: String): Bool {
+	public function tab(handle: Handle, text: String, vertical = false): Bool {
 		if (tabNames == null) { // First tab
 			tabNames = [];
 			tabHandle = handle;
-			windowHeader += buttonOffsetY + BUTTON_H();
+			tabVertical = vertical;
+			vertical ?
+				windowHeaderW += ELEMENT_W() :
+				windowHeaderH += BUTTON_H() + buttonOffsetY;
 			restoreX = inputX; // Mouse in tab header, disable clicks for tab content
 			restoreY = inputY;
-			if (getInputInRect(_windowX, _windowY, _windowW, windowHeader)) {
+			if (!vertical && getInputInRect(_windowX, _windowY, _windowW, windowHeaderH)) {
 				inputX = inputY = -1;
 			}
 		}
 		tabNames.push(text);
 		var selected = handle.position == tabNames.length - 1;
-		if (selected) { endElement(); _y += 2; }
+		if (tabNames.length == 1) { // Do once
+			vertical ? _x += windowHeaderW + 6 : _y += windowHeaderH + ELEMENT_OFFSET() + 3;
+		}
 		return selected;
 	}
 
@@ -484,21 +492,30 @@ class Zui {
 		inputY = restoreY;
 		if (currentWindow == null) return;
 		var tabX = 0.0;
+		var tabY = 0.0;
 		var tabH = Std.int(BUTTON_H() * 1.1);
 		var origy = _y;
 		_y = currentWindow.dragEnabled ? 15 : 0;
 		tabHandle.changed = false;
 
-		g.color = t.SEPARATOR_COL;
-		g.fillRect(0, _y, _windowW, buttonOffsetY + tabH + 2);
-		g.color = t.ACCENT_COL; // Underline tab buttons
-		g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH + 2, _windowW - buttonOffsetY * 2, 1);
+		g.color = t.SEPARATOR_COL; // Tab background
+		tabVertical ?
+			g.fillRect(0, _y, ELEMENT_W(), _windowH) :
+			g.fillRect(0, _y, _windowW, buttonOffsetY + tabH + 2);
 
-		_y += 2;
+		g.color = t.ACCENT_COL; // Underline tab buttons
+		tabVertical ?
+			g.fillRect(ELEMENT_W(), _y, 1, _windowH) :
+			g.fillRect(buttonOffsetY, _y + buttonOffsetY + tabH + 2, _windowW - buttonOffsetY * 2, 1);
+
+		var basey = tabVertical ? _y : _y + 2;
 
 		for (i in 0...tabNames.length) {
 			_x = tabX;
-			_w = Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 18 * SCALE());
+			_y = basey + tabY;
+			_w = tabVertical ?
+					Std.int(ELEMENT_W() - 1 * SCALE()) :
+					Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 18 * SCALE());
 			var released = getReleased();
 			var pushed = getPushed();
 			var hover = getHover();
@@ -516,12 +533,14 @@ class Zui {
 			g.color = selected ? t.WINDOW_BG_COL :
 					  (pushed || hover) ? t.BUTTON_HOVER_COL :
 					  t.SEPARATOR_COL;
-			tabX += _w + 1;
+			tabVertical ?
+				tabY += tabH + 1 :
+				tabX += _w + 1;
 			drawRect(g, true, _x + buttonOffsetY, _y + buttonOffsetY, _w, tabH);
 			g.color = selected ? t.BUTTON_TEXT_COL : t.LABEL_COL;
 			drawString(g, tabNames[i], t.TEXT_OFFSET, 0, Align.Left);
 
-			if (selected) { // Hide underline for active tab
+			if (selected && !tabVertical) { // Hide underline for active tab
 				g.color = t.WINDOW_BG_COL;
 				g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY + tabH, _w - 1, 1);
 			}
@@ -600,7 +619,7 @@ class Zui {
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
 
-	public function text(text: String, align: Align = Left, bg = 0x00000000): State {
+	public function text(text: String, align = Align.Left, bg = 0x00000000): State {
 		if (!isVisible(ELEMENT_H())) { endElement(); return State.Idle; }
 		var started = getStarted();
 		var down = getPushed();
@@ -642,7 +661,7 @@ class Zui {
 		textSelectedCurrentText = "";
 	}
 
-	function updateTextEdit(align: Align = Left) {
+	function updateTextEdit(align = Align.Left) {
 		var text = textSelectedCurrentText;
 		if (isKeyPressed) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
@@ -744,8 +763,8 @@ class Zui {
 			var hlstr = text.substr(istart, iend - istart);
 			var hlstrw = ops.font.width(fontSize, hlstr);
 			var startoff = ops.font.width(fontSize, text.substr(0, istart));
-			var hlStart = align == Left ? _x + startoff + off : _x + _w - hlstrw - off;
-			if (align == Right) {
+			var hlStart = align == Align.Left ? _x + startoff + off : _x + _w - hlstrw - off;
+			if (align == Align.Right) {
 				hlStart -= ops.font.width(fontSize, text.substr(iend, text.length));
 			}
 			g.color = t.ACCENT_SELECT_COL;
@@ -755,9 +774,9 @@ class Zui {
 		// Flash cursor
 		var time = kha.Scheduler.time();
 		if (isKeyDown || time % (FLASH_SPEED() * 2.0) < FLASH_SPEED()) {
-			var str = align == Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
+			var str = align == Align.Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
 			var strw = ops.font.width(fontSize, str);
-			var cursorX = align == Left ? _x + strw + off : _x + _w - strw - off;
+			var cursorX = align == Align.Left ? _x + strw + off : _x + _w - strw - off;
 			g.color = t.TEXT_COL; // Cursor
 			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE(), cursorHeight);
 		}
@@ -765,7 +784,7 @@ class Zui {
 		textSelectedCurrentText = text;
 	}
 
-	public function textInput(handle: Handle, label = "", align: Align = Left): String {
+	public function textInput(handle: Handle, label = "", align = Align.Left): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
@@ -781,8 +800,8 @@ class Zui {
 
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
-			var labelAlign = align == Right ? Left : Right;
-			var xOffset = labelAlign == Left ? 7 : 0;
+			var labelAlign = align == Align.Right ? Align.Left : Align.Right;
+			var xOffset = labelAlign == Align.Left ? 7 : 0;
 			drawString(g, label, xOffset, 0, labelAlign);
 		}
 
@@ -804,7 +823,7 @@ class Zui {
 		highlightAnchor = cursorX;
 	}
 
-	public function button(text: String, align: Align = Center, label = ""): Bool {
+	public function button(text: String, align = Align.Center, label = ""): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return false; }
 		var released = getReleased();
 		var pushed = getPushed();
@@ -821,7 +840,7 @@ class Zui {
 		drawString(g, text, TEXT_OFFSET(), 0, align);
 		if (label != "") {
 			g.color = t.LABEL_COL;
-			drawString(g, label, TEXT_OFFSET(), 0, align == Right ? Left : Right);
+			drawString(g, label, TEXT_OFFSET(), 0, align == Align.Right ? Align.Left : Align.Right);
 		}
 
 		endElement();
@@ -841,7 +860,7 @@ class Zui {
 		drawCheck(handle.selected, hover); // Check
 
 		g.color = t.TEXT_COL; // Text
-		drawString(g, text, titleOffsetX, 0, Left);
+		drawString(g, text, titleOffsetX, 0, Align.Left);
 
 		endElement();
 
@@ -867,7 +886,7 @@ class Zui {
 		return handle.position == position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align: Align = Left): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (comboSelectedHandle == null) {
@@ -904,22 +923,22 @@ class Zui {
 		g.fillTriangle(x, y, x + ARROW_SIZE(), y, x + ARROW_SIZE() / 2, y + ARROW_SIZE() / 2);
 
 		if (showLabel && label != "") {
-			if (align == Left) _x -= 15;
+			if (align == Align.Left) _x -= 15;
 			g.color = t.LABEL_COL;
-			drawString(g, label, null, 0, align == Left ? Right : Left);
-			if (align == Left) _x += 15;
+			drawString(g, label, null, 0, align == Align.Left ? Align.Right : Align.Left);
+			if (align == Align.Left) _x += 15;
 		}
 
-		if (align == Right) _x -= 15;
+		if (align == Align.Right) _x -= 15;
 		g.color = t.TEXT_COL; // Value
 		drawString(g, texts[handle.position], null, 0, align);
-		if (align == Right) _x += 15;
+		if (align == Align.Right) _x += 15;
 
 		endElement();
 		return handle.position;
 	}
 
-	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100.0, displayValue = true, align: Align = Right, textEdit = true): Float {
+	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100.0, displayValue = true, align = Align.Right, textEdit = true): Float {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
 		if (getStarted()) {
 			scrollHandle = handle;
@@ -949,7 +968,7 @@ class Zui {
 			startTextEdit(handle);
 			handle.changed = changed = true;
 		}
-		var lalign = align == Left ? Right : Left;
+		var lalign = align == Align.Left ? Align.Right : Align.Left;
 		if (textSelectedHandle == handle) {
 			updateTextEdit(lalign);
 		}
@@ -1086,7 +1105,7 @@ class Zui {
 
 		if (outOfScreen) { // Unroll up
 			g.color = t.LABEL_COL;
-			drawString(g, comboSelectedLabel, null, 0, Right);
+			drawString(g, comboSelectedLabel, null, 0, Align.Right);
 			_y += elementSize;
 			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 		}
@@ -1108,7 +1127,7 @@ class Zui {
 		if (!outOfScreen) { // Unroll down
 			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 			g.color = t.LABEL_COL;
-			drawString(g, comboSelectedLabel, null, 0, Right);
+			drawString(g, comboSelectedLabel, null, 0, Align.Right);
 		}
 
 		if ((inputReleased || isEscapeDown) && !comboFirst) {
@@ -1177,7 +1196,7 @@ class Zui {
 	}
 
 	function drawString(g: Graphics, text: String,
-						xOffset: Null<Float> = null, yOffset: Float = 0, align: Align = Left) {
+						xOffset: Null<Float> = null, yOffset: Float = 0, align = Align.Left) {
 		var maxChars = Std.int(_w / Std.int(fontSize / 2)); // Guess width for now
 		if (text.length > maxChars) text = text.substring(0, maxChars) + "..";
 
@@ -1185,8 +1204,8 @@ class Zui {
 		xOffset *= SCALE();
 		g.font = ops.font;
 		g.fontSize = fontSize;
-		if (align == Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
-		else if (align == Right) xOffset = _w - ops.font.width(fontSize, text) - TEXT_OFFSET();
+		if (align == Align.Center) xOffset = _w / 2 - ops.font.width(fontSize, text) / 2;
+		else if (align == Align.Right) xOffset = _w - ops.font.width(fontSize, text) - TEXT_OFFSET();
 
 		if (!enabled) fadeColor();
 		g.pipeline = rtTextPipeline;
