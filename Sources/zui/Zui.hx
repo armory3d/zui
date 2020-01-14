@@ -638,7 +638,7 @@ class Zui {
 		g.color = t.TEXT_COL;
 		drawString(g, text, TEXT_OFFSET(), 0, align);
 
-		endElement();
+		endElement(Math.max(ELEMENT_H(), ops.font.height(fontSize)) + ELEMENT_OFFSET());
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
 	}
 
