@@ -1285,9 +1285,7 @@ class Zui {
 
 	function isVisible(elemH: Float): Bool {
 		if (currentWindow == null) return true;
-		// Assume vertical layout for now
-		var top = tabNames != null ? ELEMENT_H() + ELEMENT_OFFSET() : 0;
-		return (_y + elemH > top && _y < currentWindow.texture.height);
+		return (_y + elemH > windowHeaderH && _y < currentWindow.texture.height);
 	}
 
 	function getReleased(elemH = -1.0): Bool { // Input selection
