@@ -360,7 +360,7 @@ class Zui {
 
 		handle.dragEnabled = drag;
 		if (drag) {
-			if (inputStarted && getInputInRect(_windowX, _windowY, _windowW, 15)) {
+			if (inputStarted && getInputInRect(_windowX, _windowY, _windowW, HEADER_DRAG_H())) {
 				dragHandle = handle;
 			}
 			else if (inputReleased) {
@@ -371,8 +371,8 @@ class Zui {
 				handle.dragX += Std.int(inputDX);
 				handle.dragY += Std.int(inputDY);
 			}
-			_y += 15; // Header offset
-			windowHeaderH += 15;
+			_y += HEADER_DRAG_H(); // Header offset
+			windowHeaderH += HEADER_DRAG_H();
 		}
 
 		return true;
@@ -387,7 +387,7 @@ class Zui {
 
 			if (handle.dragEnabled) { // Draggable header
 				g.color = t.SEPARATOR_COL;
-				g.fillRect(0, 0, _windowW, 15);
+				g.fillRect(0, 0, _windowW, HEADER_DRAG_H());
 			}
 
 			var wh = _windowH - windowHeaderH; // Exclude header
@@ -500,7 +500,7 @@ class Zui {
 		var tabY = 0.0;
 		var tabH = Std.int(BUTTON_H() * 1.1);
 		var origy = _y;
-		_y = currentWindow.dragEnabled ? 15 : 0;
+		_y = currentWindow.dragEnabled ? HEADER_DRAG_H() : 0;
 		tabHandle.changed = false;
 
 		g.color = t.SEPARATOR_COL; // Tab background
@@ -1416,6 +1416,7 @@ class Zui {
 	public inline function SCROLL_W(): Int { return Std.int(t.SCROLL_W * SCALE()); }
 	public inline function TEXT_OFFSET(): Float { return t.TEXT_OFFSET * SCALE(); }
 	public inline function TAB_W(): Int { return Std.int(t.TAB_W * SCALE()); }
+	public inline function HEADER_DRAG_H(): Int { return Std.int(15 * SCALE()); }
 	public inline function SCALE(): Float { return ops.scaleFactor; }
 	inline function FLASH_SPEED(): Float { return 0.5; }
 	inline function TOOLTIP_DELAY(): Float { return 1.0; }
