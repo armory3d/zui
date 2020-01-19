@@ -71,7 +71,6 @@ class Zui {
 	static var copyFrame = 0;
 
 	var cursorX = 0; // Text input
-	var cursorY = 0;
 	var highlightAnchor = 0;
 
 	var ratios: Array<Float>; // Splitting rows
@@ -626,11 +625,13 @@ class Zui {
 	}
 
 	public function text(text: String, align = Align.Left, bg = 0x00000000): State {
-		if (!isVisible(ELEMENT_H())) { endElement(); return State.Idle; }
-		var started = getStarted();
-		var down = getPushed();
-		var released = getReleased();
-		var hover = getHover();
+		if (text.indexOf("\n") >= 0) { splitText(text, align, bg); return State.Idle; }
+		var h = Math.max(ELEMENT_H(), ops.font.height(fontSize));
+		if (!isVisible(h)) { endElement(h + ELEMENT_OFFSET()); return State.Idle; }
+		var started = getStarted(h);
+		var down = getPushed(h);
+		var released = getReleased(h);
+		var hover = getHover(h);
 		if (bg != 0x0000000) {
 			g.color = bg;
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
@@ -638,8 +639,12 @@ class Zui {
 		g.color = t.TEXT_COL;
 		drawString(g, text, TEXT_OFFSET(), 0, align);
 
-		endElement(Math.max(ELEMENT_H(), ops.font.height(fontSize)) + ELEMENT_OFFSET());
+		endElement(h + ELEMENT_OFFSET());
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
+	}
+
+	inline function splitText(lines: String, align = Align.Left, bg = 0x00000000) {
+		for (line in lines.split("\n")) text(line, align, bg);
 	}
 
 	function startTextEdit(handle: Handle) {
@@ -654,7 +659,6 @@ class Zui {
 		}
 		tabPressedHandle = handle;
 		cursorX = handle.text.length;
-		cursorY = 0;
 		highlightAnchor = 0; // Highlight all text when first selected
 		if (Keyboard.get() != null) Keyboard.get().show();
 	}
@@ -774,7 +778,7 @@ class Zui {
 				hlStart -= ops.font.width(fontSize, text.substr(iend, text.length));
 			}
 			g.color = t.ACCENT_SELECT_COL;
-			g.fillRect(hlStart, _y + cursorY * lineHeight + buttonOffsetY * 1.5, hlstrw * SCALE(), cursorHeight);
+			g.fillRect(hlStart, _y + buttonOffsetY * 1.5, hlstrw * SCALE(), cursorHeight);
 		}
 
 		// Flash cursor
@@ -784,7 +788,7 @@ class Zui {
 			var strw = ops.font.width(fontSize, str);
 			var cursorX = align == Align.Left ? _x + strw + off : _x + _w - strw - off;
 			g.color = t.TEXT_COL; // Cursor
-			g.fillRect(cursorX, _y + cursorY * lineHeight + buttonOffsetY * 1.5, 1 * SCALE(), cursorHeight);
+			g.fillRect(cursorX, _y + buttonOffsetY * 1.5, 1 * SCALE(), cursorHeight);
 		}
 
 		textSelectedCurrentText = text;
@@ -815,7 +819,6 @@ class Zui {
 		textSelectedHandle != handle ? drawString(g, handle.text, null, 0, align) : drawString(g, textSelectedCurrentText, null, 0, align);
 
 		endElement();
-
 		return handle.text;
 	}
 
