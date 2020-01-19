@@ -655,12 +655,19 @@ class Zui {
 		textToSubmit = textSelected;
 		textSelectedHandle = handle;
 		textSelected = handle.text;
+		cursorX = handle.text.length;
 		if (tabPressed) {
 			tabPressed = false;
 			isKeyPressed = false; // Prevent text deselect after tab press
 		}
+		else if (!highlightOnSelect) { // Set cursor to click location
+			var x = inputX - (_windowX + _x + TEXT_OFFSET());
+			cursorX = 0;
+			while (cursorX < textSelected.length && ops.font.width(fontSize, textSelected.substr(0, cursorX)) < x) {
+				cursorX++;
+			}
+		}
 		tabPressedHandle = handle;
-		cursorX = handle.text.length;
 		highlightAnchor = highlightOnSelect ? 0 : cursorX;
 		if (Keyboard.get() != null) Keyboard.get().show();
 	}
