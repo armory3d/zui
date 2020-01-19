@@ -51,7 +51,7 @@ class Ext {
 		handle.text = Ext.keycodeToString(Std.int(handle.value));
 
 		ui.g.color = ui.t.TEXT_COL; // Text
-		ui.textSelectedHandle != handle ? ui.drawString(ui.g, handle.text, null, 0, align) : ui.drawString(ui.g, ui.textSelectedCurrentText, null, 0, align);
+		ui.textSelectedHandle != handle ? ui.drawString(ui.g, handle.text, null, 0, align) : ui.drawString(ui.g, ui.textSelected, null, 0, align);
 
 		ui.endElement();
 
@@ -69,7 +69,7 @@ class Ext {
 			if (Keyboard.get() != null) Keyboard.get().hide();
 		}
 		else {
-			ui.textSelectedCurrentText = "Press a key...";
+			ui.textSelected = "Press a key...";
 		}
 	}
 

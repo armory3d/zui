@@ -30,6 +30,7 @@ class Zui {
 	public var imageInvertY = false;
 	public var scrollEnabled = true;
 	public var alwaysRedraw = false; // Hurts performance
+	public var highlightOnSelect = true; // Highlight text edit contents on selection
 	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
@@ -120,7 +121,7 @@ class Zui {
 	var restoreY = -1.0;
 
 	var textSelectedHandle: Handle = null;
-	var textSelectedCurrentText: String;
+	var textSelected: String;
 	var submitTextHandle: Handle = null;
 	var textToSubmit = "";
 	var tabPressed = false;
@@ -650,16 +651,16 @@ class Zui {
 	function startTextEdit(handle: Handle) {
 		isTyping = true;
 		submitTextHandle = textSelectedHandle;
-		textToSubmit = textSelectedCurrentText;
+		textToSubmit = textSelected;
 		textSelectedHandle = handle;
-		textSelectedCurrentText = handle.text;
+		textSelected = handle.text;
 		if (tabPressed) {
 			tabPressed = false;
 			isKeyPressed = false; // Prevent text deselect after tab press
 		}
 		tabPressedHandle = handle;
 		cursorX = handle.text.length;
-		highlightAnchor = 0; // Highlight all text when first selected
+		highlightAnchor = highlightOnSelect ? 0 : cursorX;
 		if (Keyboard.get() != null) Keyboard.get().show();
 	}
 
@@ -668,11 +669,11 @@ class Zui {
 		submitTextHandle.changed = changed = true;
 		submitTextHandle = null;
 		textToSubmit = "";
-		textSelectedCurrentText = "";
+		textSelected = "";
 	}
 
 	function updateTextEdit(align = Align.Left) {
-		var text = textSelectedCurrentText;
+		var text = textSelected;
 		if (isKeyPressed) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
 				if (cursorX > 0) cursorX--;
@@ -709,7 +710,7 @@ class Zui {
 				deselectText(); // One-line text for now
 			}
 			else if (key == KeyCode.Escape) { // Cancel
-				textSelectedCurrentText = textSelectedHandle.text;
+				textSelected = textSelectedHandle.text;
 				deselectText();
 			}
 			else if (key == KeyCode.Tab) { // Next field
@@ -791,7 +792,7 @@ class Zui {
 			g.fillRect(cursorX, _y + buttonOffsetY * 1.5, 1 * SCALE(), cursorHeight);
 		}
 
-		textSelectedCurrentText = text;
+		textSelected = text;
 	}
 
 	public function textInput(handle: Handle, label = "", align = Align.Left): String {
@@ -816,7 +817,7 @@ class Zui {
 		}
 
 		g.color = t.TEXT_COL; // Text
-		textSelectedHandle != handle ? drawString(g, handle.text, null, 0, align) : drawString(g, textSelectedCurrentText, null, 0, align);
+		textSelectedHandle != handle ? drawString(g, handle.text, null, 0, align) : drawString(g, textSelected, null, 0, align);
 
 		endElement();
 		return handle.text;
@@ -824,7 +825,7 @@ class Zui {
 
 	function deselectText() {
 		submitTextHandle = textSelectedHandle;
-		textToSubmit = textSelectedCurrentText;
+		textToSubmit = textSelected;
 		textSelectedHandle = null;
 		isTyping = false;
 		if (currentWindow != null) currentWindow.redraws = 2;
@@ -994,7 +995,7 @@ class Zui {
 			g.color = t.TEXT_COL; // Value
 			textSelectedHandle != handle ?
 				drawString(g, handle.value + "", null, 0, lalign) :
-				drawString(g, textSelectedCurrentText, null, 0, lalign);
+				drawString(g, textSelected, null, 0, lalign);
 		}
 
 		endElement();
