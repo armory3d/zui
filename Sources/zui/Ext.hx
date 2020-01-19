@@ -354,6 +354,60 @@ class Ext {
 		return handle.color;
 	}
 
+	public static function textArea(ui: Zui, handle: Handle, align = Align.Left): String {
+		var lines = handle.text.split("\n");
+		var selected = ui.textSelectedHandle == handle; // Text being edited
+		var cursorStartX = ui.cursorX;
+		var keyPressed = selected && ui.isKeyPressed;
+		ui.highlightOnSelect = false;
+		ui.tabSwitchEnabled = false;
+		ui.g.color = ui.t.SEPARATOR_COL;
+		ui.drawRect(ui.g, true, ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, lines.length * ui.ELEMENT_H() - ui.buttonOffsetY * 2);
+
+		for (i in 0...lines.length) { // Draw lines
+			if ((!selected && ui.getHover()) || (selected && i == handle.position)) {
+				handle.position = i; // Set active line
+				handle.text = lines[i];
+				ui.textInput(handle, "", align);
+				if (keyPressed && ui.key != KeyCode.Return) { // Edit text
+					lines[i] = ui.textSelected;
+				}
+			}
+			else {
+				ui.text(lines[i], align);
+			}
+			ui._y -= ui.ELEMENT_OFFSET();
+		}
+		ui._y += ui.ELEMENT_OFFSET();
+
+		if (keyPressed) {
+			// Move cursor vertically
+			if (ui.key == KeyCode.Down && handle.position < lines.length - 1) { handle.position++; }
+			if (ui.key == KeyCode.Up && handle.position > 0) { handle.position--; }
+			// New line
+			if (ui.key == KeyCode.Return) {
+				handle.position++;
+				lines.insert(handle.position, lines[handle.position - 1].substr(ui.cursorX));
+				lines[handle.position - 1] = lines[handle.position - 1].substr(0, ui.cursorX);
+				ui.startTextEdit(handle);
+				ui.cursorX = ui.highlightAnchor = 0;
+			}
+			// Delete line
+			if (ui.key == KeyCode.Backspace && cursorStartX == 0 && handle.position > 0) {
+				handle.position--;
+				ui.cursorX = ui.highlightAnchor = lines[handle.position].length;
+				lines[handle.position] += lines[handle.position + 1];
+				lines.splice(handle.position + 1, 1);
+			}
+			ui.textSelected = lines[handle.position];
+		}
+
+		ui.highlightOnSelect = true;
+		ui.tabSwitchEnabled = true;
+		handle.text = lines.join("\n");
+		return handle.text;
+	}
+
 	/**
 	Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
 	**/
