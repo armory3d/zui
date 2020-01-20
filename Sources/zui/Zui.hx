@@ -488,7 +488,7 @@ class Zui {
 		tabColors.push(color);
 		var selected = handle.position == tabNames.length - 1;
 		if (tabNames.length == 1) { // Do once
-			vertical ? _x += windowHeaderW + 6 : _y += windowHeaderH + 3;
+			vertical ? { _x += windowHeaderW + 6; _w -= 6; } : _y += windowHeaderH + 3;
 		}
 		return selected;
 	}
