@@ -536,9 +536,9 @@ class Zui {
 			}
 			var selected = tabHandle.position == i;
 
-			g.color = tabColors[i] != -1 ? tabColors[i] :
+			g.color = (pushed || hover) ? t.BUTTON_HOVER_COL :
+					  tabColors[i] != -1 ? tabColors[i] :
 					  selected ? t.WINDOW_BG_COL :
-					  (pushed || hover) ? t.BUTTON_HOVER_COL :
 					  t.SEPARATOR_COL;
 			tabVertical ?
 				tabY += tabH + 1 :
