@@ -32,11 +32,11 @@ Portable immediate mode UI library designed for tools and debug interfaces. Writ
 
 ## Elements
 ``` hx
-function tab(handle: Handle, text: String): Bool;
-function panel(handle: Handle, text: String, accent = 1): Bool;
-function image(image: Image): State;
-function text(text: String, align = Left, bg = 0);
-function textInput(handle: Handle, label = ""): String;
+function tab(handle: Handle, text: String, vertical = false): Bool;
+function panel(handle: Handle, text: String, isTree = false): Bool;
+function image(image: Image, tint = 0xffffffff): State;
+function text(text: String, align = Left, bg = 0x00000000);
+function textInput(handle: Handle, label = "", align = Left): String;
 function button(text: String, align = Center, label = ""): Bool;
 function check(handle: Handle, text: String): Bool;
 function radio(groupId: Handle, pos: Int, text: String): Bool;
@@ -66,6 +66,7 @@ function colorWheel(...);
 function fileBrowser(...);
 function keyInput(handle: Handle, label = ""): kha.input.KeyCode;
 function inlineRadio(handle: Handle, texts: Array<String>): Int;
+function textArea(handle: Handle, align = Left): String;
 ```
 
 Nodes.hx - drawing node systems
