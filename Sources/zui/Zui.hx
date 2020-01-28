@@ -581,16 +581,17 @@ class Zui {
 		var ih = (sh > 0 ? sh : image.height) * SCALE();
 		var w = Math.min(iw, _w);
 		var x = _x;
-		if (imageScrollAlign) {
+		var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
+		var r = curRatio == -1 ? 1.0 : ratios[curRatio];
+		if (imageScrollAlign) { // Account for scrollbar size
 			w = Math.min(iw, _w - buttonOffsetY * 2);
 			x += buttonOffsetY;
-			var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
 			if (!scroll) {
-				var r = curRatio == -1 ? 1.0 : ratios[curRatio];
 				w -= SCROLL_W() * r;
 				x += SCROLL_W() * r / 2;
 			}
 		}
+		else if (scroll) w += SCROLL_W() * r;
 
 		// Image size
 		var ratio = h == null ?
