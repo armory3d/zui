@@ -132,6 +132,8 @@ class Zui {
 	var comboSelectedWindow: Handle = null;
 	var comboSelectedAlign: Align;
 	var comboSelectedTexts: Array<String>;
+	var comboItemCount: Int;
+	var comboItemOffset: Int;
 	var comboSelectedLabel: String;
 	var comboSelectedX: Int;
 	var comboSelectedY: Int;
@@ -907,7 +909,7 @@ class Zui {
 		return handle.position == position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left, itemCount = -1 ): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (comboSelectedHandle == null) {
@@ -920,6 +922,8 @@ class Zui {
 				comboSelectedX = Std.int(_x + _windowX);
 				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H());
 				comboSelectedW = Std.int(_w);
+				comboItemCount = itemCount < 0 ? texts.length : itemCount;
+				comboItemOffset = -1; // handle.position;
 			}
 		}
 		if (handle == submitComboHandle) {
@@ -928,6 +932,25 @@ class Zui {
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
+
+		if (inputWheelDelta != 0 && comboSelectedHandle != null) {
+			if (inputWheelDelta > 0) {
+				comboItemOffset += 1;
+			}
+			else {
+				comboItemOffset -= 1;
+			}
+
+			final maxOffset = comboSelectedTexts.length - comboItemCount;
+
+			if (comboItemOffset > maxOffset) {
+				comboItemOffset = maxOffset;
+			}
+
+			if (comboItemOffset < 0) {
+				comboItemOffset = 0;
+			}
+		}
 
 		var hover = getHover();
 		if (hover) { // Bg
@@ -1109,13 +1132,18 @@ class Zui {
 		drawRect(g, true, sliderX, y, sliderW, BUTTON_H());
 	}
 
+	static inline function clampi( value: Int, min: Int, max: Int ) : Int {
+		return value < min ? min : value > max ? max : value;
+	}
+
 	static var comboFirst = true;
 	function drawCombo() {
 		if (comboSelectedHandle == null) return;
 		var _g = g;
 		globalG.color = t.SEPARATOR_COL;
 		var elementSize = Std.int(ELEMENT_H() + ELEMENT_OFFSET());
-		var comboH = (comboSelectedTexts.length + 1) * elementSize;
+		final maxItemCount = Std.int(Math.min(comboSelectedTexts.length, comboItemCount));
+		var comboH = (maxItemCount + 1) * elementSize;
 		globalG.begin(false);
 		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H());
 		var distBottom = kha.System.windowHeight() - (comboSelectedY + comboH);
@@ -1123,6 +1151,17 @@ class Zui {
 		var comboY = outOfScreen ? comboSelectedY - comboH - Std.int(ELEMENT_H()) : comboSelectedY;
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
 		beginRegion(globalG, comboSelectedX, comboY, comboSelectedW);
+
+		// move offset into visible range
+		if (comboItemOffset == -1) {
+			if (outOfScreen) {
+				comboItemOffset = comboSelectedTexts.length - 1 - comboSelectedHandle.position;
+			} else {
+				comboItemOffset = comboSelectedHandle.position;
+			}
+
+			comboItemOffset = clampi(comboItemOffset, 0, comboSelectedTexts.length - maxItemCount);
+		}
 
 		if (outOfScreen) { // Unroll up
 			g.color = t.LABEL_COL;
@@ -1133,9 +1172,9 @@ class Zui {
 
 		inputEnabled = true;
 		var BUTTON_COL = t.BUTTON_COL;
-		for (i in 0...comboSelectedTexts.length) {
+		for (i in comboItemOffset...comboItemOffset + maxItemCount) {
 			var j = outOfScreen ? comboSelectedTexts.length - 1 - i : i;
-			t.BUTTON_COL = j == comboSelectedHandle.position ? t.WINDOW_BG_COL : t.SEPARATOR_COL;
+			t.BUTTON_COL = j == comboSelectedHandle.position ? t.ACCENT_SELECT_COL : t.SEPARATOR_COL;
 			if (button(comboSelectedTexts[j], comboSelectedAlign)) {
 				comboToSubmit = j;
 				submitComboHandle = comboSelectedHandle;
