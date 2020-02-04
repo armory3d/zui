@@ -475,6 +475,7 @@ class Zui {
 			tabColors = [];
 			tabHandle = handle;
 			tabVertical = vertical;
+			_w -= tabVertical ? Std.int(ELEMENT_OFFSET() + ELEMENT_W() - 1 * SCALE()) : 0; // shrink window area by width of vertical tabs
 			vertical ?
 				windowHeaderW += ELEMENT_W() :
 				windowHeaderH += BUTTON_H() + buttonOffsetY + ELEMENT_OFFSET();
