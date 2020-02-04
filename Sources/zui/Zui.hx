@@ -32,6 +32,7 @@ class Zui {
 	public var alwaysRedraw = false; // Hurts performance
 	public var highlightOnSelect = true; // Highlight text edit contents on selection
 	public var tabSwitchEnabled = true; // Allow switching focus to the next element by pressing tab
+	var highlightFullRow = false;
 	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
@@ -583,7 +584,7 @@ class Zui {
 		var w = Math.min(iw, _w);
 		var x = _x;
 		var scroll = currentWindow != null ? currentWindow.scrollEnabled : false;
-		var r = curRatio == -1 ? 1.0 : ratios[curRatio];
+		var r = curRatio == -1 ? 1.0 : getRatio(ratios[curRatio], 1);
 		if (imageScrollAlign) { // Account for scrollbar size
 			w = Math.min(iw, _w - buttonOffsetY * 2);
 			x += buttonOffsetY;
@@ -1241,17 +1242,19 @@ class Zui {
 		if (currentWindow == null || currentWindow.layout == Vertical) {
 			if (curRatio == -1 || (ratios != null && curRatio == ratios.length - 1)) { // New line
 				_y += elementSize;
+
 				if ((ratios != null && curRatio == ratios.length - 1)) { // Last row element
 					curRatio = -1;
 					ratios = null;
 					_x = xBeforeSplit;
 					_w = wBeforeSplit;
+					highlightFullRow = false;
 				}
 			}
 			else { // Row
 				curRatio++;
 				_x += _w; // More row elements to place
-				_w = Std.int(wBeforeSplit * ratios[curRatio]);
+				_w = Std.int(getRatio(ratios[curRatio], wBeforeSplit));
 			}
 		}
 		else { // Horizontal
@@ -1259,12 +1262,28 @@ class Zui {
 		}
 	}
 
+	/**
+	 * Highlight all upcoming elements in the next row on a `mouse-over` event.
+	 */
+	public inline function highlightNextRow() {
+		highlightFullRow = true;
+	}
+
+	inline function getRatio(ratio: Float, dyn: Float): Float {
+		return ratio < 0 ? -ratio : ratio * dyn;
+	}
+
+	/**
+	 * Draw the upcoming elements in the same row.
+	 *
+	 * Negative values will be treated as absolute, positive values as ratio to `window width`.
+	 */
 	public function row(ratios: Array<Float>) {
 		this.ratios = ratios;
 		curRatio = 0;
 		xBeforeSplit = _x;
 		wBeforeSplit = _w;
-		_w = Std.int(_w * ratios[curRatio]);
+		_w = Std.int(getRatio(ratios[curRatio], _w));
 	}
 
 	public function indent() {
@@ -1330,7 +1349,7 @@ class Zui {
 	function getHover(elemH = -1.0): Bool {
 		if (elemH == -1.0) elemH = ELEMENT_H();
 		isHovered = enabled && inputEnabled &&
-			inputX >= _windowX + _x && inputX < (_windowX + _x + _w) &&
+			inputX >= _windowX + (highlightFullRow ? 0 : _x) && inputX < (_windowX + _x + (highlightFullRow ? _windowW : _w)) &&
 			inputY >= _windowY + _y && inputY < (_windowY + _y + elemH);
 		return isHovered;
 	}
