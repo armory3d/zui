@@ -487,14 +487,11 @@ class Zui {
 			if (!vertical && getInputInRect(_windowX, _windowY, _windowW, windowHeaderH)) {
 				inputX = inputY = -1;
 			}
+			vertical ? { _x += windowHeaderW + 6; _w -= 6; } : _y += windowHeaderH + 3;
 		}
 		tabNames.push(text);
 		tabColors.push(color);
-		var selected = handle.position == tabNames.length - 1;
-		if (tabNames.length == 1) { // Do once
-			vertical ? { _x += windowHeaderW + 6; _w -= 6; } : _y += windowHeaderH + 3;
-		}
-		return selected;
+		return handle.position == tabNames.length - 1;
 	}
 
 	function drawTabs() {
@@ -1132,7 +1129,7 @@ class Zui {
 		drawRect(g, true, sliderX, y, sliderW, BUTTON_H());
 	}
 
-	static inline function clampi( value: Int, min: Int, max: Int ) : Int {
+	static inline function clampi(value: Int, min: Int, max: Int): Int {
 		return value < min ? min : value > max ? max : value;
 	}
 
@@ -1152,14 +1149,14 @@ class Zui {
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
 		beginRegion(globalG, comboSelectedX, comboY, comboSelectedW);
 
-		// move offset into visible range
+		// Move offset into visible range
 		if (comboItemOffset == -1) {
 			if (outOfScreen) {
 				comboItemOffset = comboSelectedTexts.length - 1 - comboSelectedHandle.position;
-			} else {
+			}
+			else {
 				comboItemOffset = comboSelectedHandle.position;
 			}
-
 			comboItemOffset = clampi(comboItemOffset, 0, comboSelectedTexts.length - maxItemCount);
 		}
 
@@ -1329,6 +1326,7 @@ class Zui {
 		_x += TAB_W();
 		_w -= TAB_W();
 	}
+
 	public function unindent() {
 		_x -= TAB_W();
 		_w += TAB_W();
