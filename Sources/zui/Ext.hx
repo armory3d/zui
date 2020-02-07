@@ -146,9 +146,9 @@ class Ext {
 	public static function colorField(ui: Zui, handle:Handle, alpha = false): Int {
 		ui.g.color = handle.color;
 
-		ui.drawRect(ui.g, true, ui._x + 2, ui._y, ui._w - 4, ui.BUTTON_H());
+		ui.drawRect(ui.g, true, ui._x + 2, ui._y + ui.buttonOffsetY, ui._w - 4, ui.BUTTON_H());
 		ui.g.color = ui.getHover() ? ui.t.ACCENT_HOVER_COL : ui.t.ACCENT_COL;
-		ui.drawRect(ui.g, false, ui._x + 2, ui._y, ui._w - 4, ui.BUTTON_H(), 1.0);
+		ui.drawRect(ui.g, false, ui._x + 2, ui._y + ui.buttonOffsetY, ui._w - 4, ui.BUTTON_H(), 1.0);
 
 		if (ui.getStarted()) {
 			Popup.showCustom(
