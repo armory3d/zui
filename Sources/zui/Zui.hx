@@ -559,11 +559,16 @@ class Zui {
 		_w = Std.int(!currentWindow.scrollEnabled ? _windowW : _windowW - SCROLL_W());
 	}
 
-	public function panel(handle: Handle, text: String, isTree = false): Bool {
+	public function panel(handle: Handle, text: String, isTree = false, filled = true, pack = true): Bool {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
 		if (getReleased()) {
 			handle.selected = !handle.selected;
 			handle.changed = changed = true;
+		}
+
+		if (filled) {
+			g.color = t.PANEL_BG_COL;
+			drawRect(g, true, _x, _y, _w, ELEMENT_H());
 		}
 
 		isTree ? drawTree(handle.selected) : drawArrow(handle.selected);
@@ -573,6 +578,7 @@ class Zui {
 		drawString(g, text, titleOffsetX, 0);
 
 		endElement();
+		if (pack && !handle.selected) _y -= ELEMENT_OFFSET();
 
 		return handle.selected;
 	}

@@ -34,6 +34,7 @@ class Themes {
 		SEPARATOR_COL: 0xff272727,
 		HIGHLIGHT_COL: 0xff205d9c,
 		CONTEXT_COL: 0xff222222,
+		PANEL_BG_COL: 0xff3b3b3b,
 	};
 
 	// 2x scaled, for games
@@ -69,6 +70,7 @@ class Themes {
 		SEPARATOR_COL: 0xff999999,
 		HIGHLIGHT_COL: 0xff205d9c,
 		CONTEXT_COL: 0xffaaaaaa,
+		PANEL_BG_COL: 0xffaaaaaa,
 	};
 }
 
@@ -104,4 +106,5 @@ typedef TTheme = {
 	var SEPARATOR_COL: Int;
 	var HIGHLIGHT_COL: Int;
 	var CONTEXT_COL: Int;
+	var PANEL_BG_COL: Int;
 }
