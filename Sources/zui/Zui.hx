@@ -1322,14 +1322,18 @@ class Zui {
 		_w = Std.int(getRatio(ratios[curRatio], _w));
 	}
 
-	public function indent() {
+	public function indent(bothSides = true) {
 		_x += TAB_W();
 		_w -= TAB_W();
+
+		if (bothSides) _w -= TAB_W();
 	}
 
-	public function unindent() {
+	public function unindent(bothSides = true) {
 		_x -= TAB_W();
 		_w += TAB_W();
+
+		if (bothSides) _w += TAB_W();
 	}
 
 	function fadeColor() {
