@@ -840,6 +840,7 @@ class Zui {
 	}
 
 	function deselectText() {
+		if (textSelectedHandle == null) return;
 		submitTextHandle = textSelectedHandle;
 		textToSubmit = textSelected;
 		textSelectedHandle = null;
