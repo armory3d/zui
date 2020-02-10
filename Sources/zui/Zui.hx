@@ -779,7 +779,7 @@ class Zui {
 		var off = TEXT_OFFSET();
 		var lineHeight = ELEMENT_H();
 		var cursorHeight = lineHeight - buttonOffsetY * 3.0;
-		//Draw highlight
+		// Draw highlight
 		if (highlightAnchor != cursorX) {
 			var istart = cursorX;
 			var iend = highlightAnchor;
@@ -795,7 +795,7 @@ class Zui {
 				hlStart -= ops.font.width(fontSize, text.substr(iend, text.length));
 			}
 			g.color = t.ACCENT_SELECT_COL;
-			g.fillRect(hlStart, _y + buttonOffsetY * 1.5, hlstrw * SCALE(), cursorHeight);
+			g.fillRect(hlStart, _y + buttonOffsetY * 1.5, hlstrw, cursorHeight);
 		}
 
 		// Flash cursor
