@@ -170,6 +170,10 @@ class Canvas {
 			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
 			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
 			ui.textInput(h.nest(element.id), getText(canvas, element), element.alignment);
+			if (h.nest(element.id).changed) {
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
 
 		case KeyInput:
 			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
