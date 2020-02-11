@@ -1462,6 +1462,9 @@ class Zui {
 		case KeyCode.Escape: isEscapeDown = true;
 		case KeyCode.Return: isReturnDown = true;
 		case KeyCode.Space: char = " ";
+		#if kha_android_rmb // Detect right mouse button on Android..
+		case KeyCode.Back: onMouseDown(1, Std.int(inputX), Std.int(inputY));
+		#end
 		default:
 		}
 	}
@@ -1476,6 +1479,9 @@ class Zui {
 		case KeyCode.Delete: isDeleteDown = false;
 		case KeyCode.Escape: isEscapeDown = false;
 		case KeyCode.Return: isReturnDown = false;
+		#if kha_android_rmb
+		case KeyCode.Back: onMouseUp(1, Std.int(inputX), Std.int(inputY));
+		#end
 		default:
 		}
 	}
