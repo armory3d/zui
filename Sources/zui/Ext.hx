@@ -354,7 +354,7 @@ class Ext {
 		return handle.color;
 	}
 
-	public static function textArea(ui: Zui, handle: Handle, align = Align.Left): String {
+	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true): String {
 		var lines = handle.text.split("\n");
 		var selected = ui.textSelectedHandle == handle; // Text being edited
 		var cursorStartX = ui.cursorX;
@@ -368,7 +368,7 @@ class Ext {
 			if ((!selected && ui.getHover()) || (selected && i == handle.position)) {
 				handle.position = i; // Set active line
 				handle.text = lines[i];
-				ui.textInput(handle, "", align);
+				ui.textInput(handle, "", align, editable);
 				if (keyPressed && ui.key != KeyCode.Return) { // Edit text
 					lines[i] = ui.textSelected;
 				}
@@ -385,7 +385,7 @@ class Ext {
 			if (ui.key == KeyCode.Down && handle.position < lines.length - 1) { handle.position++; }
 			if (ui.key == KeyCode.Up && handle.position > 0) { handle.position--; }
 			// New line
-			if (ui.key == KeyCode.Return) {
+			if (editable && ui.key == KeyCode.Return) {
 				handle.position++;
 				lines.insert(handle.position, lines[handle.position - 1].substr(ui.cursorX));
 				lines[handle.position - 1] = lines[handle.position - 1].substr(0, ui.cursorX);
@@ -393,7 +393,7 @@ class Ext {
 				ui.cursorX = ui.highlightAnchor = 0;
 			}
 			// Delete line
-			if (ui.key == KeyCode.Backspace && cursorStartX == 0 && handle.position > 0) {
+			if (editable && ui.key == KeyCode.Backspace && cursorStartX == 0 && handle.position > 0) {
 				handle.position--;
 				ui.cursorX = ui.highlightAnchor = lines[handle.position].length;
 				lines[handle.position] += lines[handle.position + 1];

@@ -688,7 +688,7 @@ class Zui {
 		textSelected = "";
 	}
 
-	function updateTextEdit(align = Align.Left) {
+	function updateTextEdit(align = Align.Left, editable = true) {
 		var text = textSelected;
 		if (isKeyPressed) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
@@ -697,7 +697,7 @@ class Zui {
 			else if (key == KeyCode.Right) {
 				if (cursorX < text.length) cursorX++;
 			}
-			else if (key == KeyCode.Backspace) { // Remove char
+			else if (editable && key == KeyCode.Backspace) { // Remove char
 				if (cursorX > 0 && highlightAnchor == cursorX) {
 					text = text.substr(0, cursorX - 1) + text.substr(cursorX, text.length);
 					cursorX--;
@@ -710,7 +710,7 @@ class Zui {
 					text = text.substr(0, cursorX) + text.substr(highlightAnchor, text.length);
 				}
 			}
-			else if (key == KeyCode.Delete) {
+			else if (editable && key == KeyCode.Delete) {
 				if (highlightAnchor == cursorX) {
 					text = text.substr(0, cursorX) + text.substr(cursorX + 1);
 				}
@@ -740,7 +740,8 @@ class Zui {
 			else if (key == KeyCode.End) {
 				cursorX = text.length;
 			}
-			else if (key != KeyCode.Shift && // Write
+			else if (editable && // Write
+					 key != KeyCode.Shift &&
 					 key != KeyCode.CapsLock &&
 					 key != KeyCode.Control &&
 					 key != KeyCode.Alt &&
@@ -811,7 +812,7 @@ class Zui {
 		textSelected = text;
 	}
 
-	public function textInput(handle: Handle, label = "", align = Align.Left): String {
+	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
 		var hover = getHover();
@@ -821,7 +822,7 @@ class Zui {
 
 		var startEdit = getReleased() || tabPressed;
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align);
+		if (textSelectedHandle == handle) updateTextEdit(align, editable);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
 
