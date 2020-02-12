@@ -59,6 +59,7 @@ class Zui {
 	public var isShiftDown = false;
 	public var isCtrlDown = false;
 	public var isAltDown = false;
+	public var isADown = false;
 	public var isBackspaceDown = false;
 	public var isDeleteDown = false;
 	public var isEscapeDown = false;
@@ -739,6 +740,10 @@ class Zui {
 			}
 			else if (key == KeyCode.End) {
 				cursorX = text.length;
+			}
+			else if (isCtrlDown && isADown) { // Select all
+				cursorX = text.length;
+				highlightAnchor = 0;
 			}
 			else if (editable && // Write
 					 key != KeyCode.Shift &&
@@ -1462,6 +1467,7 @@ class Zui {
 		case KeyCode.Delete: isDeleteDown = true;
 		case KeyCode.Escape: isEscapeDown = true;
 		case KeyCode.Return: isReturnDown = true;
+		case KeyCode.A: isADown = true;
 		case KeyCode.Space: char = " ";
 		#if kha_android_rmb // Detect right mouse button on Android..
 		case KeyCode.Back: onMouseDown(1, Std.int(inputX), Std.int(inputY));
@@ -1480,6 +1486,7 @@ class Zui {
 		case KeyCode.Delete: isDeleteDown = false;
 		case KeyCode.Escape: isEscapeDown = false;
 		case KeyCode.Return: isReturnDown = false;
+		case KeyCode.A: isADown = false;
 		#if kha_android_rmb
 		case KeyCode.Back: onMouseUp(1, Std.int(inputX), Std.int(inputY));
 		#end
