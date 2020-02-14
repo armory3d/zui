@@ -37,6 +37,11 @@ class Zui {
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 	public static var keyRepeat = true; // Emulate key repeat for non-character keys
+	#if kha_android
+	public static var touchScroll = true; // Pan with two fingers to scroll panels
+	#else
+	public static var touchScroll = false;
+	#end
 	static var keyRepeatTime = 0.0;
 
 	public var inputRegistered = false;
@@ -424,12 +429,13 @@ class Zui {
 					isScrolling = true;
 				}
 
+				var scrollDelta = touchScroll && inputDownR && inputDY != 0 ? -inputDY / 20 : inputWheelDelta;
 				if (handle == scrollHandle) { // Scroll
 					scroll(inputDY * e, fullHeight);
 				}
-				else if (inputWheelDelta != 0 && comboSelectedHandle == null &&
+				else if (scrollDelta != 0 && comboSelectedHandle == null &&
 						 getInputInRect(_windowX, wy, _windowW, wh)) { // Wheel
-					scroll(inputWheelDelta * ELEMENT_H(), fullHeight);
+					scroll(scrollDelta * ELEMENT_H(), fullHeight);
 				}
 
 				//Stay in bounds
