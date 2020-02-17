@@ -4,6 +4,7 @@ package zui;
 // https://github.com/armory3d/zui
 
 import kha.input.Mouse;
+import kha.input.Surface;
 import kha.input.Keyboard;
 import kha.input.KeyCode;
 import kha.graphics2.Graphics;
@@ -37,7 +38,7 @@ class Zui {
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 	public static var keyRepeat = true; // Emulate key repeat for non-character keys
-	#if kha_android
+	#if (kha_android || kha_ios)
 	public static var touchScroll = true; // Pan with two fingers to scroll panels
 	#else
 	public static var touchScroll = false;
@@ -228,12 +229,18 @@ class Zui {
 	public function registerInput() {
 		Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
+		#if (kha_android || kha_ios)
+		if (Surface.get() != null) Surface.get().notify(onTouchDown, onTouchUp, onTouchMove);
+		#end
 		inputRegistered = true;
 	}
 
 	public function unregisterInput() {
 		Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
 		Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
+		#if (kha_android || kha_ios)
+		if (Surface.get() != null) Surface.get().remove(onTouchDown, onTouchUp, onTouchMove);
+		#end
 		// kha.System.removeCutCopyPaste(onCut, onCopy, onPaste);
 		endInput();
 		inputX = inputY = 0;
@@ -429,7 +436,11 @@ class Zui {
 					isScrolling = true;
 				}
 
-				var scrollDelta = touchScroll && inputDownR && inputDY != 0 ? -inputDY / 20 : inputWheelDelta;
+				var scrollDelta: Float = inputWheelDelta;
+				if (touchScroll && inputDownR && inputDY != 0) {
+					isScrolling = true;
+					scrollDelta = -inputDY / 20;
+				}
 				if (handle == scrollHandle) { // Scroll
 					scroll(inputDY * e, fullHeight);
 				}
@@ -1429,17 +1440,16 @@ class Zui {
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
-		if (button == 0) {
-			if (isScrolling) {
-				isScrolling = false;
-				scrollHandle = null;
-				if (x == inputStartedX && y == inputStartedY) inputReleased = true; // Mouse not moved
-			}
-			else { // To prevent action when scrolling is active
-				inputReleased = true;
+		if (isScrolling) { // Prevent action when scrolling is active
+			isScrolling = false;
+			scrollHandle = null;
+			if (x == inputStartedX && y == inputStartedY) { // Mouse not moved
+				button == 0 ? inputReleased = true : inputReleasedR = true;
 			}
 		}
-		else if (button == 1) inputReleasedR = true;
+		else {
+			button == 0 ? inputReleased = true : inputReleasedR = true;
+		}
 		button == 0 ? inputDown = false : inputDownR = false;
 		setInputPosition(x, y);
 		deselectText();
@@ -1476,7 +1486,7 @@ class Zui {
 		case KeyCode.A: isADown = true;
 		case KeyCode.Space: char = " ";
 		#if kha_android_rmb // Detect right mouse button on Android..
-		case KeyCode.Back: onMouseDown(1, Std.int(inputX), Std.int(inputY));
+		case KeyCode.Back: if (!inputDownR) onMouseDown(1, Std.int(inputX), Std.int(inputY));
 		#end
 		default:
 		}
@@ -1504,6 +1514,19 @@ class Zui {
 		this.char = char;
 		isKeyPressed = true;
 	}
+
+	#if (kha_android || kha_ios)
+	public function onTouchDown(index: Int, x: Int, y: Int) {
+		// Two fingers down - right mouse button
+		if (index == 1) { onMouseUp(0, x, y); onMouseDown(1, x, y); }
+	}
+
+	public function onTouchUp(index: Int, x: Int, y: Int) {
+		if (index == 1) onMouseUp(1, x, y);
+	}
+
+	public function onTouchMove(index: Int, x: Int, y: Int) {}
+	#end
 
 	public function onCut(): String { isCut = true; return onCopy(); }
 	public function onCopy(): String { isCopy = true; return textToCopy; }
