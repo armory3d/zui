@@ -39,10 +39,11 @@ class Zui {
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 	public static var keyRepeat = true; // Emulate key repeat for non-character keys
 	#if (kha_android || kha_ios)
-	public static var touchScroll = true; // Pan with two fingers to scroll panels
+	public static var touchControls = true; // Pan with two fingers to scroll, hold finger for right click
 	#else
-	public static var touchScroll = false;
+	public static var touchControls = true;
 	#end
+	var touchHold = false;
 	static var keyRepeatTime = 0.0;
 
 	public var inputRegistered = false;
@@ -79,6 +80,7 @@ class Zui {
 	static var isPaste = false;
 	static var copyReceiver: Zui = null;
 	static var copyFrame = 0;
+	var inputStartedTime = 0.0;
 
 	var cursorX = 0; // Text input
 	var highlightAnchor = 0;
@@ -303,6 +305,10 @@ class Zui {
 				isKeyPressed = true;
 			}
 		}
+		if (touchControls && inputDown && inputX == inputStartedX && inputY == inputStartedY && inputStartedTime > 0 && kha.Scheduler.time() - inputStartedTime > 0.5) {
+			touchHold = true;
+			inputStartedTime = 0;
+		}
 	}
 
 	function inputChanged(): Bool {
@@ -437,7 +443,7 @@ class Zui {
 				}
 
 				var scrollDelta: Float = inputWheelDelta;
-				if (touchScroll && inputDownR && inputDY != 0) {
+				if (touchControls && inputDownR && inputDY != 0) {
 					isScrolling = true;
 					scrollDelta = -inputDY / 20;
 				}
@@ -1434,6 +1440,7 @@ class Zui {
 	public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
 		button == 0 ? inputStarted = true : inputStartedR = true;
 		button == 0 ? inputDown = true : inputDownR = true;
+		inputStartedTime = kha.Scheduler.time();
 		setInputPosition(x, y);
 		inputStartedX = x;
 		inputStartedY = y;
@@ -1453,6 +1460,11 @@ class Zui {
 		button == 0 ? inputDown = false : inputDownR = false;
 		setInputPosition(x, y);
 		deselectText();
+		if (touchHold) {
+			touchHold = false;
+			inputReleased = false;
+			inputReleasedR = true;
+		}
 	}
 
 	public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
