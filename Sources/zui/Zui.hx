@@ -41,7 +41,7 @@ class Zui {
 	#if (kha_android || kha_ios)
 	public static var touchControls = true; // Pan with two fingers to scroll, hold finger for right click
 	#else
-	public static var touchControls = true;
+	public static var touchControls = false;
 	#end
 	var touchHold = false;
 	static var keyRepeatTime = 0.0;
