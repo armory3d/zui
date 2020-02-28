@@ -1008,7 +1008,8 @@ class Zui {
 
 		if (align == Align.Right) _x -= 15;
 		g.color = t.TEXT_COL; // Value
-		drawString(g, texts[handle.position], null, 0, align);
+		if(texts.length > 0)
+			drawString(g, texts[handle.position], null, 0, align);
 		if (align == Align.Right) _x += 15;
 
 		endElement();
