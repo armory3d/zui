@@ -304,6 +304,7 @@ typedef TCanvas = {
 	var name: String;
 	var x: Float;
 	var y: Float;
+	var fullscreen:Bool;
 	var width: Int;
 	var height: Int;
 	var elements: Array<TElement>;
