@@ -355,6 +355,7 @@ class Ext {
 	}
 
 	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true): String {
+		handle.text = StringTools.replace(handle.text, "\t", "    ");
 		var lines = handle.text.split("\n");
 		var selected = ui.textSelectedHandle == handle; // Text being edited
 		var cursorStartX = ui.cursorX;
