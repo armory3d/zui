@@ -234,6 +234,8 @@ class Zui {
 		#if (kha_android || kha_ios)
 		if (Surface.get() != null) Surface.get().notify(onTouchDown, onTouchUp, onTouchMove);
 		#end
+		// Reset mouse delta on foreground
+		kha.System.notifyOnApplicationState(function() { inputDX = inputDY = 0; }, null, null, null, null);
 		inputRegistered = true;
 	}
 
