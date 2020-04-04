@@ -657,7 +657,7 @@ class Zui {
 		}
 
 		endElement(h);
-		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
+		return started ? State.Started : released ? State.Released : down ? State.Down : hover ? State.Hovered : State.Idle;
 	}
 
 	public function text(text: String, align = Align.Left, bg = 0x00000000): State {
@@ -1649,4 +1649,5 @@ class Handle {
 	var Started = 1;
 	var Down = 2;
 	var Released = 3;
+	var Hovered = 4;
 }
