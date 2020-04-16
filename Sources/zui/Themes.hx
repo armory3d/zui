@@ -19,6 +19,7 @@ class Themes {
 		FILL_WINDOW_BG: false,
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
+		LINK_STYLE: Line,
 
 		WINDOW_BG_COL: 0xff333333,
 		WINDOW_TINT_COL: 0xffffffff,
@@ -55,6 +56,7 @@ class Themes {
 		FILL_WINDOW_BG: false,
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
+		LINK_STYLE: Line,
 
 		WINDOW_BG_COL: 0xffefefef,
 		WINDOW_TINT_COL: 0xff222222,
@@ -91,6 +93,7 @@ typedef TTheme = {
 	var FILL_WINDOW_BG: Bool;
 	var FILL_BUTTON_BG: Bool;
 	var FILL_ACCENT_BG: Bool;
+	var LINK_STYLE: LinkStyle;
 
 	var WINDOW_BG_COL: Int;
 	var WINDOW_TINT_COL: Int;
@@ -107,4 +110,9 @@ typedef TTheme = {
 	var HIGHLIGHT_COL: Int;
 	var CONTEXT_COL: Int;
 	var PANEL_BG_COL: Int;
+}
+
+@:enum abstract LinkStyle(Int) from Int {
+	var Line = 0;
+	var CubicBezier = 1;
 }

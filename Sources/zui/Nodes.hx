@@ -208,7 +208,7 @@ class Nodes {
 				}
 			}
 
-			drawLink(ui, fromX - wx, fromY - wy, toX - wx, toY - wy, selected, link.link_style);
+			drawLink(ui, fromX - wx, fromY - wy, toX - wx, toY - wy, selected);
 		}
 
 		for (node in canvas.nodes) {
@@ -710,19 +710,20 @@ class Nodes {
 		ui._w = uiW;
 	}
 
-	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false, link_style: TNodeLinkStyle = Line) {
+	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false) {
 		var g = ui.g;
 		var c1: kha.Color = ui.t.LABEL_COL;
 		var c2: kha.Color = ui.t.ACCENT_SELECT_COL;
 		g.color = highlight ? kha.Color.fromBytes(c1.Rb, c1.Gb, c1.Bb, 210) : kha.Color.fromBytes(c2.Rb, c2.Gb, c2.Bb, 210);
-		if (link_style == Line) {
+		if (ui.t.LINK_STYLE == Line) {
 			g.drawLine(x1, y1, x2, y2, 1.0);
 			g.color = highlight ? kha.Color.fromBytes(c1.Rb, c1.Gb, c1.Bb, 150) : kha.Color.fromBytes(c2.Rb, c2.Gb, c2.Bb, 150); // AA
 			g.drawLine(x1 + 0.5, y1, x2 + 0.5, y2, 1.0);
 			g.drawLine(x1 - 0.5, y1, x2 - 0.5, y2, 1.0);
 			g.drawLine(x1, y1 + 0.5, x2, y2 + 0.5, 1.0);
 			g.drawLine(x1, y1 - 0.5, x2, y2 - 0.5, 1.0);
-		} else if (link_style == CubicBezier) {
+		}
+		else if (ui.t.LINK_STYLE == CubicBezier) {
 			g.drawCubicBezier([x1, x1 + Math.abs(x1 - x2) / 2, x2 - Math.abs(x1 - x2) / 2, x2], [y1, y1, y2, y2], 30, highlight ? 2.0 : 1.0);
 		}
 	}
@@ -784,18 +785,12 @@ typedef TNodeSocket = {
 	@:optional var precision: Null<Float>;
 }
 
-enum TNodeLinkStyle {
-	Line;
-	CubicBezier;
-}
-
 typedef TNodeLink = {
 	var id: Int;
 	var from_id: Int;
 	var from_socket: Int;
 	var to_id: Int;
 	var to_socket: Int;
-	@:optional var link_style: TNodeLinkStyle;
 }
 
 typedef TNodeButton = {
