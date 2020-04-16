@@ -4,23 +4,6 @@ class Themes {
 
 	public static var dark: TTheme = {
 		NAME: "Default Dark",
-
-		FONT_SIZE: 13,
-		ELEMENT_W: 100,
-		ELEMENT_H: 24,
-		ELEMENT_OFFSET: 4,
-		ARROW_SIZE: 5,
-		BUTTON_H: 22,
-		CHECK_SIZE: 15,
-		CHECK_SELECT_SIZE: 8,
-		SCROLL_W: 6,
-		TEXT_OFFSET: 8,
-		TAB_W: 6,
-		FILL_WINDOW_BG: false,
-		FILL_BUTTON_BG: true,
-		FILL_ACCENT_BG: false,
-		LINK_STYLE: Line,
-
 		WINDOW_BG_COL: 0xff333333,
 		WINDOW_TINT_COL: 0xffffffff,
 		ACCENT_COL: 0xff444444,
@@ -36,28 +19,26 @@ class Themes {
 		HIGHLIGHT_COL: 0xff205d9c,
 		CONTEXT_COL: 0xff222222,
 		PANEL_BG_COL: 0xff3b3b3b,
+		FONT_SIZE: 13,
+		ELEMENT_W: 100,
+		ELEMENT_H: 24,
+		ELEMENT_OFFSET: 4,
+		ARROW_SIZE: 5,
+		BUTTON_H: 22,
+		CHECK_SIZE: 15,
+		CHECK_SELECT_SIZE: 8,
+		SCROLL_W: 6,
+		TEXT_OFFSET: 8,
+		TAB_W: 6,
+		FILL_WINDOW_BG: false,
+		FILL_BUTTON_BG: true,
+		FILL_ACCENT_BG: false,
+		LINK_STYLE: Line,
 	};
 
 	// 2x scaled, for games
 	public static var light: TTheme = {
 		NAME: "Default Light",
-
-		FONT_SIZE: 13 * 2,
-		ELEMENT_W: 100 * 2,
-		ELEMENT_H: 24 * 2,
-		ELEMENT_OFFSET: 4 * 2,
-		ARROW_SIZE: 5 * 2,
-		BUTTON_H: 22 * 2,
-		CHECK_SIZE: 15 * 2,
-		CHECK_SELECT_SIZE: 8 * 2,
-		SCROLL_W: 6 * 2,
-		TEXT_OFFSET: 8 * 2,
-		TAB_W: 12 * 2,
-		FILL_WINDOW_BG: false,
-		FILL_BUTTON_BG: true,
-		FILL_ACCENT_BG: false,
-		LINK_STYLE: Line,
-
 		WINDOW_BG_COL: 0xffefefef,
 		WINDOW_TINT_COL: 0xff222222,
 		ACCENT_COL: 0xffeeeeee,
@@ -73,28 +54,26 @@ class Themes {
 		HIGHLIGHT_COL: 0xff205d9c,
 		CONTEXT_COL: 0xffaaaaaa,
 		PANEL_BG_COL: 0xffaaaaaa,
+		FONT_SIZE: 13 * 2,
+		ELEMENT_W: 100 * 2,
+		ELEMENT_H: 24 * 2,
+		ELEMENT_OFFSET: 4 * 2,
+		ARROW_SIZE: 5 * 2,
+		BUTTON_H: 22 * 2,
+		CHECK_SIZE: 15 * 2,
+		CHECK_SELECT_SIZE: 8 * 2,
+		SCROLL_W: 6 * 2,
+		TEXT_OFFSET: 8 * 2,
+		TAB_W: 12 * 2,
+		FILL_WINDOW_BG: false,
+		FILL_BUTTON_BG: true,
+		FILL_ACCENT_BG: false,
+		LINK_STYLE: Line,
 	};
 }
 
 typedef TTheme = {
-	var NAME:String;
-
-	var FONT_SIZE: Int;
-	var ELEMENT_W: Int;
-	var ELEMENT_H: Int;
-	var ELEMENT_OFFSET: Int;
-	var ARROW_SIZE: Int;
-	var BUTTON_H: Int;
-	var CHECK_SIZE: Int;
-	var CHECK_SELECT_SIZE: Int;
-	var SCROLL_W: Int;
-	var TEXT_OFFSET: Int;
-	var TAB_W: Int;
-	var FILL_WINDOW_BG: Bool;
-	var FILL_BUTTON_BG: Bool;
-	var FILL_ACCENT_BG: Bool;
-	var LINK_STYLE: LinkStyle;
-
+	var NAME: String;
 	var WINDOW_BG_COL: Int;
 	var WINDOW_TINT_COL: Int;
 	var ACCENT_COL: Int;
@@ -110,6 +89,21 @@ typedef TTheme = {
 	var HIGHLIGHT_COL: Int;
 	var CONTEXT_COL: Int;
 	var PANEL_BG_COL: Int;
+	var FONT_SIZE: Int;
+	var ELEMENT_W: Int;
+	var ELEMENT_H: Int;
+	var ELEMENT_OFFSET: Int;
+	var ARROW_SIZE: Int;
+	var BUTTON_H: Int;
+	var CHECK_SIZE: Int;
+	var CHECK_SELECT_SIZE: Int;
+	var SCROLL_W: Int;
+	var TEXT_OFFSET: Int;
+	var TAB_W: Int;
+	var FILL_WINDOW_BG: Bool;
+	var FILL_BUTTON_BG: Bool;
+	var FILL_ACCENT_BG: Bool;
+	var LINK_STYLE: LinkStyle;
 }
 
 @:enum abstract LinkStyle(Int) from Int {
