@@ -265,8 +265,8 @@ class Canvas {
 		var offsetY = 0.0;
 
 		if (element.parent == null) {
-			boxWidth = scaled(canvas.width);
-			boxHeight = scaled(canvas.height);
+			boxWidth = canvas.width;
+			boxHeight = canvas.height;
 		} else {
 			var parent = elemById(canvas, element.parent);
 			boxWidth = scaled(parent.width);
