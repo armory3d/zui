@@ -561,7 +561,9 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				var texts = Std.is(but.data, Array) ? but.data : enumTexts(node.type);
-				but.default_value = ui.combo(nhandle.nest(buti, {position: but.default_value}), texts, but.name);
+				var buthandle = nhandle.nest(buti);
+				buthandle.position = but.default_value;
+				but.default_value = ui.combo(buthandle, texts, but.name);
 			}
 			else if (but.type == "BOOL") {
 				ny += lineh;
