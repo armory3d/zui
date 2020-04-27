@@ -112,7 +112,7 @@ class Nodes {
 		ui.inputEnabled = popupCommands == null;
 
 		// Pan canvas
-		if (ui.inputEnabled && ui.inputDownR) {
+		if (ui.inputEnabled && (ui.inputDownR || (ui.inputDown && ui.isAltDown))) {
 			panX += ui.inputDX / SCALE();
 			panY += ui.inputDY / SCALE();
 		}
@@ -330,7 +330,7 @@ class Nodes {
 			ui.g.drawRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
 			ui.g.color = 0xffffffff;
 		}
-		if (ui.inputEnabled && ui.inputStarted && linkDrag == null && !nodesDrag && !ui.changed) {
+		if (ui.inputEnabled && ui.inputStarted && !ui.isAltDown && linkDrag == null && !nodesDrag && !ui.changed) {
 			boxSelect = true;
 			boxSelectX = Std.int(ui.inputX - ui._windowX);
 			boxSelectY = Std.int(ui.inputY - ui._windowY);
