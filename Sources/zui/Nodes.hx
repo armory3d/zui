@@ -112,7 +112,7 @@ class Nodes {
 		ui.inputEnabled = popupCommands == null;
 
 		// Pan canvas
-		if (ui.inputEnabled && (ui.inputDownR || (ui.inputDown && ui.isAltDown))) {
+		if (ui.inputEnabled && (ui.inputDownR || (ui.inputDown && ui.isCtrlDown))) {
 			panX += ui.inputDX / SCALE();
 			panY += ui.inputDY / SCALE();
 		}

@@ -774,6 +774,7 @@ class Zui {
 					 key != KeyCode.Shift &&
 					 key != KeyCode.CapsLock &&
 					 key != KeyCode.Control &&
+					 key != KeyCode.Meta &&
 					 key != KeyCode.Alt &&
 					 key != KeyCode.Up &&
 					 key != KeyCode.Down &&
@@ -1494,6 +1495,9 @@ class Zui {
 		switch code {
 		case KeyCode.Shift: isShiftDown = true;
 		case KeyCode.Control: isCtrlDown = true;
+		#if kha_darwin
+		case KeyCode.Meta: isCtrlDown = true;
+		#end
 		case KeyCode.Alt: isAltDown = true;
 		case KeyCode.Backspace: isBackspaceDown = true;
 		case KeyCode.Delete: isDeleteDown = true;
@@ -1513,6 +1517,9 @@ class Zui {
 		switch code {
 		case KeyCode.Shift: isShiftDown = false;
 		case KeyCode.Control: isCtrlDown = false;
+		#if kha_darwin
+		case KeyCode.Meta: isCtrlDown = false;
+		#end
 		case KeyCode.Alt: isAltDown = false;
 		case KeyCode.Backspace: isBackspaceDown = false;
 		case KeyCode.Delete: isDeleteDown = false;
