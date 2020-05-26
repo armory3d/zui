@@ -1473,7 +1473,9 @@ class Zui {
 	}
 
 	public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
+		#if (!kha_android && !kha_ios)
 		setInputPosition(x, y);
+		#end
 	}
 
 	public function onMouseWheel(delta: Int) {
@@ -1540,15 +1542,22 @@ class Zui {
 
 	#if (kha_android || kha_ios)
 	public function onTouchDown(index: Int, x: Int, y: Int) {
+		// Reset movement delta on touch start
+		if (index == 0) { inputDX = 0; inputDY = 0; inputX = x; inputY = y; }
 		// Two fingers down - right mouse button
-		if (index == 1) { onMouseUp(0, x, y); onMouseDown(1, x, y); }
+		if (index == 1) {
+			onMouseUp(0, Std.int(inputX), Std.int(inputY));
+			onMouseDown(1, Std.int(inputX), Std.int(inputY));
+		}
 	}
 
 	public function onTouchUp(index: Int, x: Int, y: Int) {
-		if (index == 1) onMouseUp(1, x, y);
+		if (index == 1) { onMouseUp(1, Std.int(inputX), Std.int(inputY)); }
 	}
 
-	public function onTouchMove(index: Int, x: Int, y: Int) {}
+	public function onTouchMove(index: Int, x: Int, y: Int) {
+		if (index == 0) setInputPosition(x, y);
+	}
 	#end
 
 	public function onCut(): String { isCut = true; return onCopy(); }
