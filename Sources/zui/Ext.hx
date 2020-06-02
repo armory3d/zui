@@ -409,6 +409,31 @@ class Ext {
 		return handle.text;
 	}
 
+	static var _ELEMENT_OFFSET = 0;
+	static var _BUTTON_COL = 0;
+	public static function beginMenu(ui: Zui) {
+		_ELEMENT_OFFSET = ui.t.ELEMENT_OFFSET;
+		_BUTTON_COL = ui.t.BUTTON_COL;
+		ui.t.ELEMENT_OFFSET = 0;
+		ui.t.BUTTON_COL = ui.t.SEPARATOR_COL;
+		ui.g.color = ui.t.SEPARATOR_COL;
+		ui.g.fillRect(0, 0, ui._windowW, MENUBAR_H(ui));
+	}
+
+	public static function endMenu(ui: Zui) {
+		ui.t.ELEMENT_OFFSET = _ELEMENT_OFFSET;
+		ui.t.BUTTON_COL = _BUTTON_COL;
+	}
+
+	public static function menuButton(ui: Zui, text: String): Bool {
+		ui._w = Std.int(ui.ops.font.width(ui.fontSize, text) + 25 * ui.SCALE());
+		return ui.button(text);
+	}
+
+	public static inline function MENUBAR_H(ui: Zui): Float {
+		return ui.BUTTON_H() * 1.1 + 2 + ui.buttonOffsetY;
+	}
+
 	/**
 	Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
 	**/
