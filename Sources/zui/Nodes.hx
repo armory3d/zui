@@ -330,7 +330,7 @@ class Nodes {
 			ui.g.drawRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
 			ui.g.color = 0xffffffff;
 		}
-		if (ui.inputEnabled && ui.inputStarted && !ui.isAltDown && linkDrag == null && !nodesDrag && !ui.changed) {
+		if (ui.inputEnabled && ui.inputStarted && !ui.isAltDown && !ui.isCtrlDown && linkDrag == null && !nodesDrag && !ui.changed) {
 			boxSelect = true;
 			boxSelectX = Std.int(ui.inputX - ui._windowX);
 			boxSelectY = Std.int(ui.inputY - ui._windowY);
