@@ -215,7 +215,7 @@ class Nodes {
 			// Cull
 			if (NODE_X(node) > ui._windowW || NODE_X(node) + NODE_W() < 0 ||
 				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(node) < 0) {
-				continue;
+				if (!isSelected(node)) continue;
 			}
 
 			var inps = node.inputs;
