@@ -1066,7 +1066,7 @@ class Zui {
 		if (displayValue) {
 			g.color = t.TEXT_COL; // Value
 			textSelectedHandle != handle ?
-				drawString(g, handle.value + "", null, 0, lalign) :
+				drawString(g, (Math.round(handle.value * precision) / precision) + "", null, 0, lalign) :
 				drawString(g, textSelected, null, 0, lalign);
 		}
 
