@@ -578,7 +578,7 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				// Preview
-				var vals: Array<Array<Float>> = but.default_value;
+				var vals: Array<kha.arrays.Float32Array> = but.default_value; // [[r, g, b, a, pos], ..]
 				var sw = w / SCALE();
 				for (val in vals) {
 					var pos = val[4];
@@ -591,7 +591,9 @@ class Nodes {
 				ui.row([1 / 4, 1 / 4, 2 / 4]);
 				if (ui.button("+")) {
 					var last = vals[vals.length - 1];
-					vals.push([last[0], last[1], last[2], last[3], 1.0]); // [[r, g, b, a, pos], ..]
+					var f32 = new kha.arrays.Float32Array(5);
+					f32[0] = last[0]; f32[1] = last[1]; f32[2] = last[2]; f32[3] = last[3]; f32[4] = 1.0;
+					vals.push(f32);
 					ihandle.value += 1;
 				}
 				if (ui.button("-") && vals.length > 1) {
@@ -623,24 +625,26 @@ class Nodes {
 				ui.radio(nhandle.nest(buti).nest(1), 2, "Z");
 				// Preview
 				var axis = nhandle.nest(buti).nest(1).position;
-				var val: Array<Float> = but.default_value[axis]; // [[x, y, x, y,..], [x, y], ..]
-				var num = Std.int(val.length / 2);
+				var val: Array<kha.arrays.Float32Array> = but.default_value[axis]; // [ [[x, y], [x, y], ..], [[x, y]], ..]
+				var num = val.length;
 				// for (i in 0...num) { ui.line(); }
 				ui._y += lineh * 5;
 				// Edit
 				ui.row([1 / 5, 1 / 5, 3 / 5]);
 				if (ui.button("+")) {
-					val.push(0); val.push(0);
+					var f32 = new kha.arrays.Float32Array(2);
+					f32[0] = 0; f32[1] = 0;
+					val.push(f32);
 				}
 				if (ui.button("-")) {
-					if (val.length > 4) { val.pop(); val.pop(); }
+					if (val.length > 2) { val.pop(); }
 				}
 				var i = Std.int(ui.slider(nhandle.nest(buti).nest(2).nest(axis, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
 				ui.row([1 / 2, 1 / 2]);
-				nhandle.nest(buti).nest(3).value = val[i * 2    ];
-				nhandle.nest(buti).nest(4).value = val[i * 2 + 1];
-				val[i * 2    ] = ui.slider(nhandle.nest(buti).nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
-				val[i * 2 + 1] = ui.slider(nhandle.nest(buti).nest(4, {value: 0}), "Y", -1, 1, true, 100, true, Left);
+				nhandle.nest(buti).nest(3).value = val[i][0];
+				nhandle.nest(buti).nest(4).value = val[i][1];
+				val[i][0] = ui.slider(nhandle.nest(buti).nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
+				val[i][1] = ui.slider(nhandle.nest(buti).nest(4, {value: 0}), "Y", -1, 1, true, 100, true, Left);
 				ny += lineh * 7;
 			}
 		}
