@@ -287,14 +287,14 @@ class Ext {
 				ui.g.drawRect(ui._x + step * i, ui._y + ui.buttonOffsetY, step, ui.BUTTON_H());
 			}
 			ui.g.color = ui.t.TEXT_COL; // Text
-			ui.drawString(ui.g, texts[i], ui.TEXT_OFFSET() + step * i, 0, Align.Left);
+			ui.drawString(ui.g, texts[i], ui.TEXT_OFFSET() + (step * i) / ui.SCALE(), 0, Align.Left);
 		}
 		ui.endElement();
 		return handle.position;
 	}
 
 	static var wheelSelectedHande: Handle = null;
-	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, rowAlign = false, colorPreview = true): kha.Color {
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, colorPreview = true): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
 		var chue = ar[0];
@@ -326,13 +326,7 @@ class Ext {
 		ui.g.fillRect(cx - 3 * ui.SCALE(), cy - 3 * ui.SCALE(), 6 * ui.SCALE(), 6 * ui.SCALE());
 		ui.g.color = 0xffffffff;
 		ui.g.fillRect(cx - 2 * ui.SCALE(), cy - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE());
-		// Val slider
-		if (rowAlign) alpha ? ui.row([1 / 3, 1 / 3, 1 / 3]) : ui.row([1 / 2, 1 / 2]);
-		var valHandle = handle.nest(0);
-		valHandle.value = Math.round(cval * 100) / 100;
-		cval = ui.slider(valHandle, "Value", 0.0, 1.0, true);
-		if (valHandle.changed) handle.changed = ui.changed = true;
-		else handle.changed = false;
+
 		if (alpha) {
 			var alphaHandle = handle.nest(1, {value: Math.round(calpha * 100) / 100});
 			calpha = ui.slider(alphaHandle, "Alpha", 0.0, 1.0, true);
@@ -354,7 +348,39 @@ class Ext {
 		// Save as rgb
 		hsvToRgb(chue, csat, cval, ar);
 		handle.color = kha.Color.fromFloats(ar[0], ar[1], ar[2], calpha);
+
 		if (colorPreview) ui.text("", Right, handle.color);
+
+		var pos = Ext.inlineRadio(ui, Id.handle(), ["RGB", "HSV", "Hex"]);
+		var h0 = handle.nest(0).nest(0);
+		var h1 = handle.nest(0).nest(1);
+		var h2 = handle.nest(0).nest(2);
+		if (pos == 0) {
+			h0.value = handle.color.R;
+
+			handle.color.R = ui.slider(h0, "R", 0, 1, true);
+			h1.value = handle.color.G;
+
+			handle.color.G = ui.slider(h1, "G", 0, 1, true);
+			h2.value = handle.color.B;
+			handle.color.B = ui.slider(h2, "B", 0, 1, true);
+		}
+		else if (pos == 1) {
+			rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
+			h0.value = ar[0];
+			h1.value = ar[1];
+			h2.value = ar[2];
+			var chue = ui.slider(h0, "H", 0, 1, true);
+			var csat = ui.slider(h1, "S", 0, 1, true);
+			var cval = ui.slider(h2, "V", 0, 1, true);
+			hsvToRgb(chue, csat, cval, ar);
+			handle.color = kha.Color.fromFloats(ar[0], ar[1], ar[2]);
+		}
+		else if (pos == 2) {
+			handle.text = untyped (handle.color >>> 0).toString(16);
+			handle.color = untyped parseInt(ui.textInput(handle, "Hex"), 16);
+		}
+		if (h0.changed || h1.changed || h2.changed) handle.changed = ui.changed = true;
 		return handle.color;
 	}
 
