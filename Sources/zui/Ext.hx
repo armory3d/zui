@@ -154,7 +154,8 @@ class Ext {
 			Popup.showCustom(
 				new Zui(ui.ops),
 				function(ui:Zui) {
-					colorWheel(ui, handle, alpha);},
+					colorWheel(ui, handle, alpha);
+				},
 				Std.int(ui.inputX), Std.int(ui.inputY), 200, 500);
 		}
 
@@ -262,31 +263,34 @@ class Ext {
 
 	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Center): Int {
 		if (!ui.isVisible(ui.ELEMENT_H())) { ui.endElement(); return handle.position; }
+		var step = ui._w / texts.length;
+		var hovered = -1;
+		if (ui.getHover()) {
+			var ix = Std.int(ui.inputX - ui._x - ui._windowX);
+			for (i in 0...texts.length) if (ix < i * step + step) { hovered = i; break; }
+		}
 		if (ui.getReleased()) {
-			if (++handle.position >= texts.length) handle.position = 0;
+			handle.position = hovered;
 			handle.changed = ui.changed = true;
 		}
 		else handle.changed = false;
 
-		var hover = ui.getHover();
-		drawInlineRadio(ui, texts[handle.position], hover, align); // Radio
-
+		for (i in 0...texts.length) {
+			if (handle.position == i) {
+				ui.g.color = ui.t.ACCENT_HOVER_COL;
+				if (!ui.enabled) ui.fadeColor();
+				ui.g.fillRect(ui._x + step * i, ui._y + ui.buttonOffsetY, step, ui.BUTTON_H());
+			}
+			else if (hovered == i) {
+				ui.g.color = ui.t.ACCENT_COL;
+				if (!ui.enabled) ui.fadeColor();
+				ui.g.drawRect(ui._x + step * i, ui._y + ui.buttonOffsetY, step, ui.BUTTON_H());
+			}
+			ui.g.color = ui.t.TEXT_COL; // Text
+			ui.drawString(ui.g, texts[i], ui.TEXT_OFFSET() + step * i, 0, Align.Left);
+		}
 		ui.endElement();
 		return handle.position;
-	}
-
-	static function drawInlineRadio(ui: Zui, text: String, hover: Bool, align: Align = Center) {
-		if (hover) { // Bg
-			ui.g.color = ui.t.ACCENT_HOVER_COL;
-			ui.g.fillRect(ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, ui.BUTTON_H());
-		}
-		else {
-			ui.g.color = ui.t.ACCENT_COL;
-			if (!ui.enabled) ui.fadeColor();
-			ui.g.drawRect(ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, ui.BUTTON_H());
-		}
-		ui.g.color = ui.t.TEXT_COL; // Text
-		ui.drawString(ui.g, text, ui.TEXT_OFFSET(), 0, align);
 	}
 
 	static var wheelSelectedHande: Handle = null;
