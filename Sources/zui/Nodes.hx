@@ -45,9 +45,9 @@ class Nodes {
 	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
-			if (but.type == "RGBA") buttonsH += 150 * SCALE();
+			if (but.type == "RGBA") buttonsH += 235 * SCALE();
 			else if (but.type == "VECTOR") buttonsH += LINE_H() * 4;
-			else if (but.type == "RAMP") buttonsH += LINE_H() * 9.5;
+			else if (but.type == "RAMP") buttonsH += LINE_H() * 4.5;
 			else if (but.type == "CURVES") buttonsH += LINE_H() * 8;
 			else buttonsH += LINE_H();
 		}
@@ -435,8 +435,8 @@ class Nodes {
 			ui._y = popupY;
 			ui._w = popupW;
 
-			ui.fill(-6, -6, ui._w / ui.SCALE() + 12, ui.t.ELEMENT_H * 4 + 12, ui.t.ACCENT_SELECT_COL);
-			ui.fill(-5, -5, ui._w / ui.SCALE() + 10, ui.t.ELEMENT_H * 4 + 10, ui.t.SEPARATOR_COL);
+			ui.fill(-6, -6, ui._w / ui.SCALE() + 12, popupH + 12, ui.t.ACCENT_SELECT_COL);
+			ui.fill(-5, -5, ui._w / ui.SCALE() + 10, popupH + 10, ui.t.SEPARATOR_COL);
 			popupCommands(ui);
 
 			var hide = (ui.inputStarted || ui.inputStartedR) && (ui.inputX - wx < popupX - 6 || ui.inputX - wx > popupX + popupW + 6 || ui.inputY - wy < popupY - 6 || ui.inputY - wy > popupY + popupH * ui.SCALE() + 6);
@@ -512,7 +512,7 @@ class Nodes {
 				ui._w = w;
 				var val = node.outputs[but.output].default_value;
 				nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
-				Ext.colorWheel(ui, nhandle, false);
+				Ext.colorWheel(ui, nhandle);
 				val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
 			}
 			else if (but.type == "VECTOR") {
@@ -608,11 +608,16 @@ class Nodes {
 				val[4] = ui.slider(nhandle.nest(buti).nest(3), "Pos", 0, 1, true, 100, true, Left);
 				var chandle = nhandle.nest(buti).nest(4);
 				chandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
-				Ext.colorWheel(ui, chandle, false);
+				if (ui.text("", Right, chandle.color) == Started) {
+					var rx = nx + w - p(37);
+					var ry = ny - p(5);
+					ui.inputStarted = false;
+					rgbaPopup(ui, chandle, val, Std.int(rx), Std.int(ry + ui.ELEMENT_H()));
+				}
 				val[0] = chandle.color.R;
 				val[1] = chandle.color.G;
 				val[2] = chandle.color.B;
-				ny += lineh * 8 + lineh * 0.5;
+				ny += lineh * 3.5;
 			}
 			else if (but.type == "CURVES") {
 				ny += lineh;
@@ -697,12 +702,7 @@ class Nodes {
 				var iy = ui.inputY - wy;
 				if (ui.inputStarted && ix > rx && iy > ry && ix < rx + rw && iy < ry + rh) {
 					ui.inputStarted = false;
-					popup(Std.int(rx), Std.int(ry + ui.ELEMENT_H()), Std.int(100 * scaleFactor), ui.t.ELEMENT_H * 4, function(ui: Zui) {
-						var val = soc.default_value;
-						nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
-						Ext.colorWheel(ui, nhandle, false, null, false, false);
-						val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
-					});
+					rgbaPopup(ui, nhandle, soc.default_value, Std.int(rx), Std.int(ry + ui.ELEMENT_H()));
 				}
 			}
 			else {
@@ -714,6 +714,14 @@ class Nodes {
 		ui._x = uiX;
 		ui._y = uiY;
 		ui._w = uiW;
+	}
+
+	function rgbaPopup(ui: Zui, nhandle: zui.Zui.Handle, val: kha.arrays.Float32Array, x: Int, y: Int) {
+		popup(x, y, Std.int(140 * scaleFactor), Std.int(ui.ELEMENT_H() * 9), function(ui: Zui) {
+			nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
+			Ext.colorWheel(ui, nhandle, false, null, false);
+			val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
+		});
 	}
 
 	public function drawLink(ui: Zui, x1: Float, y1: Float, x2: Float, y2: Float, highlight: Bool = false) {
