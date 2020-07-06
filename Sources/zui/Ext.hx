@@ -378,7 +378,7 @@ class Ext {
 		}
 		else if (pos == 2) {
 			handle.text = untyped (handle.color >>> 0).toString(16);
-			handle.color = untyped parseInt(ui.textInput(handle, "Hex"), 16);
+			handle.color = untyped parseInt(ui.textInput(handle, "#"), 16);
 		}
 		if (h0.changed || h1.changed || h2.changed) handle.changed = ui.changed = true;
 		return handle.color;
