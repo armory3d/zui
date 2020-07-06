@@ -1056,7 +1056,11 @@ class Zui {
 		}
 		if (submitTextHandle == handle) {
 			submitTextEdit();
+			#if js
+			handle.value = js.Lib.eval(handle.text);
+			#else
 			handle.value = Std.parseFloat(handle.text);
+			#end
 			handle.changed = changed = true;
 		}
 
