@@ -970,13 +970,7 @@ class Zui {
 		else handle.changed = false;
 
 		if (inputWheelDelta != 0 && comboSelectedHandle != null) {
-			if (inputWheelDelta > 0) {
-				comboItemOffset += 1;
-			}
-			else {
-				comboItemOffset -= 1;
-			}
-
+			comboItemOffset += inputWheelDelta > 0 ? 1 : -1;
 			final maxOffset = comboSelectedTexts.length - comboItemCount;
 
 			if (comboItemOffset > maxOffset) {
@@ -1230,6 +1224,15 @@ class Zui {
 			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Align.Right);
+		}
+
+		final maxOffset = comboSelectedTexts.length - comboItemCount;
+		if (maxOffset > 0) {
+			var barH = Math.max((comboItemCount / comboSelectedTexts.length) * ELEMENT_H() * 16, ELEMENT_H());
+
+			var off = (comboH - barH - elementSize) * comboItemOffset / maxOffset;
+			g.color = t.ACCENT_COL; // Bg
+			g.fillRect((_x + _w) - SCROLL_W() / 3, comboY + off, SCROLL_W() / 3, barH);
 		}
 
 		if ((inputReleased || isEscapeDown) && !comboFirst) {
