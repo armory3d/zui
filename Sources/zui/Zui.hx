@@ -1227,11 +1227,10 @@ class Zui {
 		}
 
 		final maxOffset = comboSelectedTexts.length - comboItemCount;
-		if (maxOffset > 0) {
+		if (maxOffset > 0) { // Scrollbar
 			var barH = Math.max((comboItemCount / comboSelectedTexts.length) * ELEMENT_H() * 16, ELEMENT_H());
-
 			var off = (comboH - barH - elementSize) * comboItemOffset / maxOffset;
-			g.color = t.ACCENT_COL; // Bg
+			g.color = t.ACCENT_COL;
 			g.fillRect((_x + _w) - SCROLL_W() / 3, comboY + off, SCROLL_W() / 3, barH);
 		}
 
