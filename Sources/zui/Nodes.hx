@@ -465,6 +465,19 @@ class Nodes {
 		var text = node.name;
 		var lineh = LINE_H();
 
+		// Disallow input if node is overlapped by another node
+		var _inputStarted = ui.inputStarted;
+		if (ui.inputStarted) {
+			for (i in (canvas.nodes.indexOf(node) + 1)...canvas.nodes.length) {
+				var n = canvas.nodes[i];
+				if (NODE_X(n) < ui.inputX - ui._windowX && NODE_X(n) + NODE_W() > ui.inputX - ui._windowX &&
+					NODE_Y(n) < ui.inputY - ui._windowY && NODE_Y(n) + NODE_H(n) > ui.inputY - ui._windowY) {
+					ui.inputStarted = false;
+					break;
+				}
+			}
+		}
+
 		// Outline
 		g.color = isSelected(node) ? ui.t.LABEL_COL : ui.t.CONTEXT_COL;
 		g.fillRect(nx - 1, ny - 1, w + 2, h + 2);
@@ -611,7 +624,7 @@ class Nodes {
 				if (ui.text("", Right, chandle.color) == Started) {
 					var rx = nx + w - p(37);
 					var ry = ny - p(5);
-					ui.inputStarted = false;
+					_inputStarted = ui.inputStarted = false;
 					rgbaPopup(ui, chandle, val, Std.int(rx), Std.int(ry + ui.ELEMENT_H()));
 				}
 				val[0] = chandle.color.R;
@@ -701,7 +714,7 @@ class Nodes {
 				var ix = ui.inputX - wx;
 				var iy = ui.inputY - wy;
 				if (ui.inputStarted && ix > rx && iy > ry && ix < rx + rw && iy < ry + rh) {
-					ui.inputStarted = false;
+					_inputStarted = ui.inputStarted = false;
 					rgbaPopup(ui, nhandle, soc.default_value, Std.int(rx), Std.int(ry + ui.ELEMENT_H()));
 				}
 			}
@@ -714,6 +727,7 @@ class Nodes {
 		ui._x = uiX;
 		ui._y = uiY;
 		ui._w = uiW;
+		ui.inputStarted = _inputStarted;
 	}
 
 	function rgbaPopup(ui: Zui, nhandle: zui.Zui.Handle, val: kha.arrays.Float32Array, x: Int, y: Int) {
