@@ -163,6 +163,8 @@ class Zui {
 	var tabHandle: Handle = null;
 	var tabScroll = 0.0;
 	var tabVertical = false;
+	var sticky = false;
+	var scissor = false;
 
 	var elementsBaked = false;
 	var checkSelectImage: kha.Image = null;
@@ -291,6 +293,20 @@ class Zui {
 		if (last) endInput();
 	}
 
+	// Sticky region ignores window scrolling
+	public function beginSticky() {
+		sticky = true;
+		_y -= currentWindow.scrollOffset;
+	}
+
+	public function endSticky() {
+		sticky = false;
+		scissor = true;
+		g.scissor(0, Std.int(_y), Std.int(_windowW), Std.int(_windowH - _y));
+		windowHeaderH += _y - windowHeaderH;
+		_y += currentWindow.scrollOffset;
+	}
+
 	function endInput() {
 		isKeyPressed = false;
 		inputStarted = false;
@@ -408,6 +424,11 @@ class Zui {
 		if (handle == null) return;
 		if (handle.redraws > 0 || isScrolling || isTyping) {
 
+			if (scissor) {
+				scissor = false;
+				g.disableScissor();
+			}
+
 			if (tabNames != null) drawTabs();
 
 			if (handle.dragEnabled) { // Draggable header
@@ -457,7 +478,7 @@ class Zui {
 					scroll(scrollDelta * ELEMENT_H(), fullHeight);
 				}
 
-				//Stay in bounds
+				// Stay in bounds
 				if (handle.scrollOffset > 0) {
 					handle.scrollOffset = 0;
 				}
@@ -504,7 +525,7 @@ class Zui {
 			tabColors = [];
 			tabHandle = handle;
 			tabVertical = vertical;
-			_w -= tabVertical ? Std.int(ELEMENT_OFFSET() + ELEMENT_W() - 1 * SCALE()) : 0; // shrink window area by width of vertical tabs
+			_w -= tabVertical ? Std.int(ELEMENT_OFFSET() + ELEMENT_W() - 1 * SCALE()) : 0; // Shrink window area by width of vertical tabs
 			vertical ?
 				windowHeaderW += ELEMENT_W() :
 				windowHeaderH += BUTTON_H() + buttonOffsetY + ELEMENT_OFFSET();
@@ -1428,6 +1449,7 @@ class Zui {
 	}
 
 	function getInitialHover(elemH = -1.0): Bool {
+		if (scissor && inputY < _windowY + windowHeaderH) return false;
 		if (elemH == -1.0) elemH = ELEMENT_H();
 		return enabled && inputEnabled &&
 			inputStartedX >= _windowX + _x && inputStartedX < (_windowX + _x + _w) &&
@@ -1435,6 +1457,7 @@ class Zui {
 	}
 
 	function getHover(elemH = -1.0): Bool {
+		if (scissor && inputY < _windowY + windowHeaderH) return false;
 		if (elemH == -1.0) elemH = ELEMENT_H();
 		isHovered = enabled && inputEnabled &&
 			inputX >= _windowX + (highlightFullRow ? 0 : _x) && inputX < (_windowX + _x + (highlightFullRow ? _windowW : _w)) &&
