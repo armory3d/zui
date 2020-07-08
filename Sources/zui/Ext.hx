@@ -377,8 +377,10 @@ class Ext {
 			handle.color = kha.Color.fromFloats(ar[0], ar[1], ar[2]);
 		}
 		else if (pos == 2) {
+			#if js
 			handle.text = untyped (handle.color >>> 0).toString(16);
 			handle.color = untyped parseInt(ui.textInput(handle, "#"), 16);
+			#end
 		}
 		if (h0.changed || h1.changed || h2.changed) handle.changed = ui.changed = true;
 		return handle.color;
