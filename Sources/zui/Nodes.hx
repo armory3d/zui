@@ -731,7 +731,7 @@ class Nodes {
 	}
 
 	function rgbaPopup(ui: Zui, nhandle: zui.Zui.Handle, val: kha.arrays.Float32Array, x: Int, y: Int) {
-		popup(x, y, Std.int(140 * scaleFactor), Std.int(ui.ELEMENT_H() * 9), function(ui: Zui) {
+		popup(x, y, Std.int(140 * scaleFactor), Std.int(ui.t.ELEMENT_H * 9), function(ui: Zui) {
 			nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 			Ext.colorWheel(ui, nhandle, false, null, false);
 			val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
