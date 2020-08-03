@@ -663,6 +663,11 @@ class Zui {
 		var down = getPushed(h);
 		var released = getReleased(h);
 		var hover = getHover(h);
+		if(started || down || released || hover){
+			if(_windowX > inputX || inputX > (_windowX+ _x + image.width) ){
+				down = started = released = hover = false;
+			}
+		}
 		g.color = tint;
 		if (!enabled) fadeColor();
 		var h_float: Float = h; // TODO: hashlink fix
