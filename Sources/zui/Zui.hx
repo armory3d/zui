@@ -663,9 +663,9 @@ class Zui {
 		var down = getPushed(h);
 		var released = getReleased(h);
 		var hover = getHover(h);
-		if(curRatio == -1 && (started || down || released || hover)){
-			if(_windowX + _x > inputX || inputX > (_windowX+ _x + image.width) ){
-				down = started = released = hover = false;
+		if (curRatio == -1 && (started || down || released || hover)) {
+			if (inputX < _windowX + _x || inputX > _windowX + _x + w) {
+				started = down = released = hover = false;
 			}
 		}
 		g.color = tint;
