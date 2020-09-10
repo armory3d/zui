@@ -36,6 +36,12 @@ class Nodes {
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
 
+	#if zui_translate
+	public static dynamic function tr(id: String, vars: Map<String, String> = null) { return id; }
+	#else
+	public static inline function tr(id: String, vars: Map<String, String> = null) { return id; }
+	#end
+
 	public function new() {}
 
 	public inline function SCALE(): Float { return scaleFactor * zoom; }
@@ -462,7 +468,7 @@ class Nodes {
 		var h = NODE_H(node);
 		var nx = NODE_X(node);
 		var ny = NODE_Y(node);
-		var text = node.name;
+		var text = tr(node.name);
 		var lineh = LINE_H();
 
 		// Disallow input if node is overlapped by another node
@@ -508,8 +514,8 @@ class Nodes {
 		g.color = ui.t.LABEL_COL;
 		for (out in node.outputs) {
 			ny += lineh;
-			var strw = ui.ops.font.width(ui.fontSize, out.name);
-			g.drawString(out.name, nx + w - strw - p(12), ny - p(3));
+			var strw = ui.ops.font.width(ui.fontSize, tr(out.name));
+			g.drawString(tr(out.name), nx + w - strw - p(12), ny - p(3));
 		}
 
 		// Buttons
@@ -537,7 +543,7 @@ class Nodes {
 				var max = but.max != null ? but.max : 1.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				ui.text(but.name);
+				ui.text(tr(but.name));
 				but.default_value[0] = ui.slider(nhandle.nest(buti).nest(0, {value: but.default_value[0]}), "X", min, max, true, 100, true, Left);
 				but.default_value[1] = ui.slider(nhandle.nest(buti).nest(1, {value: but.default_value[1]}), "Y", min, max, true, 100, true, Left);
 				but.default_value[2] = ui.slider(nhandle.nest(buti).nest(2, {value: but.default_value[2]}), "Z", min, max, true, 100, true, Left);
@@ -565,7 +571,7 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				var soc = but.output != null ? node.outputs[but.output] : null;
-				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : ""}), but.name);
+				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : ""}), tr(but.name));
 				if (soc != null) soc.default_value = but.default_value;
 			}
 			else if (but.type == "ENUM") {
@@ -576,14 +582,14 @@ class Nodes {
 				var texts = Std.is(but.data, Array) ? but.data : enumTexts(node.type);
 				var buthandle = nhandle.nest(buti);
 				buthandle.position = but.default_value;
-				but.default_value = ui.combo(buthandle, texts, but.name);
+				but.default_value = ui.combo(buthandle, texts, tr(but.name));
 			}
 			else if (but.type == "BOOL") {
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				but.default_value = ui.check(nhandle.nest(buti, {selected: but.default_value}), but.name);
+				but.default_value = ui.check(nhandle.nest(buti, {selected: but.default_value}), tr(but.name));
 			}
 			else if (but.type == "RAMP") {
 				ny += lineh;
@@ -686,7 +692,7 @@ class Nodes {
 				var prec = soc.precision != null ? soc.precision : 100.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), inp.name, min, max, true, prec, true, Left);
+				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), tr(inp.name), min, max, true, prec, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (!isLinked && inp.type == "STRING") {
@@ -696,12 +702,12 @@ class Nodes {
 				var soc = inp;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				soc.default_value = ui.textInput(nhandle.nest(maxButtons).nest(i, {text: soc.default_value}), inp.name, Left);
+				soc.default_value = ui.textInput(nhandle.nest(maxButtons).nest(i, {text: soc.default_value}), tr(inp.name), Left);
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (!isLinked && inp.type == "RGBA") {
 				g.color = ui.t.LABEL_COL;
-				g.drawString(inp.name, nx + p(12), ny - p(3));
+				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
 				var soc = inp;
 				g.color = 0xff000000;
 				g.fillRect(nx + w - p(38), ny - p(6), p(36), p(18));
@@ -720,7 +726,7 @@ class Nodes {
 			}
 			else {
 				g.color = ui.t.LABEL_COL;
-				g.drawString(inp.name, nx + p(12), ny - p(3));
+				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
 			}
 		}
 
