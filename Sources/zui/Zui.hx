@@ -71,6 +71,7 @@ class Zui {
 	public var isDeleteDown = false;
 	public var isEscapeDown = false;
 	public var isReturnDown = false;
+	public var isTabDown = false;
 	public var key: Null<KeyCode> = null;
 	public var char: String;
 	static var textToPaste = "";
@@ -552,6 +553,12 @@ class Zui {
 		_y = currentWindow.dragEnabled ? HEADER_DRAG_H() : 0;
 		tabHandle.changed = false;
 
+		if (isCtrlDown && isTabDown) { // Next tab
+			tabHandle.position++;
+			if (tabHandle.position >= tabNames.length) tabHandle.position = 0;
+			isTabDown = false;
+		}
+
 		g.color = t.SEPARATOR_COL; // Tab background
 		tabVertical ?
 			g.fillRect(0, _y, ELEMENT_W(), _windowH) :
@@ -781,7 +788,7 @@ class Zui {
 				textSelected = textSelectedHandle.text;
 				deselectText();
 			}
-			else if (key == KeyCode.Tab && tabSwitchEnabled) { // Next field
+			else if (key == KeyCode.Tab && tabSwitchEnabled && !isCtrlDown) { // Next field
 				tabPressed = true;
 				deselectText();
 				key = null;
@@ -1540,6 +1547,7 @@ class Zui {
 		case KeyCode.Delete: isDeleteDown = true;
 		case KeyCode.Escape: isEscapeDown = true;
 		case KeyCode.Return: isReturnDown = true;
+		case KeyCode.Tab: isTabDown = true;
 		case KeyCode.A: isADown = true;
 		case KeyCode.Space: char = " ";
 		#if kha_android_rmb // Detect right mouse button on Android..
@@ -1562,6 +1570,7 @@ class Zui {
 		case KeyCode.Delete: isDeleteDown = false;
 		case KeyCode.Escape: isEscapeDown = false;
 		case KeyCode.Return: isReturnDown = false;
+		case KeyCode.Tab: isTabDown = false;
 		case KeyCode.A: isADown = false;
 		#if kha_android_rmb
 		case KeyCode.Back: onMouseUp(1, Std.int(inputX), Std.int(inputY));
