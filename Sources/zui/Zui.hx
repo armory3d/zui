@@ -560,6 +560,8 @@ class Zui {
 			isTabDown = false;
 		}
 
+		if (tabHandle.position >= tabNames.length) tabHandle.position = tabNames.length - 1;
+
 		g.color = t.SEPARATOR_COL; // Tab background
 		tabVertical ?
 			g.fillRect(0, _y, ELEMENT_W(), _windowH) :
