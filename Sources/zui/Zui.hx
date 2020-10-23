@@ -268,7 +268,7 @@ class Zui {
 	public function end(last = true) { // End drawing
 		if (!windowEnded) endWindow();
 		drawCombo(); // Handle active combo
-		drawTooltip();
+		drawTooltip(true);
 		tabPressedHandle = null;
 		if (last) endInput();
 	}
@@ -290,7 +290,7 @@ class Zui {
 	}
 
 	public function endRegion(last = true) {
-		drawTooltip();
+		drawTooltip(false);
 		tabPressedHandle = null;
 		if (last) endInput();
 	}
@@ -1287,7 +1287,7 @@ class Zui {
 		g = _g; // Restore
 	}
 
-	function drawTooltip() {
+	function drawTooltip(bindGlobalG: Bool) {
 		if (tooltipText != "" || tooltipImg != null) {
 			if (inputChanged()) {
 				tooltipShown = false;
@@ -1299,13 +1299,13 @@ class Zui {
 				tooltipTime = kha.Scheduler.time();
 			}
 			if (!tooltipWait && kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
-				tooltipText != "" ? drawTooltipText() : drawTooltipImage();
+				tooltipText != "" ? drawTooltipText(bindGlobalG) : drawTooltipImage(bindGlobalG);
 			}
 		}
 		else tooltipShown = false;
 	}
 
-	function drawTooltipText() {
+	function drawTooltipText(bindGlobalG: Bool) {
 		globalG.color = t.TEXT_COL;
 		var lines = tooltipText.split("\n");
 		var tooltipW = 0.0;
@@ -1314,7 +1314,7 @@ class Zui {
 			if (lineTooltipW > tooltipW) tooltipW = lineTooltipW;
 		}
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipW - 20);
-		globalG.begin(false);
+		if (bindGlobalG) globalG.begin(false);
 		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * lines.length * 0.6);
 		globalG.font = ops.font;
 		globalG.fontSize = fontSize;
@@ -1322,23 +1322,23 @@ class Zui {
 		for (i in 0...lines.length) {
 			globalG.drawString(lines[i], tooltipX + 5, tooltipY + i * fontSize);
 		}
-		globalG.end();
+		if (bindGlobalG) globalG.end();
 	}
 
-	function drawTooltipImage() {
+	function drawTooltipImage(bindGlobalG: Bool) {
 		var w = tooltipImg.width;
 		if (tooltipImgMaxWidth != null && w > tooltipImgMaxWidth) w = tooltipImgMaxWidth;
 		var h = tooltipImg.height * (w / tooltipImg.width);
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - w - 20);
 		tooltipY = Math.min(tooltipY, kha.System.windowHeight() - h - 20);
+		if (bindGlobalG) globalG.begin(false);
 		globalG.color = 0xff000000;
-		globalG.begin(false);
 		globalG.fillRect(tooltipX, tooltipY, w, h);
 		globalG.color = 0xffffffff;
 		tooltipInvertY ?
 			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY + h, w, -h) :
 			globalG.drawScaledImage(tooltipImg, tooltipX, tooltipY, w, h);
-		globalG.end();
+		if (bindGlobalG) globalG.end();
 	}
 
 	function drawString(g: Graphics, text: String,
