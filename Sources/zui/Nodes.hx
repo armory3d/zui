@@ -386,33 +386,40 @@ class Nodes {
 			cutSelected = Zui.isCut;
 		}
 		if (Zui.isPaste && !ui.isTyping) {
-			var pasteCanvas: TNodeCanvas = haxe.Json.parse(clipboard);
-			for (l in pasteCanvas.links) {
-				// Assign unique link id
-				l.id = getLinkId(canvas.links);
-				canvas.links.push(l);
+			var pasteCanvas: TNodeCanvas = null;
+			// Clipboard can contain non-json data
+			try {
+				pasteCanvas = haxe.Json.parse(clipboard);
 			}
-			for (n in pasteCanvas.nodes) {
-				// Assign unique node id
-				var old_id = n.id;
-				n.id = getNodeId(canvas.nodes);
-				for (soc in n.inputs) {
-					soc.id = getSocketId(canvas.nodes);
-					soc.node_id = n.id;
-				}
-				for (soc in n.outputs) {
-					soc.id = getSocketId(canvas.nodes);
-					soc.node_id = n.id;
-				}
+			catch(_) {}
+			if (pasteCanvas != null) {
 				for (l in pasteCanvas.links) {
-					if (l.from_id == old_id) l.from_id = n.id;
-					else if (l.to_id == old_id) l.to_id = n.id;
+					// Assign unique link id
+					l.id = getLinkId(canvas.links);
+					canvas.links.push(l);
 				}
-				n.x += 10;
-				n.y += 10;
-				canvas.nodes.push(n);
+				for (n in pasteCanvas.nodes) {
+					// Assign unique node id
+					var old_id = n.id;
+					n.id = getNodeId(canvas.nodes);
+					for (soc in n.inputs) {
+						soc.id = getSocketId(canvas.nodes);
+						soc.node_id = n.id;
+					}
+					for (soc in n.outputs) {
+						soc.id = getSocketId(canvas.nodes);
+						soc.node_id = n.id;
+					}
+					for (l in pasteCanvas.links) {
+						if (l.from_id == old_id) l.from_id = n.id;
+						else if (l.to_id == old_id) l.to_id = n.id;
+					}
+					n.x += 10;
+					n.y += 10;
+					canvas.nodes.push(n);
+				}
+				nodesSelected = pasteCanvas.nodes;
 			}
-			nodesSelected = pasteCanvas.nodes;
 		}
 
 		// Select all nodes
