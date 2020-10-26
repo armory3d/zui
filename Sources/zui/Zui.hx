@@ -1614,7 +1614,7 @@ class Zui {
 
 	public function onCut(): String { isCut = true; return onCopy(); }
 	public function onCopy(): String { isCopy = true; return textToCopy; }
-	public function onPaste(s: String) { isPaste = true; textToPaste = s; }
+	public function onPaste(s: String) { isPaste = isCtrlDown && key == KeyCode.V; textToPaste = s; }
 
 	public inline function ELEMENT_W(): Float { return t.ELEMENT_W * SCALE(); }
 	public inline function ELEMENT_H(): Float { return t.ELEMENT_H * SCALE(); }
