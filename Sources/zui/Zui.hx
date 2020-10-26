@@ -1092,7 +1092,10 @@ class Zui {
 		if (submitTextHandle == handle) {
 			submitTextEdit();
 			#if js
-			handle.value = js.Lib.eval(handle.text);
+			try {
+				handle.value = js.Lib.eval(handle.text);
+			}
+			catch(_) {}
 			#else
 			handle.value = Std.parseFloat(handle.text);
 			#end
