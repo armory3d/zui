@@ -557,6 +557,7 @@ class Zui {
 		if (isCtrlDown && isTabDown) { // Next tab
 			tabHandle.position++;
 			if (tabHandle.position >= tabNames.length) tabHandle.position = 0;
+			tabHandle.changed = true;
 			isTabDown = false;
 		}
 
