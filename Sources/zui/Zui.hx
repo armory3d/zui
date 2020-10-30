@@ -251,6 +251,7 @@ class Zui {
 		#end
 		// kha.System.removeCutCopyPaste(onCut, onCopy, onPaste);
 		endInput();
+		isShiftDown = isCtrlDown = isAltDown = false;
 		inputX = inputY = 0;
 		inputRegistered = false;
 	}
