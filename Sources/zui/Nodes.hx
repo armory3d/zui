@@ -55,6 +55,7 @@ class Nodes {
 			else if (but.type == "VECTOR") buttonsH += LINE_H() * 4;
 			else if (but.type == "RAMP") buttonsH += LINE_H() * 4.5;
 			else if (but.type == "CURVES") buttonsH += LINE_H() * 8;
+			else if (but.type == "ARRAY") buttonsH += Std.is(but.default_value,Array) ? LINE_H() * (cast(but.default_value,Array<Dynamic>).length + 1.5) : LINE_H() * 1.5;
 			else buttonsH += LINE_H();
 		}
 		return Std.int(buttonsH);
@@ -590,6 +591,36 @@ class Nodes {
 				var buthandle = nhandle.nest(buti);
 				buthandle.position = but.default_value;
 				but.default_value = ui.combo(buthandle, texts, tr(but.name));
+			}
+			else if (but.type == "ARRAY") {
+				ny += lineh;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				var texts = Std.is(but.data, Array) ? but.data : enumTexts(node.type);
+
+				if(!Std.is(but.default_value,Array)){
+					but.default_value = [];
+				}
+				var values:Array<Dynamic> = but.default_value;
+				ui.row([0.74,0.25]);
+				ui.text(tr(but.name));
+				if (ui.button("+")) {
+					values.push(0);
+				}
+				var i = 0;
+				while (i < values.length) {
+					ui.row([0.74,0.25]);
+					var buthandle = nhandle.nest(buti+i);
+					buthandle.position = values[i];
+					values[i] = ui.combo(buthandle, texts,'$i');
+					if(ui.button("-")){
+						values.splice(i,1);
+					}
+					else {i++;}
+				}
+				but.default_value = values;
+				ny += lineh * i;
 			}
 			else if (but.type == "BOOL") {
 				ny += lineh;
