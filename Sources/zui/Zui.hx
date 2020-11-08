@@ -889,16 +889,18 @@ class Zui {
 	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true): String {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
 
-		var hover = getHover();
+		var hover = editable ? getHover() :false;
 		if (hover && onTextHover != null) onTextHover();
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
 		drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
-		var startEdit = getReleased() || tabPressed;
-		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
-		if (textSelectedHandle == handle) updateTextEdit(align, editable);
-		if (submitTextHandle == handle) submitTextEdit();
-		else handle.changed = false;
+		if(editable){
+			var startEdit = getReleased() || tabPressed;
+			if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
+			if (textSelectedHandle == handle) updateTextEdit(align, editable);
+			if (submitTextHandle == handle) submitTextEdit();
+			else handle.changed = false;
+		}
 
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
