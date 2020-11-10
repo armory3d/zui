@@ -381,16 +381,16 @@ typedef TTranslatedText = {
 	var Combo = 8;
 	var Slider = 9;
 	var TextInput = 10;
-	var TextArea = 11;
-	var KeyInput = 12;
-	var FRectangle = 13;
-	var Rectangle = 14;
-	var FCircle = 15;
-	var Circle = 16;
-	var FTriangle = 17;
-	var Triangle = 18;
-	var ProgressBar = 19;
-	var CProgressBar = 20;
+	var KeyInput = 11;
+	var FRectangle = 12;
+	var Rectangle = 13;
+	var FCircle = 14;
+	var Circle = 15;
+	var FTriangle = 16;
+	var Triangle = 17;
+	var ProgressBar = 18;
+	var CProgressBar = 19;
+	var TextArea = 20;
 }
 
 @:enum abstract Anchor(Int) from Int to Int {
