@@ -257,7 +257,7 @@ class Nodes {
 					var sy = wy + NODE_Y(node) + SOCKET_Y(i);
 					if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 						// New link from output
-						var l = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
+						var l: TNodeLink = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
 						canvas.links.push(l);
 						linkDrag = l;
 						isNewLink = true;
@@ -280,7 +280,7 @@ class Nodes {
 							}
 							if (linkDrag != null) break;
 							// New link from input
-							var l = { id: getLinkId(canvas.links), from_id: -1, from_socket: -1, to_id: node.id, to_socket: i };
+							var l: TNodeLink = { id: getLinkId(canvas.links), from_id: -1, from_socket: -1, to_id: node.id, to_socket: i };
 							canvas.links.push(l);
 							linkDrag = l;
 							isNewLink = true;
