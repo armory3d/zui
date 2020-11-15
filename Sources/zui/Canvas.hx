@@ -175,6 +175,18 @@ class Canvas {
 				if (e != null && e != "") events.push(e);
 			}
 
+		case TextArea:
+			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+			h.nest(element.id).text = getText(canvas, element);
+			Ext.textArea(ui,h.nest(element.id), element.alignment,element.editable);
+			if (h.nest(element.id).changed) {
+				var e = element.event;
+				if (e != null && e != "") events.push(e);
+			}
+
 		case KeyInput:
 			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
 			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
@@ -338,6 +350,7 @@ typedef TElement = {
 	@:optional var children: Array<Int>; // ids
 	@:optional var asset: String;
 	@:optional var visible: Null<Bool>;
+	@:optional var editable: Null<Bool>;
 }
 
 typedef TAsset = {
@@ -377,6 +390,7 @@ typedef TTranslatedText = {
 	var Triangle = 17;
 	var ProgressBar = 18;
 	var CProgressBar = 19;
+	var TextArea = 20;
 }
 
 @:enum abstract Anchor(Int) from Int to Int {
