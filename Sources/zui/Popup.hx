@@ -5,8 +5,14 @@ import kha.System;
 
 @:access(zui.Zui)
 class Popup {
-	public static var show = false;
-
+	public static var show(default,set):Bool = false;
+	static function set_show(value:Bool){
+		if(!value){
+			hwnd.scrollOffset = 0.0;
+		}
+		return show = value;
+	}
+	
 	static var ui:Zui = null;
 	static var hwnd = new Handle();
 	static var boxTitle = "";
