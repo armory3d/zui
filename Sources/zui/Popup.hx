@@ -5,25 +5,19 @@ import kha.System;
 
 @:access(zui.Zui)
 class Popup {
-	public static var show(default,set):Bool = false;
-	static function set_show(value:Bool){
-		if(!value){
-			hwnd.scrollOffset = 0.0;
-		}
-		return show = value;
-	}
-	
-	static var ui:Zui = null;
+	public static var show = false;
+
+	static var ui: Zui = null;
 	static var hwnd = new Handle();
 	static var boxTitle = "";
 	static var boxText = "";
-	static var boxCommands:Zui->Void = null;
+	static var boxCommands: Zui->Void = null;
 	static var modalX = 0;
 	static var modalY = 0;
 	static var modalW = 400;
 	static var modalH = 160;
 
-	public static function render(g:kha.graphics2.Graphics) {
+	public static function render(g: kha.graphics2.Graphics) {
 		if (boxCommands == null) {
 			ui.begin(g);
 			if (ui.window(hwnd, modalX, modalY, modalW, modalH)) {
@@ -54,7 +48,7 @@ class Popup {
 		}
 	}
 
-	public static function drawTitle(g:kha.graphics2.Graphics) {
+	public static function drawTitle(g: kha.graphics2.Graphics) {
 		if (boxTitle != "") {
 			g.color = ui.t.SEPARATOR_COL;
 			ui.drawRect(g, true, ui._x, ui._y, ui._w, ui.t.BUTTON_H);
@@ -81,7 +75,7 @@ class Popup {
 	 * @param title the title to display
 	 * @param text  the text to display
 	 */
-	public static function showMessage(ui:Zui, title:String, text:String) {
+	public static function showMessage(ui: Zui, title: String, text: String) {
 		Popup.ui = ui;
 		init();
 
@@ -99,7 +93,7 @@ class Popup {
 	 * @param mw       the width of the popup (defaults to 400)
 	 * @param mh       the height of the popup (defaults to 160)
 	 */
-	public static function showCustom(ui:Zui, commands:Zui->Void = null, mx = -1, my = -1, mw = 400, mh = 160) {
+	public static function showCustom(ui: Zui, commands: Zui->Void = null, mx = -1, my = -1, mw = 400, mh = 160) {
 		Popup.ui = ui;
 		init(mx, my, mw, mh);
 
@@ -118,8 +112,8 @@ class Popup {
 		modalH = Std.int(mh * ui.SCALE());
 
 		// Center popup window if no value is given
-		if (mx == -1) { modalX = Std.int(appW / 2 - modalW / 2);}
-		if (my == -1) { modalY = Std.int(appH / 2 - modalH / 2);}
+		if (mx == -1) { modalX = Std.int(appW / 2 - modalW / 2); }
+		if (my == -1) { modalY = Std.int(appH / 2 - modalH / 2); }
 
 		// Limit popup position to screen
 		modalX = Std.int(Math.max(0, Math.min(modalX, appW - modalW)));
@@ -127,6 +121,7 @@ class Popup {
 
 		hwnd.dragX = 0;
 		hwnd.dragY = 0;
+		hwnd.scrollOffset = 0.0;
 		show = true;
 	}
 }
