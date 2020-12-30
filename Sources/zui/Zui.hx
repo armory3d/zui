@@ -1320,7 +1320,8 @@ class Zui {
 		}
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipW - 20);
 		if (bindGlobalG) globalG.begin(false);
-		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, ELEMENT_H() * lines.length * 0.6);
+		var fontHeight = ops.font.height(fontSize);
+		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, fontHeight * lines.length);
 		globalG.font = ops.font;
 		globalG.fontSize = fontSize;
 		globalG.color = t.ACCENT_COL;
