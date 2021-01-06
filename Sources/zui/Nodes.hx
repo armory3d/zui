@@ -36,6 +36,7 @@ class Nodes {
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
+	public static var onNodeRemove: TNode->Void = null;
 
 	#if zui_translate
 	public static dynamic function tr(id: String, vars: Map<String, String> = null) { return id; }
@@ -712,6 +713,9 @@ class Nodes {
 			else i++;
 		}
 		canvas.nodes.remove(n);
+		if (onNodeRemove != null) {
+			onNodeRemove(n);
+		}
 	}
 
 	var popupX = 0;
