@@ -12,6 +12,7 @@ class Nodes {
 	public var zoom = 1.0;
 	public var uiw = 0;
 	public var uih = 0;
+	public var _inputStarted = false;
 	var scaleFactor = 1.0;
 	var ELEMENT_H = 25;
 	var dragged = false;
@@ -47,14 +48,13 @@ class Nodes {
 	public inline function SCALE(): Float { return scaleFactor * zoom; }
 	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE() + zoomPan; }
 	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE() + zoomPan; }
-	inline function LINE_H(): Int { return Std.int(ELEMENT_H * SCALE()); }
+	public inline function LINE_H(): Int { return Std.int(ELEMENT_H * SCALE()); }
 	function BUTTONS_H(node: TNode): Int {
 		var buttonsH = 0.0;
 		for (but in node.buttons) {
 			if (but.type == "RGBA") buttonsH += 235 * SCALE();
 			else if (but.type == "VECTOR") buttonsH += LINE_H() * 4;
-			else if (but.type == "RAMP") buttonsH += LINE_H() * 4.5;
-			else if (but.type == "CURVES") buttonsH += LINE_H() * 8;
+			else if (but.type == "CUSTOM") buttonsH += LINE_H() * but.height;
 			else buttonsH += LINE_H();
 		}
 		return Std.int(buttonsH);
@@ -66,7 +66,7 @@ class Nodes {
 	inline function NODE_X(node: TNode): Float { return node.x * SCALE() + PAN_X(); }
 	inline function NODE_Y(node: TNode): Float { return node.y * SCALE() + PAN_Y(); }
 	inline function SOCKET_Y(pos: Int): Int { return Std.int(LINE_H() * 1.62) + pos * LINE_H(); }
-	inline function p(f: Float): Float { return f * SCALE(); }
+	public inline function p(f: Float): Float { return f * SCALE(); }
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -481,7 +481,7 @@ class Nodes {
 		var lineh = LINE_H();
 
 		// Disallow input if node is overlapped by another node
-		var _inputStarted = ui.inputStarted;
+		_inputStarted = ui.inputStarted;
 		if (ui.inputStarted) {
 			for (i in (canvas.nodes.indexOf(node) + 1)...canvas.nodes.length) {
 				var n = canvas.nodes[i];
@@ -600,85 +600,15 @@ class Nodes {
 				ui._w = w;
 				but.default_value = ui.check(nhandle.nest(buti, {selected: but.default_value}), tr(but.name));
 			}
-			else if (but.type == "RAMP") {
+			else if (but.type == "CUSTOM") { // Calls external function for custom button drawing
 				ny += lineh;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				// Preview
-				var vals: Array<kha.arrays.Float32Array> = but.default_value; // [[r, g, b, a, pos], ..]
-				var sw = w / SCALE();
-				for (val in vals) {
-					var pos = val[4];
-					var col = kha.Color.fromFloats(val[0], val[1], val[2]);
-					ui.fill(pos * sw, 0, (1.0 - pos) * sw, lineh - 2 * SCALE(), col);
-				}
-				ui._y += lineh;
-				// Edit
-				var ihandle = nhandle.nest(buti).nest(2);
-				ui.row([1 / 4, 1 / 4, 2 / 4]);
-				if (ui.button("+")) {
-					var last = vals[vals.length - 1];
-					var f32 = new kha.arrays.Float32Array(5);
-					f32[0] = last[0]; f32[1] = last[1]; f32[2] = last[2]; f32[3] = last[3]; f32[4] = 1.0;
-					vals.push(f32);
-					ihandle.value += 1;
-				}
-				if (ui.button("-") && vals.length > 1) {
-					vals.pop();
-					ihandle.value -= 1;
-				}
-				but.data = ui.combo(nhandle.nest(buti).nest(1, {position: but.data}), ["Linear", "Constant"], "Interpolate");
-				ui.row([1 / 2, 1 / 2]);
-				var i = Std.int(ui.slider(ihandle, "Index", 0, vals.length - 1, false, 1, true, Left));
-				var val = vals[i];
-				nhandle.nest(buti).nest(3).value = val[4];
-				val[4] = ui.slider(nhandle.nest(buti).nest(3), "Pos", 0, 1, true, 100, true, Left);
-				var chandle = nhandle.nest(buti).nest(4);
-				chandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
-				if (ui.text("", Right, chandle.color) == Started) {
-					var rx = nx + w - p(37);
-					var ry = ny - p(5);
-					_inputStarted = ui.inputStarted = false;
-					rgbaPopup(ui, chandle, val, Std.int(rx), Std.int(ry + ui.ELEMENT_H()));
-				}
-				val[0] = chandle.color.R;
-				val[1] = chandle.color.G;
-				val[2] = chandle.color.B;
-				ny += lineh * 3.5;
-			}
-			else if (but.type == "CURVES") {
-				ny += lineh;
-				ui._x = nx;
-				ui._y = ny;
-				ui._w = w;
-				ui.row([1 / 3, 1 / 3, 1 / 3]);
-				ui.radio(nhandle.nest(buti).nest(1), 0, "X");
-				ui.radio(nhandle.nest(buti).nest(1), 1, "Y");
-				ui.radio(nhandle.nest(buti).nest(1), 2, "Z");
-				// Preview
-				var axis = nhandle.nest(buti).nest(1).position;
-				var val: Array<kha.arrays.Float32Array> = but.default_value[axis]; // [ [[x, y], [x, y], ..], [[x, y]], ..]
-				var num = val.length;
-				// for (i in 0...num) { ui.line(); }
-				ui._y += lineh * 5;
-				// Edit
-				ui.row([1 / 5, 1 / 5, 3 / 5]);
-				if (ui.button("+")) {
-					var f32 = new kha.arrays.Float32Array(2);
-					f32[0] = 0; f32[1] = 0;
-					val.push(f32);
-				}
-				if (ui.button("-")) {
-					if (val.length > 2) { val.pop(); }
-				}
-				var i = Std.int(ui.slider(nhandle.nest(buti).nest(2).nest(axis, {position: 0}), "Index", 0, num - 1, false, 1, true, Left));
-				ui.row([1 / 2, 1 / 2]);
-				nhandle.nest(buti).nest(3).value = val[i][0];
-				nhandle.nest(buti).nest(4).value = val[i][1];
-				val[i][0] = ui.slider(nhandle.nest(buti).nest(3, {value: 0}), "X", -1, 1, true, 100, true, Left);
-				val[i][1] = ui.slider(nhandle.nest(buti).nest(4, {value: 0}), "Y", -1, 1, true, 100, true, Left);
-				ny += lineh * 7;
+				var dot = but.name.lastIndexOf("."); // TNodeButton.name specifies external function path
+				var fn = Reflect.field(Type.resolveClass(but.name.substr(0, dot)), but.name.substr(dot + 1));
+				fn(ui, this, node);
+				ny += lineh * (but.height - 1); // TNodeButton.height specifies vertical button size
 			}
 		}
 		ny += lineh / 3; // Fix align
@@ -745,7 +675,7 @@ class Nodes {
 		ui.inputStarted = _inputStarted;
 	}
 
-	function rgbaPopup(ui: Zui, nhandle: zui.Zui.Handle, val: kha.arrays.Float32Array, x: Int, y: Int) {
+	public function rgbaPopup(ui: Zui, nhandle: zui.Zui.Handle, val: kha.arrays.Float32Array, x: Int, y: Int) {
 		popup(x, y, Std.int(140 * scaleFactor), Std.int(ui.t.ELEMENT_H * 9), function(ui: Zui) {
 			nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 			Ext.colorWheel(ui, nhandle, false, null, false);
@@ -845,4 +775,5 @@ typedef TNodeButton = {
 	@:optional var min: Null<Float>;
 	@:optional var max: Null<Float>;
 	@:optional var precision: Null<Float>;
+	@:optional var height: Null<Float>;
 }
