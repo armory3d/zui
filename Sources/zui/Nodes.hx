@@ -36,6 +36,7 @@ class Nodes {
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
+	public static var onSocketReleased: TNodeSocket->Void = null;
 	public static var onNodeRemove: TNode->Void = null;
 
 	#if zui_translate
@@ -526,6 +527,11 @@ class Nodes {
 			ny += lineh;
 			var strw = ui.ops.font.width(ui.fontSize, tr(out.name));
 			g.drawString(tr(out.name), nx + w - strw - p(12), ny - p(3));
+			if (onSocketReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR)) {
+				if (ui.inputX > wx + nx && ui.inputX < wx + nx + w && ui.inputY > wy + ny && ui.inputY < wy + ny + lineh) {
+					onSocketReleased(out);
+				}
+			}
 		}
 
 		// Buttons
@@ -667,6 +673,11 @@ class Nodes {
 			else {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
+			}
+			if (onSocketReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR)) {
+				if (ui.inputX > wx + nx && ui.inputX < wx + nx + w && ui.inputY > wy + ny && ui.inputY < wy + ny + lineh) {
+					onSocketReleased(inp);
+				}
 			}
 		}
 
