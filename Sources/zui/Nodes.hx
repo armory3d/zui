@@ -38,6 +38,7 @@ class Nodes {
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
 	public static var onSocketReleased: TNodeSocket->Void = null;
 	public static var onNodeRemove: TNode->Void = null;
+	public static var onCanvasControl: Void->CanvasControl = null; // Pan, zoom
 
 	#if zui_translate
 	public static dynamic function tr(id: String, vars: Map<String, String> = null) { return id; }
@@ -118,16 +119,21 @@ class Nodes {
 		var wx = ui._windowX;
 		var wy = ui._windowY;
 		ui.inputEnabled = popupCommands == null;
+		var controls = onCanvasControl != null ? onCanvasControl() : {
+			panX: ui.inputDownR ? ui.inputDX : 0.0,
+			panY: ui.inputDownR ? ui.inputDY : 0.0,
+			zoom: -ui.inputWheelDelta / 10.0
+		};
 
 		// Pan canvas
-		if (ui.inputEnabled && (ui.inputDownR || (ui.inputDown && ui.isCtrlDown))) {
-			panX += ui.inputDX / SCALE();
-			panY += ui.inputDY / SCALE();
+		if (ui.inputEnabled && (controls.panX != 0.0 || controls.panY != 0.0)) {
+			panX += controls.panX / SCALE();
+			panY += controls.panY / SCALE();
 		}
 
 		// Zoom canvas
-		if (ui.inputEnabled && ui.inputWheelDelta != 0) {
-			zoom += -ui.inputWheelDelta / 10;
+		if (ui.inputEnabled && controls.zoom != 0.0) {
+			zoom += controls.zoom;
 			if (zoom < 0.1) zoom = 0.1;
 			else if (zoom > 1.0) zoom = 1.0;
 			zoom = Math.round(zoom * 10) / 10;
@@ -741,6 +747,12 @@ class Nodes {
 		popupH = h;
 		popupCommands = commands;
 	}
+}
+
+typedef CanvasControl = {
+	var panX: Float;
+	var panY: Float;
+	var zoom: Float;
 }
 
 typedef TNodeCanvas = {
