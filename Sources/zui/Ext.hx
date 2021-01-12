@@ -21,8 +21,8 @@ typedef ListOpts = {
 @:access(zui.Zui)
 class Ext {
 
-	public static function floatInput(ui: Zui, handle: Handle, label = "", align: Align = Left): Float {
-		handle.text = Std.string(handle.value);
+	public static function floatInput(ui: Zui, handle: Handle, label = "", align: Align = Left, precision = 1000.0): Float {
+		handle.text = Std.string(Math.round(handle.value * precision) / precision);
 		var text = ui.textInput(handle, label, align);
 		handle.value = Std.parseFloat(text);
 		return handle.value;
