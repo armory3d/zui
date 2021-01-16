@@ -1350,7 +1350,7 @@ class Zui {
 	function drawString(g: Graphics, text: String,
 						xOffset: Null<Float> = null, yOffset: Float = 0, align = Align.Left) {
 		var fullLength = text.length;
-		while (text.length > 0 && ops.font.width(fontSize, text) > _w) {
+		while (text.length > 0 && ops.font.width(fontSize, text) > _w - 6) {
 			text = text.substr(0, text.length - 1);
 		}
 		if (text.length < fullLength) text += "..";
