@@ -1224,9 +1224,8 @@ class Zui {
 		if (comboSelectedHandle == null) return;
 		var _g = g;
 		globalG.color = t.SEPARATOR_COL;
-		var elementSize = Std.int(ELEMENT_H() + ELEMENT_OFFSET());
 		final maxItemCount = Std.int(Math.min(comboSelectedTexts.length, comboItemCount));
-		var comboH = (maxItemCount + 1) * elementSize;
+		var comboH = (maxItemCount + (comboSelectedLabel != "" ? 1 : 0)) * Std.int(ELEMENT_H());
 		globalG.begin(false);
 		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H());
 		var distBottom = kha.System.windowHeight() - (comboSelectedY + comboH);
@@ -1246,15 +1245,17 @@ class Zui {
 			comboItemOffset = clampi(comboItemOffset, 0, comboSelectedTexts.length - maxItemCount);
 		}
 
-		if (outOfScreen) { // Unroll up
+		if (outOfScreen && comboSelectedLabel != "") { // Unroll up
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Align.Right);
-			_y += elementSize;
+			_y += ELEMENT_H();
 			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 		}
 
 		inputEnabled = true;
-		var BUTTON_COL = t.BUTTON_COL;
+		var _BUTTON_COL = t.BUTTON_COL;
+		var _ELEMENT_OFFSET = t.ELEMENT_OFFSET;
+		t.ELEMENT_OFFSET = 0;
 		for (i in comboItemOffset...comboItemOffset + maxItemCount) {
 			var j = outOfScreen ? comboSelectedTexts.length - 1 - i : i;
 			t.BUTTON_COL = j == comboSelectedHandle.position ? t.ACCENT_SELECT_COL : t.SEPARATOR_COL;
@@ -1265,9 +1266,10 @@ class Zui {
 				break;
 			}
 		}
-		t.BUTTON_COL = BUTTON_COL;
+		t.BUTTON_COL = _BUTTON_COL;
+		t.ELEMENT_OFFSET = _ELEMENT_OFFSET;
 
-		if (!outOfScreen) { // Unroll down
+		if (!outOfScreen && comboSelectedLabel != "") { // Unroll down
 			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 			g.color = t.LABEL_COL;
 			drawString(g, comboSelectedLabel, null, 0, Align.Right);
@@ -1276,7 +1278,7 @@ class Zui {
 		final maxOffset = comboSelectedTexts.length - comboItemCount;
 		if (maxOffset > 0) { // Scrollbar
 			var barH = Math.max((comboItemCount / comboSelectedTexts.length) * ELEMENT_H() * 16, ELEMENT_H());
-			var off = (comboH - barH - elementSize) * comboItemOffset / maxOffset;
+			var off = (comboH - barH - ELEMENT_H()) * comboItemOffset / maxOffset;
 			g.color = t.ACCENT_COL;
 			g.fillRect((_x + _w) - SCROLL_W() / 3, comboY + off, SCROLL_W() / 3, barH);
 		}
