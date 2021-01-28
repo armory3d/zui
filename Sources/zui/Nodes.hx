@@ -118,7 +118,8 @@ class Nodes {
 
 		var wx = ui._windowX;
 		var wy = ui._windowY;
-		ui.inputEnabled = popupCommands == null;
+		var _inputEnabled = ui.inputEnabled;
+		ui.inputEnabled = _inputEnabled && popupCommands == null;
 		var controls = onCanvasControl != null ? onCanvasControl() : {
 			panX: ui.inputDownR ? ui.inputDX : 0.0,
 			panY: ui.inputDownR ? ui.inputDY : 0.0,
@@ -451,7 +452,7 @@ class Nodes {
 
 		ui.setScale(scaleFactor); // Restore non-zoomed scale
 		ui.elementsBaked = true;
-		ui.inputEnabled = true;
+		ui.inputEnabled = _inputEnabled;
 
 		if (popupCommands != null) {
 			ui._x = popupX;
