@@ -53,22 +53,30 @@ class Nodes {
 	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE() + zoomPan; }
 	public inline function LINE_H(): Int { return Std.int(ELEMENT_H * SCALE()); }
 	function BUTTONS_H(node: TNode): Int {
-		var buttonsH = 0.0;
+		var h = 0.0;
 		for (but in node.buttons) {
-			if (but.type == "RGBA") buttonsH += 235 * SCALE();
-			else if (but.type == "VECTOR") buttonsH += LINE_H() * 4;
-			else if (but.type == "CUSTOM") buttonsH += LINE_H() * but.height;
-			else buttonsH += LINE_H();
+			if (but.type == "RGBA") h += 235 * SCALE();
+			else if (but.type == "VECTOR") h += LINE_H() * 4;
+			else if (but.type == "CUSTOM") h += LINE_H() * but.height;
+			else h += LINE_H();
 		}
-		return Std.int(buttonsH);
+		return Std.int(h);
+	}
+	function SOCKETS_H(sockets: Array<TNodeSocket>, length: Null<Int> = null): Int {
+		var h = 0.0;
+		for (i in 0...(length == null ? sockets.length : length)) {
+			if (sockets[i].type == "VECTOR" && sockets[i].display == 1) h += LINE_H() * 4;
+			else h += LINE_H();
+		}
+		return Std.int(h);
 	}
 	inline function NODE_H(node: TNode): Int {
-		return Std.int(LINE_H() * 1.2 + node.inputs.length * LINE_H() + node.outputs.length * LINE_H() + BUTTONS_H(node));
+		return Std.int(LINE_H() * 1.2 + SOCKETS_H(node.inputs) + node.outputs.length * LINE_H() + BUTTONS_H(node));
 	}
 	inline function NODE_W(): Int { return Std.int(140 * SCALE()); }
 	inline function NODE_X(node: TNode): Float { return node.x * SCALE() + PAN_X(); }
 	inline function NODE_Y(node: TNode): Float { return node.y * SCALE() + PAN_Y(); }
-	inline function SOCKET_Y(pos: Int): Int { return Std.int(LINE_H() * 1.62) + pos * LINE_H(); }
+	inline function SOCKET_Y(sockets: Array<TNodeSocket>, pos: Int): Int { return Std.int(LINE_H() * 1.62) + SOCKETS_H(sockets, pos); }
 	public inline function p(f: Float): Float { return f * SCALE(); }
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
@@ -152,9 +160,9 @@ class Nodes {
 			var from = getNode(canvas.nodes, link.from_id);
 			var to = getNode(canvas.nodes, link.to_id);
 			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W();
-			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + SOCKET_Y(link.from_socket);
+			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + SOCKET_Y(from.outputs, link.from_socket);
 			var toX = to == null ? ui.inputX : wx + NODE_X(to);
-			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(link.to_socket + to.outputs.length) + BUTTONS_H(to);
+			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(to.inputs, link.to_socket) + SOCKETS_H(to.outputs) + BUTTONS_H(to);
 
 			// Cull
 			var left = toX > fromX ? fromX : toX;
@@ -184,7 +192,7 @@ class Nodes {
 						if (from == null && node.id != to.id) { // Snap to output
 							for (i in 0...outs.length) {
 								var sx = wx + NODE_X(node) + NODE_W();
-								var sy = wy + NODE_Y(node) + SOCKET_Y(i);
+								var sy = wy + NODE_Y(node) + SOCKET_Y(outs, i);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
 								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
@@ -199,7 +207,7 @@ class Nodes {
 						else if (to == null && node.id != from.id) { // Snap to input
 							for (i in 0...inps.length) {
 								var sx = wx + NODE_X(node);
-								var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length) + BUTTONS_H(node);
+								var sy = wy + NODE_Y(node) + SOCKET_Y(inps, i) + SOCKETS_H(outs) + BUTTONS_H(node);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
 								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
@@ -264,7 +272,7 @@ class Nodes {
 				if (linkDrag == null) {
 					for (i in 0...outs.length) {
 						var sx = wx + NODE_X(node) + NODE_W();
-						var sy = wy + NODE_Y(node) + SOCKET_Y(i);
+						var sy = wy + NODE_Y(node) + SOCKET_Y(outs, i);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// New link from output
 							var l: TNodeLink = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
@@ -278,7 +286,7 @@ class Nodes {
 				if (linkDrag == null) {
 					for (i in 0...inps.length) {
 						var sx = wx + NODE_X(node);
-						var sy = wy + NODE_Y(node) + SOCKET_Y(i + outs.length) + BUTTONS_H(node);
+						var sy = wy + NODE_Y(node) + SOCKET_Y(inps, i) + SOCKETS_H(outs) + BUTTONS_H(node);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
@@ -677,6 +685,23 @@ class Nodes {
 					rgbaPopup(ui, nhandle, soc.default_value, Std.int(rx), Std.int(ry + ui.ELEMENT_H()));
 				}
 			}
+			else if (!isLinked && inp.type == "VECTOR" && inp.display == 1) {
+				g.color = ui.t.LABEL_COL;
+				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
+				ny += lineh / 2;
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				var min = inp.min != null ? inp.min : 0.0;
+				var max = inp.max != null ? inp.max : 1.0;
+				var textOff = ui.t.TEXT_OFFSET;
+				ui.t.TEXT_OFFSET = 6;
+				inp.default_value[0] = ui.slider(nhandle.nest(i + node.buttons.length).nest(0, {value: inp.default_value[0]}), "X", min, max, true, 100, true, Left);
+				inp.default_value[1] = ui.slider(nhandle.nest(i + node.buttons.length).nest(1, {value: inp.default_value[1]}), "Y", min, max, true, 100, true, Left);
+				inp.default_value[2] = ui.slider(nhandle.nest(i + node.buttons.length).nest(2, {value: inp.default_value[2]}), "Z", min, max, true, 100, true, Left);
+				ui.t.TEXT_OFFSET = textOff;
+				ny += lineh * 2.5;
+			}
 			else {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
@@ -784,6 +809,7 @@ typedef TNodeSocket = {
 	@:optional var min: Null<Float>;
 	@:optional var max: Null<Float>;
 	@:optional var precision: Null<Float>;
+	@:optional var display: Null<Int>;
 }
 
 typedef TNodeLink = {
