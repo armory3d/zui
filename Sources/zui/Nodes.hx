@@ -62,21 +62,29 @@ class Nodes {
 		}
 		return Std.int(h);
 	}
-	function SOCKETS_H(sockets: Array<TNodeSocket>, length: Null<Int> = null): Int {
+	function OUTPUTS_H(sockets: Array<TNodeSocket>, length: Null<Int> = null): Int {
 		var h = 0.0;
 		for (i in 0...(length == null ? sockets.length : length)) {
-			if (sockets[i].type == "VECTOR" && sockets[i].display == 1) h += LINE_H() * 4;
+			h += LINE_H();
+		}
+		return Std.int(h);
+	}
+	function INPUTS_H(canvas: TNodeCanvas, sockets: Array<TNodeSocket>, length: Null<Int> = null): Int {
+		var h = 0.0;
+		for (i in 0...(length == null ? sockets.length : length)) {
+			if (sockets[i].type == "VECTOR" && sockets[i].display == 1 && !inputLinked(canvas, sockets[i].node_id, i)) h += LINE_H() * 4;
 			else h += LINE_H();
 		}
 		return Std.int(h);
 	}
-	inline function NODE_H(node: TNode): Int {
-		return Std.int(LINE_H() * 1.2 + SOCKETS_H(node.inputs) + node.outputs.length * LINE_H() + BUTTONS_H(node));
+	inline function NODE_H(canvas: TNodeCanvas, node: TNode): Int {
+		return Std.int(LINE_H() * 1.2 + INPUTS_H(canvas, node.inputs) + OUTPUTS_H(node.outputs) + BUTTONS_H(node));
 	}
 	inline function NODE_W(): Int { return Std.int(140 * SCALE()); }
 	inline function NODE_X(node: TNode): Float { return node.x * SCALE() + PAN_X(); }
 	inline function NODE_Y(node: TNode): Float { return node.y * SCALE() + PAN_Y(); }
-	inline function SOCKET_Y(sockets: Array<TNodeSocket>, pos: Int): Int { return Std.int(LINE_H() * 1.62) + SOCKETS_H(sockets, pos); }
+	inline function INPUT_Y(canvas: TNodeCanvas, sockets: Array<TNodeSocket>, pos: Int): Int { return Std.int(LINE_H() * 1.62) + INPUTS_H(canvas, sockets, pos); }
+	inline function OUTPUT_Y(sockets: Array<TNodeSocket>, pos: Int): Int { return Std.int(LINE_H() * 1.62) + OUTPUTS_H(sockets, pos); }
 	public inline function p(f: Float): Float { return f * SCALE(); }
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
@@ -103,6 +111,11 @@ class Nodes {
 			for (s in n.outputs) if (s.id >= id) id = s.id + 1;
 		}
 		return id;
+	}
+
+	function inputLinked(canvas: TNodeCanvas, node_id: Int, i: Int): Bool {
+		for (l in canvas.links) if (l.to_id == node_id && l.to_socket == i) return true;
+		return false;
 	}
 
 	function bakeElements(ui: Zui) {
@@ -160,9 +173,9 @@ class Nodes {
 			var from = getNode(canvas.nodes, link.from_id);
 			var to = getNode(canvas.nodes, link.to_id);
 			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W();
-			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + SOCKET_Y(from.outputs, link.from_socket);
+			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + OUTPUT_Y(from.outputs, link.from_socket);
 			var toX = to == null ? ui.inputX : wx + NODE_X(to);
-			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + SOCKET_Y(to.inputs, link.to_socket) + SOCKETS_H(to.outputs) + BUTTONS_H(to);
+			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + INPUT_Y(canvas, to.inputs, link.to_socket) + OUTPUTS_H(to.outputs) + BUTTONS_H(to);
 
 			// Cull
 			var left = toX > fromX ? fromX : toX;
@@ -183,7 +196,7 @@ class Nodes {
 				for (node in canvas.nodes) {
 					var inps = node.inputs;
 					var outs = node.outputs;
-					var nodeh = NODE_H(node);
+					var nodeh = NODE_H(canvas, node);
 					var rx = wx + NODE_X(node) - LINE_H() / 2;
 					var ry = wy + NODE_Y(node) - LINE_H() / 2;
 					var rw = NODE_W() + LINE_H();
@@ -192,7 +205,7 @@ class Nodes {
 						if (from == null && node.id != to.id) { // Snap to output
 							for (i in 0...outs.length) {
 								var sx = wx + NODE_X(node) + NODE_W();
-								var sy = wy + NODE_Y(node) + SOCKET_Y(outs, i);
+								var sy = wy + NODE_Y(node) + OUTPUT_Y(outs, i);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
 								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
@@ -207,7 +220,7 @@ class Nodes {
 						else if (to == null && node.id != from.id) { // Snap to input
 							for (i in 0...inps.length) {
 								var sx = wx + NODE_X(node);
-								var sy = wy + NODE_Y(node) + SOCKET_Y(inps, i) + SOCKETS_H(outs) + BUTTONS_H(node);
+								var sy = wy + NODE_Y(node) + INPUT_Y(canvas, inps, i) + OUTPUTS_H(outs) + BUTTONS_H(node);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
 								if (ui.getInputInRect(rx, ry, LINE_H(), LINE_H())) {
@@ -237,7 +250,7 @@ class Nodes {
 		for (node in canvas.nodes) {
 			// Cull
 			if (NODE_X(node) > ui._windowW || NODE_X(node) + NODE_W() < 0 ||
-				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(node) < 0) {
+				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(canvas, node) < 0) {
 				if (!isSelected(node)) continue;
 			}
 
@@ -245,7 +258,7 @@ class Nodes {
 			var outs = node.outputs;
 
 			// Drag node
-			var nodeh = NODE_H(node);
+			var nodeh = NODE_H(canvas, node);
 			if (ui.inputEnabled && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
 				if (ui.inputStarted) {
 					if (ui.isShiftDown) {
@@ -272,7 +285,7 @@ class Nodes {
 				if (linkDrag == null) {
 					for (i in 0...outs.length) {
 						var sx = wx + NODE_X(node) + NODE_W();
-						var sy = wy + NODE_Y(node) + SOCKET_Y(outs, i);
+						var sy = wy + NODE_Y(node) + OUTPUT_Y(outs, i);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// New link from output
 							var l: TNodeLink = { id: getLinkId(canvas.links), from_id: node.id, from_socket: i, to_id: -1, to_socket: -1 };
@@ -286,7 +299,7 @@ class Nodes {
 				if (linkDrag == null) {
 					for (i in 0...inps.length) {
 						var sx = wx + NODE_X(node);
-						var sy = wy + NODE_Y(node) + SOCKET_Y(inps, i) + SOCKETS_H(outs) + BUTTONS_H(node);
+						var sy = wy + NODE_Y(node) + INPUT_Y(canvas, inps, i) + OUTPUTS_H(outs) + BUTTONS_H(node);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// Already has a link - disconnect
 							for (l in canvas.links) {
@@ -371,7 +384,7 @@ class Nodes {
 			if (top > bottom) { var t = top; top = bottom; bottom = t; }
 			for (n in canvas.nodes) {
 				if (NODE_X(n) + NODE_W() > left && NODE_X(n) < right &&
-					NODE_Y(n) + NODE_H(n) > top && NODE_Y(n) < bottom) {
+					NODE_Y(n) + NODE_H(canvas, n) > top && NODE_Y(n) < bottom) {
 					nodes.push(n);
 				}
 			}
@@ -491,7 +504,7 @@ class Nodes {
 		var uiW = ui._w;
 		var w = NODE_W();
 		var g = ui.g;
-		var h = NODE_H(node);
+		var h = NODE_H(canvas, node);
 		var nx = NODE_X(node);
 		var ny = NODE_Y(node);
 		var text = tr(node.name);
@@ -503,7 +516,7 @@ class Nodes {
 			for (i in (canvas.nodes.indexOf(node) + 1)...canvas.nodes.length) {
 				var n = canvas.nodes[i];
 				if (NODE_X(n) < ui.inputX - ui._windowX && NODE_X(n) + NODE_W() > ui.inputX - ui._windowX &&
-					NODE_Y(n) < ui.inputY - ui._windowY && NODE_Y(n) + NODE_H(n) > ui.inputY - ui._windowY) {
+					NODE_Y(n) < ui.inputY - ui._windowY && NODE_Y(n) + NODE_H(canvas, n) > ui.inputY - ui._windowY) {
 					ui.inputStarted = false;
 					break;
 				}
@@ -641,8 +654,7 @@ class Nodes {
 			ny += lineh;
 			g.color = inp.color;
 			g.drawScaledImage(socketImage, nx - p(6), ny - p(3), p(12), p(12));
-			var isLinked = false;
-			for (l in canvas.links) if (l.to_id == node.id && l.to_socket == i) { isLinked = true; break; }
+			var isLinked = inputLinked(canvas, node.id, i);
 			if (!isLinked && inp.type == "VALUE") {
 				ui._x = nx + p(6);
 				ui._y = ny - p(9);
