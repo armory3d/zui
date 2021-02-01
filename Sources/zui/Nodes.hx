@@ -696,9 +696,9 @@ class Nodes {
 				var max = inp.max != null ? inp.max : 1.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				inp.default_value[0] = ui.slider(nhandle.nest(i + node.buttons.length).nest(0, {value: inp.default_value[0]}), "X", min, max, true, 100, true, Left);
-				inp.default_value[1] = ui.slider(nhandle.nest(i + node.buttons.length).nest(1, {value: inp.default_value[1]}), "Y", min, max, true, 100, true, Left);
-				inp.default_value[2] = ui.slider(nhandle.nest(i + node.buttons.length).nest(2, {value: inp.default_value[2]}), "Z", min, max, true, 100, true, Left);
+				inp.default_value[0] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(0, {value: inp.default_value[0]}), "X", min, max, true, 100, true, Left);
+				inp.default_value[1] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(1, {value: inp.default_value[1]}), "Y", min, max, true, 100, true, Left);
+				inp.default_value[2] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(2, {value: inp.default_value[2]}), "Z", min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 				ny += lineh * 2.5;
 			}
