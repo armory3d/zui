@@ -1003,7 +1003,12 @@ class Zui {
 				comboSelectedW = Std.int(_w);
 				comboItemCount = itemCount < 0 ? texts.length : itemCount;
 				comboItemOffset = -1; // handle.position;
+				comboToSubmit = handle.position;
 			}
+		}
+		if (handle == comboSelectedHandle && isKeyPressed) {
+			if (key == KeyCode.Up && comboToSubmit > 0) { comboToSubmit--; submitComboHandle = comboSelectedHandle; }
+			else if (key == KeyCode.Down && comboToSubmit < comboSelectedTexts.length - 1) { comboToSubmit++; submitComboHandle = comboSelectedHandle; }
 		}
 		if (handle == submitComboHandle) {
 			handle.position = comboToSubmit;
@@ -1283,7 +1288,7 @@ class Zui {
 			g.fillRect((_x + _w) - SCROLL_W() / 3, comboY + off, SCROLL_W() / 3, barH);
 		}
 
-		if ((inputReleased || isEscapeDown) && !comboFirst) {
+		if ((inputReleased || isEscapeDown || isReturnDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
 		}
