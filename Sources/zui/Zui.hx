@@ -605,7 +605,7 @@ class Zui {
 				tabX += _w + 1;
 			drawRect(g, true, _x + buttonOffsetY, _y + buttonOffsetY, _w, tabH);
 			g.color = selected ? t.BUTTON_TEXT_COL : t.LABEL_COL;
-			drawString(g, tabNames[i], t.TEXT_OFFSET, 0, Align.Left);
+			drawString(g, tabNames[i], null, 0, Align.Left);
 
 			if (selected && !tabVertical) { // Hide underline for active tab
 				g.color = t.WINDOW_BG_COL;
@@ -711,7 +711,7 @@ class Zui {
 			g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 		}
 		g.color = t.TEXT_COL;
-		drawString(g, text, TEXT_OFFSET(), 0, align);
+		drawString(g, text, null, 0, align);
 
 		endElement(h + ELEMENT_OFFSET());
 		return started ? State.Started : released ? State.Released : down ? State.Down : State.Idle;
@@ -903,8 +903,7 @@ class Zui {
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
 			var labelAlign = align == Align.Right ? Align.Left : Align.Right;
-			var xOffset = labelAlign == Align.Left ? 7 : 0;
-			drawString(g, label, xOffset, 0, labelAlign);
+			drawString(g, label, labelAlign == Align.Left ? null : 0, 0, labelAlign);
 		}
 
 		g.color = t.TEXT_COL; // Text
@@ -939,10 +938,10 @@ class Zui {
 		drawRect(g, t.FILL_BUTTON_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
 		g.color = t.BUTTON_TEXT_COL;
-		drawString(g, text, TEXT_OFFSET(), 0, align);
+		drawString(g, text, null, 0, align);
 		if (label != "") {
 			g.color = t.LABEL_COL;
-			drawString(g, label, TEXT_OFFSET(), 0, align == Align.Right ? Align.Left : Align.Right);
+			drawString(g, label, null, 0, align == Align.Right ? Align.Left : Align.Right);
 		}
 
 		endElement();
