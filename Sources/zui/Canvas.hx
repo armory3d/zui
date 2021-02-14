@@ -20,7 +20,7 @@ class Canvas {
 		screenW = kha.System.windowWidth();
 		screenH = kha.System.windowHeight();
 
-		events = [];
+		events.resize(0);
 
 		_ui = ui;
 

@@ -57,7 +57,8 @@ class Elements {
 				name: "kode",
 				file: "kode.png"
 			}
-		]
+		],
+		theme: "Default Light"
 	};
 
 	public function new() {
@@ -66,6 +67,9 @@ class Elements {
 
 	function loadingFinished() {
 		ui = new Zui({font: Assets.fonts.DroidSans});
+
+		// Add default light theme to canvas
+		Canvas.themes.push(zui.Themes.light);
 
 		// Map images referenced in canvas
 		for (a in canvas.assets) {
