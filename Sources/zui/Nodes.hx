@@ -35,6 +35,7 @@ class Nodes {
 
 	public static var excludeRemove: Array<String> = []; // No removal for listed node types
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
+	public static var onHeaderReleased: TNode->Void = null;
 	public static var onSocketReleased: TNodeSocket->Void = null;
 	public static var onNodeRemove: TNode->Void = null;
 	public static var onCanvasControl: Void->CanvasControl = null; // Pan, zoom
@@ -275,6 +276,9 @@ class Nodes {
 				else if (ui.inputReleased && !ui.isShiftDown && !dragged) {
 					// No drag performed, select single node
 					nodesSelected = [node];
+					if (onHeaderReleased != null) {
+						onHeaderReleased(node);
+					}
 				}
 			}
 			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node) - LINE_H() / 2, NODE_W() + LINE_H(), nodeh + LINE_H())) {
