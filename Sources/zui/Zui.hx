@@ -1005,10 +1005,6 @@ class Zui {
 				comboToSubmit = handle.position;
 			}
 		}
-		if (handle == comboSelectedHandle && isKeyPressed) {
-			if (key == KeyCode.Up && comboToSubmit > 0) { comboToSubmit--; submitComboHandle = comboSelectedHandle; }
-			else if (key == KeyCode.Down && comboToSubmit < comboSelectedTexts.length - 1) { comboToSubmit++; submitComboHandle = comboSelectedHandle; }
-		}
 		if (handle == submitComboHandle) {
 			handle.position = comboToSubmit;
 			submitComboHandle = null;
@@ -1237,7 +1233,17 @@ class Zui {
 		var comboY = outOfScreen ? comboSelectedY - comboH - Std.int(ELEMENT_H()) : comboSelectedY;
 		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
 		beginRegion(globalG, comboSelectedX, comboY, comboSelectedW);
-
+		if (isKeyPressed) {
+			if (key == (outOfScreen ? KeyCode.Down : KeyCode.Up) && comboToSubmit > 0) {
+				comboToSubmit--;
+				submitComboHandle = comboSelectedHandle;
+			}
+			else if (key == (outOfScreen ? KeyCode.Up : KeyCode.Down) && comboToSubmit < comboSelectedTexts.length - 1) {
+				comboToSubmit++;
+				submitComboHandle = comboSelectedHandle;
+			}
+			if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
+		}
 		// Move offset into visible range
 		if (comboItemOffset == -1) {
 			if (outOfScreen) {
