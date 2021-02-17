@@ -25,7 +25,6 @@ class Nodes {
 	var snapX = 0.0;
 	var snapY = 0.0;
 	var handle = new Zui.Handle();
-	var lastNodesCount = 0;
 	static var elementsBaked = false;
 	static var socketImage: kha.Image = null;
 	static var clipboard = "";
@@ -134,8 +133,6 @@ class Nodes {
 
 	public function nodeCanvas(ui: Zui, canvas: TNodeCanvas) {
 		if (!elementsBaked) bakeElements(ui);
-		if (lastNodesCount > canvas.nodes.length) ui.changed = true;
-		lastNodesCount = canvas.nodes.length;
 
 		var wx = ui._windowX;
 		var wy = ui._windowY;
