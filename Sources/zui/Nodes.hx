@@ -451,6 +451,7 @@ class Nodes {
 					canvas.nodes.push(n);
 				}
 				nodesSelected = pasteCanvas.nodes;
+				ui.changed = true;
 			}
 		}
 
