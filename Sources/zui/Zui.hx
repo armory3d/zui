@@ -34,6 +34,7 @@ class Zui {
 	public var highlightOnSelect = true; // Highlight text edit contents on selection
 	public var tabSwitchEnabled = true; // Allow switching focus to the next element by pressing tab
 	var highlightFullRow = false;
+	public static var current: Zui = null;
 	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
@@ -260,6 +261,7 @@ class Zui {
 		if (!elementsBaked) bakeElements();
 		changed = false;
 		globalG = g;
+		current = this;
 		_x = 0; // Reset cursor
 		_y = 0;
 		_w = 0;
