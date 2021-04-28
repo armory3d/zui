@@ -186,7 +186,14 @@ class Zui {
 			kha.System.notifyOnCutCopyPaste(onCut, onCopy, onPaste);
 			kha.System.notifyOnFrames(function(frames: Array<kha.Framebuffer>) {
 				// Set isCopy to false on next frame
-				if ((isCopy || isPaste) && ++copyFrame > 1) { isCopy = isCut = isPaste = false; copyFrame = 0; }
+				if ((isCopy || isPaste) && ++copyFrame > 1) {
+					isCopy = isCut = isPaste = false;
+				}
+				// Clear unpasted text on next frame
+				else if (copyFrame > 1 && ++copyFrame > 2) {
+					copyFrame = 0;
+					textToPaste = "";
+				}
 			});
 		}
 		var rtTextVS = kha.graphics4.Graphics2.createTextVertexStructure();
@@ -321,7 +328,6 @@ class Zui {
 		inputDX = 0;
 		inputDY = 0;
 		inputWheelDelta = 0;
-		textToPaste = "";
 		if (keyRepeat && isKeyDown && kha.Scheduler.time() - keyRepeatTime > 0.05) {
 			if (key == KeyCode.Backspace || key == KeyCode.Delete || key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Up || key == KeyCode.Down) {
 				keyRepeatTime = kha.Scheduler.time();
@@ -838,6 +844,7 @@ class Zui {
 			cursorX += textToPaste.length;
 			highlightAnchor = cursorX;
 			textToPaste = "";
+			isPaste = false;
 		}
 		if (highlightAnchor == cursorX) textToCopy = text; // Copy
 		else if (highlightAnchor < cursorX) textToCopy = text.substring(highlightAnchor, cursorX);
