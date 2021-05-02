@@ -409,8 +409,10 @@ class Nodes {
 			}
 			var copyLinks: Array<TNodeLink> = [];
 			for (l in canvas.links) {
-				if (getNode(nodesSelected, l.from_id) != null &&
-					getNode(nodesSelected, l.to_id) != null) {
+				var from = getNode(nodesSelected, l.from_id);
+				var to = getNode(nodesSelected, l.to_id);
+				if (from != null && excludeRemove.indexOf(from.type) == -1 &&
+					to != null && excludeRemove.indexOf(to.type) == -1) {
 					copyLinks.push(l);
 				}
 			}
