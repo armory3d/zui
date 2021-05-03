@@ -33,6 +33,10 @@ class Zui {
 	public var alwaysRedraw = false; // Hurts performance
 	public var highlightOnSelect = true; // Highlight text edit contents on selection
 	public var tabSwitchEnabled = true; // Allow switching focus to the next element by pressing tab
+	public var windowBorderTop = 0;
+	public var windowBorderBottom = 0;
+	public var windowBorderLeft = 0;
+	public var windowBorderRight = 0;
 	var highlightFullRow = false;
 	public static var current: Zui = null;
 	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
@@ -144,8 +148,6 @@ class Zui {
 	var comboSelectedWindow: Handle = null;
 	var comboSelectedAlign: Align;
 	var comboSelectedTexts: Array<String>;
-	var comboItemCount: Int;
-	var comboItemOffset: Int;
 	var comboSelectedLabel: String;
 	var comboSelectedX: Int;
 	var comboSelectedY: Int;
@@ -996,7 +998,7 @@ class Zui {
 		return handle.position == position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left, itemCount = -1 ): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left): Int {
 		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
 		if (getReleased()) {
 			if (comboSelectedHandle == null) {
@@ -1009,8 +1011,6 @@ class Zui {
 				comboSelectedX = Std.int(_x + _windowX);
 				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H());
 				comboSelectedW = Std.int(_w);
-				comboItemCount = itemCount < 0 ? texts.length : itemCount;
-				comboItemOffset = -1; // handle.position;
 				comboToSubmit = handle.position;
 			}
 		}
@@ -1020,19 +1020,6 @@ class Zui {
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
-
-		if (inputWheelDelta != 0 && comboSelectedHandle != null) {
-			comboItemOffset += inputWheelDelta > 0 ? 1 : -1;
-			final maxOffset = comboSelectedTexts.length - comboItemCount;
-
-			if (comboItemOffset > maxOffset) {
-				comboItemOffset = maxOffset;
-			}
-
-			if (comboItemOffset < 0) {
-				comboItemOffset = 0;
-			}
-		}
 
 		var hover = getHover();
 		if (hover) { // Bg
@@ -1224,82 +1211,68 @@ class Zui {
 		drawRect(g, true, sliderX, y, sliderW, BUTTON_H());
 	}
 
-	static inline function clampi(value: Int, min: Int, max: Int): Int {
-		return value < min ? min : value > max ? max : value;
-	}
-
 	static var comboFirst = true;
 	function drawCombo() {
 		if (comboSelectedHandle == null) return;
 		var _g = g;
 		globalG.color = t.SEPARATOR_COL;
-		final maxItemCount = Std.int(Math.min(comboSelectedTexts.length, comboItemCount));
-		var comboH = (maxItemCount + (comboSelectedLabel != "" ? 1 : 0)) * Std.int(ELEMENT_H());
 		globalG.begin(false);
+
+		var comboH = (comboSelectedTexts.length + (comboSelectedLabel != "" ? 1 : 0)) * Std.int(ELEMENT_H());
 		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H());
 		var distBottom = kha.System.windowHeight() - (comboSelectedY + comboH);
-		var outOfScreen = distBottom < 0 && distBottom < distTop;
-		var comboY = outOfScreen ? comboSelectedY - comboH - Std.int(ELEMENT_H()) : comboSelectedY;
-		globalG.fillRect(comboSelectedX, comboY, comboSelectedW, comboH);
-		beginRegion(globalG, comboSelectedX, comboY, comboSelectedW);
+		var unrollUp = distBottom < 0 && distBottom < distTop;
+		beginRegion(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
 		if (isKeyPressed) {
-			if (key == (outOfScreen ? KeyCode.Down : KeyCode.Up) && comboToSubmit > 0) {
+			if (key == (unrollUp ? KeyCode.Down : KeyCode.Up) && comboToSubmit > 0) {
 				comboToSubmit--;
 				submitComboHandle = comboSelectedHandle;
 			}
-			else if (key == (outOfScreen ? KeyCode.Up : KeyCode.Down) && comboToSubmit < comboSelectedTexts.length - 1) {
+			else if (key == (unrollUp ? KeyCode.Up : KeyCode.Down) && comboToSubmit < comboSelectedTexts.length - 1) {
 				comboToSubmit++;
 				submitComboHandle = comboSelectedHandle;
 			}
 			if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
-		}
-		// Move offset into visible range
-		if (comboItemOffset == -1) {
-			if (outOfScreen) {
-				comboItemOffset = comboSelectedTexts.length - 1 - comboSelectedHandle.position;
-			}
-			else {
-				comboItemOffset = comboSelectedHandle.position;
-			}
-			comboItemOffset = clampi(comboItemOffset, 0, comboSelectedTexts.length - maxItemCount);
-		}
-
-		if (outOfScreen && comboSelectedLabel != "") { // Unroll up
-			g.color = t.LABEL_COL;
-			drawString(g, comboSelectedLabel, null, 0, Align.Right);
-			_y += ELEMENT_H();
-			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
 		}
 
 		inputEnabled = true;
 		var _BUTTON_COL = t.BUTTON_COL;
 		var _ELEMENT_OFFSET = t.ELEMENT_OFFSET;
 		t.ELEMENT_OFFSET = 0;
-		for (i in comboItemOffset...comboItemOffset + maxItemCount) {
-			var j = outOfScreen ? comboSelectedTexts.length - 1 - i : i;
-			t.BUTTON_COL = j == comboSelectedHandle.position ? t.ACCENT_SELECT_COL : t.SEPARATOR_COL;
-			if (button(comboSelectedTexts[j], comboSelectedAlign)) {
-				comboToSubmit = j;
+		var unrollRight = _x + comboSelectedW * 2 < kha.System.windowWidth() - windowBorderRight ? 1 : -1;
+		for (i in 0...comboSelectedTexts.length) {
+			if (unrollUp) _y -= ELEMENT_H() * 2;
+			t.BUTTON_COL = i == comboSelectedHandle.position ? t.ACCENT_SELECT_COL : t.SEPARATOR_COL;
+			fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
+			if (button(comboSelectedTexts[i], comboSelectedAlign)) {
+				comboToSubmit = i;
 				submitComboHandle = comboSelectedHandle;
 				if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
 				break;
+			}
+			if (_y + ELEMENT_H() > kha.System.windowHeight() - windowBorderBottom || _y - ELEMENT_H() * 2 < windowBorderTop) {
+				_x += comboSelectedW * unrollRight; // Next column
+				_y = comboSelectedY;
 			}
 		}
 		t.BUTTON_COL = _BUTTON_COL;
 		t.ELEMENT_OFFSET = _ELEMENT_OFFSET;
 
-		if (!outOfScreen && comboSelectedLabel != "") { // Unroll down
-			fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
-			g.color = t.LABEL_COL;
-			drawString(g, comboSelectedLabel, null, 0, Align.Right);
-		}
-
-		final maxOffset = comboSelectedTexts.length - comboItemCount;
-		if (maxOffset > 0) { // Scrollbar
-			var barH = Math.max((comboItemCount / comboSelectedTexts.length) * ELEMENT_H() * 16, ELEMENT_H());
-			var off = (comboH - barH - ELEMENT_H()) * comboItemOffset / maxOffset;
-			g.color = t.ACCENT_COL;
-			g.fillRect((_x + _w) - SCROLL_W() / 3, comboY + off, SCROLL_W() / 3, barH);
+		if (comboSelectedLabel != "") { // Unroll down
+			if (unrollUp) {
+				_y -= ELEMENT_H() * 2;
+				fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
+				g.color = t.LABEL_COL;
+				drawString(g, comboSelectedLabel, null, 0, Align.Right);
+				_y += ELEMENT_H();
+				fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
+			}
+			else {
+				fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
+				fill(0, 0, _w / SCALE(), 1 * SCALE(), t.ACCENT_SELECT_COL); // Separator
+				g.color = t.LABEL_COL;
+				drawString(g, comboSelectedLabel, null, 0, Align.Right);
+			}
 		}
 
 		if ((inputReleased || isEscapeDown || isReturnDown) && !comboFirst) {
