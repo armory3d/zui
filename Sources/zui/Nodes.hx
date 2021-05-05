@@ -48,10 +48,20 @@ class Nodes {
 
 	public function new() {}
 
-	public inline function SCALE(): Float { return scaleFactor * zoom; }
-	public inline function PAN_X(): Float { var zoomPan = (1.0 - zoom) * uiw / 2.5; return panX * SCALE() + zoomPan; }
-	public inline function PAN_Y(): Float { var zoomPan = (1.0 - zoom) * uih / 2.5; return panY * SCALE() + zoomPan; }
-	public inline function LINE_H(): Int { return Std.int(ELEMENT_H * SCALE()); }
+	public inline function SCALE(): Float {
+		return scaleFactor * zoom;
+	}
+	public inline function PAN_X(): Float {
+		var zoomPan = (1.0 - zoom) * uiw / 2.5;
+		return panX * SCALE() + zoomPan;
+	}
+	public inline function PAN_Y(): Float {
+		var zoomPan = (1.0 - zoom) * uih / 2.5;
+		return panY * SCALE() + zoomPan;
+	}
+	public inline function LINE_H(): Int {
+		return Std.int(ELEMENT_H * SCALE());
+	}
 	function BUTTONS_H(node: TNode): Int {
 		var h = 0.0;
 		for (but in node.buttons) {
@@ -80,12 +90,24 @@ class Nodes {
 	inline function NODE_H(canvas: TNodeCanvas, node: TNode): Int {
 		return Std.int(LINE_H() * 1.2 + INPUTS_H(canvas, node.inputs) + OUTPUTS_H(node.outputs) + BUTTONS_H(node));
 	}
-	inline function NODE_W(): Int { return Std.int(140 * SCALE()); }
-	inline function NODE_X(node: TNode): Float { return node.x * SCALE() + PAN_X(); }
-	inline function NODE_Y(node: TNode): Float { return node.y * SCALE() + PAN_Y(); }
-	inline function INPUT_Y(canvas: TNodeCanvas, sockets: Array<TNodeSocket>, pos: Int): Int { return Std.int(LINE_H() * 1.62) + INPUTS_H(canvas, sockets, pos); }
-	inline function OUTPUT_Y(sockets: Array<TNodeSocket>, pos: Int): Int { return Std.int(LINE_H() * 1.62) + OUTPUTS_H(sockets, pos); }
-	public inline function p(f: Float): Float { return f * SCALE(); }
+	inline function NODE_W(): Int {
+		return Std.int(140 * SCALE());
+	}
+	inline function NODE_X(node: TNode): Float {
+		return node.x * SCALE() + PAN_X();
+	}
+	inline function NODE_Y(node: TNode): Float {
+		return node.y * SCALE() + PAN_Y();
+	}
+	inline function INPUT_Y(canvas: TNodeCanvas, sockets: Array<TNodeSocket>, pos: Int): Int {
+		return Std.int(LINE_H() * 1.62) + INPUTS_H(canvas, sockets, pos);
+	}
+	inline function OUTPUT_Y(sockets: Array<TNodeSocket>, pos: Int): Int {
+		return Std.int(LINE_H() * 1.62) + OUTPUTS_H(sockets, pos);
+	}
+	public inline function p(f: Float): Float {
+		return f * SCALE();
+	}
 
 	public function getNode(nodes: Array<TNode>, id: Int): TNode {
 		for (node in nodes) if (node.id == id) return node;
@@ -187,8 +209,14 @@ class Nodes {
 
 			// Snap to nearest socket
 			if (linkDrag == link) {
-				if (snapFromId != -1) { fromX = snapX; fromY = snapY; }
-				if (snapToId != -1) { toX = snapX; toY = snapY; }
+				if (snapFromId != -1) {
+					fromX = snapX;
+					fromY = snapY;
+				}
+				if (snapToId != -1) {
+					toX = snapX;
+					toY = snapY;
+				}
 				snapFromId = snapToId = -1;
 
 				for (node in canvas.nodes) {
@@ -313,7 +341,13 @@ class Nodes {
 							}
 							if (linkDrag != null) break;
 							// New link from input
-							var l: TNodeLink = { id: getLinkId(canvas.links), from_id: -1, from_socket: -1, to_id: node.id, to_socket: i };
+							var l: TNodeLink = {
+								id: getLinkId(canvas.links),
+								from_id: -1,
+								from_socket: -1,
+								to_id: node.id,
+								to_socket: i
+							};
 							canvas.links.push(l);
 							linkDrag = l;
 							isNewLink = true;
@@ -381,8 +415,16 @@ class Nodes {
 			var top = boxSelectY;
 			var right = Std.int(ui.inputX - ui._windowX);
 			var bottom = Std.int(ui.inputY - ui._windowY);
-			if (left > right) { var t = left; left = right; right = t; }
-			if (top > bottom) { var t = top; top = bottom; bottom = t; }
+			if (left > right) {
+				var t = left;
+				left = right;
+				right = t;
+			}
+			if (top > bottom) {
+				var t = top;
+				top = bottom;
+				bottom = t;
+			}
 			for (n in canvas.nodes) {
 				if (NODE_X(n) + NODE_W() > left && NODE_X(n) < right &&
 					NODE_Y(n) + NODE_H(canvas, n) > top && NODE_Y(n) < bottom) {
@@ -416,7 +458,11 @@ class Nodes {
 					copyLinks.push(l);
 				}
 			}
-			var copyCanvas: TNodeCanvas = { name: canvas.name, nodes: copyNodes, links: copyLinks };
+			var copyCanvas: TNodeCanvas = {
+				name: canvas.name,
+				nodes: copyNodes,
+				links: copyLinks
+			};
 			clipboard = haxe.Json.stringify(copyCanvas);
 			cutSelected = Zui.isCut;
 		}
@@ -498,7 +544,9 @@ class Nodes {
 	// Retrieve combo items for buttons of type ENUM
 	public static var enumTexts: String->Array<String> = null;
 
-	inline function isSelected(node: TNode): Bool { return nodesSelected.indexOf(node) >= 0; }
+	inline function isSelected(node: TNode): Bool {
+		return nodesSelected.indexOf(node) >= 0;
+	}
 
 	public function drawNode(ui: Zui, node: TNode, canvas: TNodeCanvas) {
 		var wx = ui._windowX;
@@ -580,7 +628,9 @@ class Nodes {
 				var val = node.outputs[but.output].default_value;
 				nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				Ext.colorWheel(ui, nhandle);
-				val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
+				val[0] = nhandle.color.R;
+				val[1] = nhandle.color.G;
+				val[2] = nhandle.color.B;
 			}
 			else if (but.type == "VECTOR") {
 				ny += lineh;

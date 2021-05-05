@@ -57,163 +57,163 @@ class Canvas {
 		if (rotated) ui.g.pushRotation(element.rotation, ui._x + scaled(element.width) / 2, ui._y + scaled(element.height) / 2);
 
 		switch (element.type) {
-		case Text:
-			var font = ui.ops.font;
-			var size = ui.fontSize;
+			case Text:
+				var font = ui.ops.font;
+				var size = ui.fontSize;
 
-			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
-			if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
-			ui.fontSize = scaled(element.height);
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.text(getText(canvas, element), element.alignment);
+				var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
+				if (fontAsset) ui.ops.font = getAsset(canvas, element.asset);
+				ui.fontSize = scaled(element.height);
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.text(getText(canvas, element), element.alignment);
 
-			ui.ops.font = font;
-			ui.fontSize = size;
+				ui.ops.font = font;
+				ui.fontSize = size;
 
-		case Button:
-			var eh = ui.t.ELEMENT_H;
-			var bh = ui.t.BUTTON_H;
-			ui.t.ELEMENT_H = element.height;
-			ui.t.BUTTON_H = element.height;
-			ui.t.BUTTON_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.BUTTON_TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).BUTTON_TEXT_COL);
-			ui.t.BUTTON_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			ui.t.BUTTON_PRESSED_COL = getColor(element.color_press, getTheme(canvas.theme).BUTTON_PRESSED_COL);
-			if (ui.button(getText(canvas, element), element.alignment)) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
-			}
-			ui.t.ELEMENT_H = eh;
-			ui.t.BUTTON_H = bh;
-
-		case Image:
-			var image = getAsset(canvas, element.asset);
-			var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
-			if (image != null && !fontAsset) {
-				ui.imageScrollAlign = false;
-				var tint = element.color != null ? element.color : 0xffffffff;
-				if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
+			case Button:
+				var eh = ui.t.ELEMENT_H;
+				var bh = ui.t.BUTTON_H;
+				ui.t.ELEMENT_H = element.height;
+				ui.t.BUTTON_H = element.height;
+				ui.t.BUTTON_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.BUTTON_TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).BUTTON_TEXT_COL);
+				ui.t.BUTTON_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				ui.t.BUTTON_PRESSED_COL = getColor(element.color_press, getTheme(canvas.theme).BUTTON_PRESSED_COL);
+				if (ui.button(getText(canvas, element), element.alignment)) {
 					var e = element.event;
 					if (e != null && e != "") events.push(e);
 				}
-				ui.imageScrollAlign = true;
-			}
+				ui.t.ELEMENT_H = eh;
+				ui.t.BUTTON_H = bh;
 
-		case FRectangle:
-			var col = ui.g.color;
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
-			ui.g.color = col;
+			case Image:
+				var image = getAsset(canvas, element.asset);
+				var fontAsset = element.asset != null && StringTools.endsWith(element.asset, ".ttf");
+				if (image != null && !fontAsset) {
+					ui.imageScrollAlign = false;
+					var tint = element.color != null ? element.color : 0xffffffff;
+					if (ui.image(image, tint, scaled(element.height)) == zui.Zui.State.Released) {
+						var e = element.event;
+						if (e != null && e != "") events.push(e);
+					}
+					ui.imageScrollAlign = true;
+				}
 
-		case FCircle:
-			var col = ui.g.color;
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2);
-			ui.g.color = col;
+			case FRectangle:
+				var col = ui.g.color;
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.fillRect(ui._x, ui._y, ui._w, scaled(element.height));
+				ui.g.color = col;
 
-		case Rectangle:
-			var col = ui.g.color;
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
-			ui.g.color = col;
+			case FCircle:
+				var col = ui.g.color;
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2);
+				ui.g.color = col;
 
-		case Circle:
-			var col = ui.g.color;
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.drawCircle(ui._x+(scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, element.strength);
-			ui.g.color = col;
+			case Rectangle:
+				var col = ui.g.color;
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
+				ui.g.color = col;
 
-		case FTriangle:
-			var col = ui.g.color;
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.fillTriangle(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height));
-			ui.g.color = col;
+			case Circle:
+				var col = ui.g.color;
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.drawCircle(ui._x+(scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, element.strength);
+				ui.g.color = col;
 
-		case Triangle:
-			var col = ui.g.color;
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.drawLine(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), element.strength);
-			ui.g.drawLine(ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height), element.strength);
-			ui.g.drawLine(ui._x + ui._w, ui._y + scaled(element.height), ui._x + (ui._w / 2), ui._y, element.strength);
-			ui.g.color = col;
+			case FTriangle:
+				var col = ui.g.color;
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.fillTriangle(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height));
+				ui.g.color = col;
 
-		case Check:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			ui.check(h.nest(element.id), getText(canvas, element));
+			case Triangle:
+				var col = ui.g.color;
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.drawLine(ui._x + (ui._w / 2), ui._y, ui._x, ui._y + scaled(element.height), element.strength);
+				ui.g.drawLine(ui._x, ui._y + scaled(element.height), ui._x + ui._w, ui._y + scaled(element.height), element.strength);
+				ui.g.drawLine(ui._x + ui._w, ui._y + scaled(element.height), ui._x + (ui._w / 2), ui._y, element.strength);
+				ui.g.color = col;
 
-		case Radio:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			Ext.inlineRadio(ui, h.nest(element.id), getText(canvas, element).split(";"));
+			case Check:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				ui.check(h.nest(element.id), getText(canvas, element));
 
-		case Combo:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.SEPARATOR_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
+			case Radio:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				Ext.inlineRadio(ui, h.nest(element.id), getText(canvas, element).split(";"));
 
-		case Slider:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true, 100, true, element.alignment);
+			case Combo:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.SEPARATOR_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				ui.combo(h.nest(element.id), getText(canvas, element).split(";"));
 
-		case TextInput:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			ui.textInput(h.nest(element.id), getText(canvas, element), element.alignment);
-			if (h.nest(element.id).changed) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
-			}
+			case Slider:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				ui.slider(h.nest(element.id), getText(canvas, element), 0.0, 1.0, true, 100, true, element.alignment);
 
-		case TextArea:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			h.nest(element.id).text = getText(canvas, element);
-			Ext.textArea(ui,h.nest(element.id), element.alignment,element.editable);
-			if (h.nest(element.id).changed) {
-				var e = element.event;
-				if (e != null && e != "") events.push(e);
-			}
+			case TextInput:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				ui.textInput(h.nest(element.id), getText(canvas, element), element.alignment);
+				if (h.nest(element.id).changed) {
+					var e = element.event;
+					if (e != null && e != "") events.push(e);
+				}
 
-		case KeyInput:
-			ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
-			ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
-			Ext.keyInput(ui, h.nest(element.id), getText(canvas, element));
+			case TextArea:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				h.nest(element.id).text = getText(canvas, element);
+				Ext.textArea(ui,h.nest(element.id), element.alignment,element.editable);
+				if (h.nest(element.id).changed) {
+					var e = element.event;
+					if (e != null && e != "") events.push(e);
+				}
 
-		case ProgressBar:
-			var col = ui.g.color;
-			var progress = element.progress_at;
-			var totalprogress = element.progress_total;
-			ui.g.color = getColor(element.color_progress, getTheme(canvas.theme).TEXT_COL);
-			ui.g.fillRect(ui._x, ui._y, ui._w / totalprogress * Math.min(progress, totalprogress), scaled(element.height));
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
-			ui.g.color = col;
+			case KeyInput:
+				ui.t.TEXT_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.LABEL_COL = getColor(element.color_text, getTheme(canvas.theme).TEXT_COL);
+				ui.t.ACCENT_COL = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.t.ACCENT_HOVER_COL = getColor(element.color_hover, getTheme(canvas.theme).BUTTON_HOVER_COL);
+				Ext.keyInput(ui, h.nest(element.id), getText(canvas, element));
 
-		case CProgressBar:
-			var col = ui.g.color;
-			var progress = element.progress_at;
-			var totalprogress = element.progress_total;
-			ui.g.color = getColor(element.color_progress, getTheme(canvas.theme).TEXT_COL);
-			ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
-			ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
-			ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
-			ui.g.color = col;
-		case Empty:
+			case ProgressBar:
+				var col = ui.g.color;
+				var progress = element.progress_at;
+				var totalprogress = element.progress_total;
+				ui.g.color = getColor(element.color_progress, getTheme(canvas.theme).TEXT_COL);
+				ui.g.fillRect(ui._x, ui._y, ui._w / totalprogress * Math.min(progress, totalprogress), scaled(element.height));
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.drawRect(ui._x, ui._y, ui._w, scaled(element.height), element.strength);
+				ui.g.color = col;
+
+			case CProgressBar:
+				var col = ui.g.color;
+				var progress = element.progress_at;
+				var totalprogress = element.progress_total;
+				ui.g.color = getColor(element.color_progress, getTheme(canvas.theme).TEXT_COL);
+				ui.g.drawArc(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), ui._w / 2, -Math.PI / 2, ((Math.PI * 2) / totalprogress * progress) - Math.PI / 2, element.strength);
+				ui.g.color = getColor(element.color, getTheme(canvas.theme).BUTTON_COL);
+				ui.g.fillCircle(ui._x + (scaled(element.width) / 2), ui._y + (scaled(element.height) / 2), (ui._w / 2) - 10);
+				ui.g.color = col;
+			case Empty:
 		}
 
 		if (element.children != null) {
@@ -251,7 +251,9 @@ class Canvas {
 		return null;
 	}
 
-	static inline function scaled(f: Float): Int { return Std.int(f * _ui.SCALE()); }
+	static inline function scaled(f: Float): Int {
+		return Std.int(f * _ui.SCALE());
+	}
 
 	public static inline function getColor(color: Null<Int>, defaultColor: Int): Int {
 		return color != null ? color : defaultColor;
@@ -261,16 +263,15 @@ class Canvas {
 		for (t in Canvas.themes) {
 			if (t.NAME == theme) return t;
 		}
-
 		return null;
 	}
 
 	/**
-	 * Returns the positional scaled offset of the given element based on its anchor setting.
-	 * @param canvas The canvas object
-	 * @param element The element
-	 * @return Array<Float> [xOffset, yOffset]
-	 */
+		Returns the positional scaled offset of the given element based on its anchor setting.
+		@param canvas The canvas object
+		@param element The element
+		@return Array<Float> [xOffset, yOffset]
+	**/
 	public static function getAnchorOffset(canvas: TCanvas, element: TElement): Array<Float> {
 		var boxWidth, boxHeight: Float;
 		var offsetX = 0.0;
@@ -279,7 +280,8 @@ class Canvas {
 		if (element.parent == null) {
 			boxWidth = canvas.width;
 			boxHeight = canvas.height;
-		} else {
+		}
+		else {
 			var parent = elemById(canvas, element.parent);
 			boxWidth = scaled(parent.width);
 			boxHeight = scaled(parent.height);

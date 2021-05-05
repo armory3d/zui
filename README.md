@@ -145,10 +145,10 @@ var h4 = Id.handle({text: "Text"});
 ## Custom integration
 Using the powerful render target system of Kha, it is possible to easily integrate the library into any scenario. Set ZuiOptions.autoNotifyInput to false when creating a new Zui instance. You can then manually process the input and render the resulting texture in any way you may need.
 ``` hx
-zui.onMouseDown(button:Int, x:Int, y:Int)
-zui.onMouseUp(button:Int, x:Int, y:Int)
-zui.onMouseMove(x:Int, y:Int, movementX:Int, movementY:Int)
-zui.onMouseWheel(delta:Int)
+zui.onMouseDown(button:Int, x: Int, y: Int)
+zui.onMouseUp(button:Int, x: Int, y: Int)
+zui.onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int)
+zui.onMouseWheel(delta: Int)
 ```
 
 ---

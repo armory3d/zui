@@ -70,11 +70,11 @@ class Popup {
 	}
 
 	/**
-	 * Displays a message box with a title, a text body and a centered "OK" button.
-	 * @param ui    the Zui instance for the popup
-	 * @param title the title to display
-	 * @param text  the text to display
-	 */
+		Displays a message box with a title, a text body and a centered "OK" button.
+		@param ui    the Zui instance for the popup
+		@param title the title to display
+		@param text  the text to display
+	**/
 	public static function showMessage(ui: Zui, title: String, text: String) {
 		Popup.ui = ui;
 		init();
@@ -85,14 +85,14 @@ class Popup {
 	}
 
 	/**
-	 * Displays a popup box with custom drawing code.
-	 * @param ui       the Zui instance for the popup
-	 * @param commands the function for drawing the popup's content
-	 * @param mx       the x position of the popup. -1 = screen center (defaults to -1)
-	 * @param my       the y position of the popup. -1 = screen center (defaults to -1)
-	 * @param mw       the width of the popup (defaults to 400)
-	 * @param mh       the height of the popup (defaults to 160)
-	 */
+		Displays a popup box with custom drawing code.
+		@param ui       the Zui instance for the popup
+		@param commands the function for drawing the popup's content
+		@param mx       the x position of the popup. -1 = screen center (defaults to -1)
+		@param my       the y position of the popup. -1 = screen center (defaults to -1)
+		@param mw       the width of the popup (defaults to 400)
+		@param mh       the height of the popup (defaults to 160)
+	**/
 	public static function showCustom(ui: Zui, commands: Zui->Void = null, mx = -1, my = -1, mw = 400, mh = 160) {
 		Popup.ui = ui;
 		init(mx, my, mw, mh);
@@ -112,8 +112,8 @@ class Popup {
 		modalH = Std.int(mh * ui.SCALE());
 
 		// Center popup window if no value is given
-		if (mx == -1) { modalX = Std.int(appW / 2 - modalW / 2); }
-		if (my == -1) { modalY = Std.int(appH / 2 - modalH / 2); }
+		if (mx == -1) modalX = Std.int(appW / 2 - modalW / 2);
+		if (my == -1) modalY = Std.int(appH / 2 - modalH / 2);
 
 		// Limit popup position to screen
 		modalX = Std.int(Math.max(0, Math.min(modalX, appW - modalW)));

@@ -29,7 +29,10 @@ class Ext {
 	}
 
 	public static function keyInput(ui: Zui, handle: Handle, label = "", align: Align = Left): Int {
-		if (!ui.isVisible(ui.ELEMENT_H())) { ui.endElement(); return Std.int(handle.value); }
+		if (!ui.isVisible(ui.ELEMENT_H())) {
+			ui.endElement();
+			return Std.int(handle.value);
+		}
 
 		var hover = ui.getHover();
 		if (hover && Zui.onTextHover != null) Zui.onTextHover();
@@ -262,12 +265,20 @@ class Ext {
 	}
 
 	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Center): Int {
-		if (!ui.isVisible(ui.ELEMENT_H())) { ui.endElement(); return handle.position; }
+		if (!ui.isVisible(ui.ELEMENT_H())) {
+			ui.endElement();
+			return handle.position;
+		}
 		var step = ui._w / texts.length;
 		var hovered = -1;
 		if (ui.getHover()) {
 			var ix = Std.int(ui.inputX - ui._x - ui._windowX);
-			for (i in 0...texts.length) if (ix < i * step + step) { hovered = i; break; }
+			for (i in 0...texts.length) {
+				if (ix < i * step + step) {
+					hovered = i;
+					break;
+				}
+			}
 		}
 		if (ui.getReleased()) {
 			handle.position = hovered;
@@ -305,7 +316,10 @@ class Ext {
 		var px = ui._x;
 		var py = ui._y;
 		var scroll = ui.currentWindow != null ? ui.currentWindow.scrollEnabled : false;
-		if (!scroll) { w -= ui.SCROLL_W(); px += ui.SCROLL_W() / 2; }
+		if (!scroll) {
+			w -= ui.SCROLL_W();
+			px += ui.SCROLL_W() / 2;
+		}
 		ui.image(ui.ops.color_wheel, kha.Color.fromFloats(cval, cval, cval));
 		// Picker
 		var ph = ui._y - py;
@@ -467,7 +481,7 @@ class Ext {
 	}
 
 	/**
-	Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
+		Keycodes can be found here: http://api.kha.tech/kha/input/KeyCode.html
 	**/
 	static function keycodeToString(keycode: Int): String {
 		switch (keycode) {
@@ -632,10 +646,19 @@ class Ext {
 		var vy = y1 - y2;
 		return Math.sqrt(vx * vx + vy * vy);
 	}
-	static inline function fract(f: Float): Float { return f - Std.int(f); }
-	static inline function mix(x: Float, y: Float, a: Float): Float { return x * (1.0 - a) + y * a; }
-	static inline function clamp(x: Float, minVal: Float, maxVal: Float): Float { return Math.min(Math.max(x, minVal), maxVal); }
-	static inline function step(edge: Float, x: Float): Float { return x < edge ? 0.0 : 1.0; }
+	static inline function fract(f: Float): Float {
+		return f - Std.int(f);
+	}
+	static inline function mix(x: Float, y: Float, a: Float): Float {
+		return x * (1.0 - a) + y * a;
+	}
+	static inline function clamp(x: Float, minVal: Float, maxVal: Float): Float {
+		return Math.min(Math.max(x, minVal), maxVal);
+	}
+	static inline function step(edge: Float, x: Float): Float {
+		return x < edge ? 0.0 : 1.0;
+	}
+
 	static inline var kx = 1.0;
 	static inline var ky = 2.0 / 3.0;
 	static inline var kz = 1.0 / 3.0;
@@ -649,6 +672,7 @@ class Ext {
 		out[1] = cB * mix(kx, clamp(py - kx, 0.0, 1.0), cG);
 		out[2] = cB * mix(kx, clamp(pz - kx, 0.0, 1.0), cG);
 	}
+
 	static inline var Kx = 0.0;
 	static inline var Ky = -1.0 / 3.0;
 	static inline var Kz = 2.0 / 3.0;

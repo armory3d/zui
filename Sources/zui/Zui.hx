@@ -87,11 +87,10 @@ class Zui {
 	static var isPaste = false;
 	static var copyReceiver: Zui = null;
 	static var copyFrame = 0;
-	var inputStartedTime = 0.0;
 
+	var inputStartedTime = 0.0;
 	var cursorX = 0; // Text input
 	var highlightAnchor = 0;
-
 	var ratios: Array<Float>; // Splitting rows
 	var curRatio = -1;
 	var xBeforeSplit: Float;
@@ -286,7 +285,11 @@ class Zui {
 	}
 
 	public function beginRegion(g: Graphics, x: Int, y: Int, w: Int) {
-		if (!elementsBaked) { g.end(); bakeElements(); g.begin(false); }
+		if (!elementsBaked) {
+			g.end();
+			bakeElements();
+			g.begin(false);
+		}
 		changed = false;
 		globalG = g;
 		this.g = g;
@@ -436,7 +439,6 @@ class Zui {
 		var handle = currentWindow;
 		if (handle == null) return;
 		if (handle.redraws > 0 || isScrolling || isTyping) {
-
 			if (scissor) {
 				scissor = false;
 				g.disableScissor();
@@ -629,12 +631,14 @@ class Zui {
 	}
 
 	public function panel(handle: Handle, text: String, isTree = false, filled = true, pack = true): Bool {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return handle.selected;
+		}
 		if (getReleased()) {
 			handle.selected = !handle.selected;
 			handle.changed = changed = true;
 		}
-
 		if (filled) {
 			g.color = t.PANEL_BG_COL;
 			drawRect(g, true, _x, _y, _w, ELEMENT_H());
@@ -709,9 +713,15 @@ class Zui {
 	}
 
 	public function text(text: String, align = Align.Left, bg = 0x00000000): State {
-		if (text.indexOf("\n") >= 0) { splitText(text, align, bg); return State.Idle; }
+		if (text.indexOf("\n") >= 0) {
+			splitText(text, align, bg);
+			return State.Idle;
+		}
 		var h = Math.max(ELEMENT_H(), ops.font.height(fontSize));
-		if (!isVisible(h)) { endElement(h + ELEMENT_OFFSET()); return State.Idle; }
+		if (!isVisible(h)) {
+			endElement(h + ELEMENT_OFFSET());
+			return State.Idle;
+		}
 		var started = getStarted(h);
 		var down = getPushed(h);
 		var released = getReleased(h);
@@ -898,7 +908,10 @@ class Zui {
 	}
 
 	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true): String {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.text; }
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return handle.text;
+		}
 
 		var hover = getHover();
 		if (hover && onTextHover != null) onTextHover();
@@ -936,7 +949,10 @@ class Zui {
 	}
 
 	public function button(text: String, align = Align.Center, label = ""): Bool {
-		if (!isVisible(ELEMENT_H())) { endElement(); return false; }
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return false;
+		}
 		var released = getReleased();
 		var pushed = getPushed();
 		var hover = getHover();
@@ -961,7 +977,10 @@ class Zui {
 	}
 
 	public function check(handle: Handle, text: String): Bool {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.selected; }
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return handle.selected;
+		}
 		if (getReleased()) {
 			handle.selected = !handle.selected;
 			handle.changed = changed = true;
@@ -980,8 +999,13 @@ class Zui {
 	}
 
 	public function radio(handle: Handle, position: Int, text: String): Bool {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position == position; }
-		if (position == 0) handle.changed = false;
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return handle.position == position;
+		}
+		if (position == 0) {
+			handle.changed = false;
+		}
 		if (getReleased()) {
 			handle.position = position;
 			handle.changed = changed = true;
@@ -999,7 +1023,10 @@ class Zui {
 	}
 
 	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left): Int {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.position; }
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return handle.position;
+		}
 		if (getReleased()) {
 			if (comboSelectedHandle == null) {
 				inputEnabled = false;
@@ -1054,7 +1081,10 @@ class Zui {
 	}
 
 	public function slider(handle: Handle, text: String, from = 0.0, to = 1.0, filled = false, precision = 100.0, displayValue = true, align = Align.Right, textEdit = true): Float {
-		if (!isVisible(ELEMENT_H())) { endElement(); return handle.value; }
+		if (!isVisible(ELEMENT_H())) {
+			endElement();
+			return handle.value;
+		}
 		if (getStarted()) {
 			scrollHandle = handle;
 			isScrolling = true;
@@ -1115,7 +1145,10 @@ class Zui {
 	}
 
 	public function separator(h = 4, fill = true) {
-		if (!isVisible(ELEMENT_H())) { _y += h * SCALE(); return; }
+		if (!isVisible(ELEMENT_H())) {
+			_y += h * SCALE();
+			return;
+		}
 		if (fill) {
 			g.color = t.SEPARATOR_COL;
 			g.fillRect(_x, _y, _w, h * SCALE());
@@ -1388,8 +1421,8 @@ class Zui {
 	}
 
 	/**
-	 * Highlight all upcoming elements in the next row on a `mouse-over` event.
-	 */
+		Highlight all upcoming elements in the next row on a `mouse-over` event.
+	**/
 	public inline function highlightNextRow() {
 		highlightFullRow = true;
 	}
@@ -1399,10 +1432,9 @@ class Zui {
 	}
 
 	/**
-	 * Draw the upcoming elements in the same row.
-	 *
-	 * Negative values will be treated as absolute, positive values as ratio to `window width`.
-	 */
+		Draw the upcoming elements in the same row.
+		Negative values will be treated as absolute, positive values as ratio to `window width`.
+	**/
 	public function row(ratios: Array<Float>) {
 		this.ratios = ratios;
 		curRatio = 0;
@@ -1414,14 +1446,12 @@ class Zui {
 	public function indent(bothSides = true) {
 		_x += TAB_W();
 		_w -= TAB_W();
-
 		if (bothSides) _w -= TAB_W();
 	}
 
 	public function unindent(bothSides = true) {
 		_x -= TAB_W();
 		_w += TAB_W();
-
 		if (bothSides) _w += TAB_W();
 	}
 
@@ -1545,45 +1575,45 @@ class Zui {
 		isKeyDown = true;
 		keyRepeatTime = kha.Scheduler.time() + 0.4;
 		switch code {
-		case KeyCode.Shift: isShiftDown = true;
-		case KeyCode.Control: isCtrlDown = true;
-		#if kha_darwin
-		case KeyCode.Meta: isCtrlDown = true;
-		#end
-		case KeyCode.Alt: isAltDown = true;
-		case KeyCode.Backspace: isBackspaceDown = true;
-		case KeyCode.Delete: isDeleteDown = true;
-		case KeyCode.Escape: isEscapeDown = true;
-		case KeyCode.Return: isReturnDown = true;
-		case KeyCode.Tab: isTabDown = true;
-		case KeyCode.A: isADown = true;
-		case KeyCode.Space: char = " ";
-		#if kha_android_rmb // Detect right mouse button on Android..
-		case KeyCode.Back: if (!inputDownR) onMouseDown(1, Std.int(inputX), Std.int(inputY));
-		#end
-		default:
+			case KeyCode.Shift: isShiftDown = true;
+			case KeyCode.Control: isCtrlDown = true;
+			#if kha_darwin
+			case KeyCode.Meta: isCtrlDown = true;
+			#end
+			case KeyCode.Alt: isAltDown = true;
+			case KeyCode.Backspace: isBackspaceDown = true;
+			case KeyCode.Delete: isDeleteDown = true;
+			case KeyCode.Escape: isEscapeDown = true;
+			case KeyCode.Return: isReturnDown = true;
+			case KeyCode.Tab: isTabDown = true;
+			case KeyCode.A: isADown = true;
+			case KeyCode.Space: char = " ";
+			#if kha_android_rmb // Detect right mouse button on Android..
+			case KeyCode.Back: if (!inputDownR) onMouseDown(1, Std.int(inputX), Std.int(inputY));
+			#end
+			default:
 		}
 	}
 
 	public function onKeyUp(code: KeyCode) {
 		isKeyDown = false;
 		switch code {
-		case KeyCode.Shift: isShiftDown = false;
-		case KeyCode.Control: isCtrlDown = false;
-		#if kha_darwin
-		case KeyCode.Meta: isCtrlDown = false;
-		#end
-		case KeyCode.Alt: isAltDown = false;
-		case KeyCode.Backspace: isBackspaceDown = false;
-		case KeyCode.Delete: isDeleteDown = false;
-		case KeyCode.Escape: isEscapeDown = false;
-		case KeyCode.Return: isReturnDown = false;
-		case KeyCode.Tab: isTabDown = false;
-		case KeyCode.A: isADown = false;
-		#if kha_android_rmb
-		case KeyCode.Back: onMouseUp(1, Std.int(inputX), Std.int(inputY));
-		#end
-		default:
+			case KeyCode.Shift: isShiftDown = false;
+			case KeyCode.Control: isCtrlDown = false;
+			#if kha_darwin
+			case KeyCode.Meta: isCtrlDown = false;
+			#end
+			case KeyCode.Alt: isAltDown = false;
+			case KeyCode.Backspace: isBackspaceDown = false;
+			case KeyCode.Delete: isDeleteDown = false;
+			case KeyCode.Escape: isEscapeDown = false;
+			case KeyCode.Return: isReturnDown = false;
+			case KeyCode.Tab: isTabDown = false;
+			case KeyCode.A: isADown = false;
+			#if kha_android_rmb
+			case KeyCode.Back: onMouseUp(1, Std.int(inputX), Std.int(inputY));
+			#end
+			default:
 		}
 	}
 
@@ -1595,7 +1625,12 @@ class Zui {
 	#if (kha_android || kha_ios)
 	public function onTouchDown(index: Int, x: Int, y: Int) {
 		// Reset movement delta on touch start
-		if (index == 0) { inputDX = 0; inputDY = 0; inputX = x; inputY = y; }
+		if (index == 0) {
+			inputDX = 0;
+			inputDY = 0;
+			inputX = x;
+			inputY = y;
+		}
 		// Two fingers down - right mouse button
 		if (index == 1) {
 			onMouseUp(0, Std.int(inputX), Std.int(inputY));
@@ -1604,7 +1639,7 @@ class Zui {
 	}
 
 	public function onTouchUp(index: Int, x: Int, y: Int) {
-		if (index == 1) { onMouseUp(1, Std.int(inputX), Std.int(inputY)); }
+		if (index == 1) onMouseUp(1, Std.int(inputX), Std.int(inputY));
 	}
 
 	public function onTouchMove(index: Int, x: Int, y: Int) {
@@ -1612,25 +1647,64 @@ class Zui {
 	}
 	#end
 
-	public function onCut(): String { isCut = true; return onCopy(); }
-	public function onCopy(): String { isCopy = true; return textToCopy; }
-	public function onPaste(s: String) { isPaste = true; textToPaste = s; }
+	public function onCut(): String {
+		isCut = true;
+		return onCopy();
+	}
+	public function onCopy(): String {
+		isCopy = true;
+		return textToCopy;
+	}
+	public function onPaste(s: String) {
+		isPaste = true;
+		textToPaste = s;
+	}
 
-	public inline function ELEMENT_W(): Float { return t.ELEMENT_W * SCALE(); }
-	public inline function ELEMENT_H(): Float { return t.ELEMENT_H * SCALE(); }
-	public inline function ELEMENT_OFFSET(): Float { return t.ELEMENT_OFFSET * SCALE(); }
-	public inline function ARROW_SIZE(): Float { return t.ARROW_SIZE * SCALE(); }
-	public inline function BUTTON_H(): Float { return t.BUTTON_H * SCALE(); }
-	public inline function CHECK_SIZE(): Float { return t.CHECK_SIZE * SCALE(); }
-	public inline function CHECK_SELECT_SIZE(): Float { return t.CHECK_SELECT_SIZE * SCALE(); }
-	public inline function FONT_SIZE(): Int { return Std.int(t.FONT_SIZE * SCALE()); }
-	public inline function SCROLL_W(): Int { return Std.int(t.SCROLL_W * SCALE()); }
-	public inline function TEXT_OFFSET(): Float { return t.TEXT_OFFSET * SCALE(); }
-	public inline function TAB_W(): Int { return Std.int(t.TAB_W * SCALE()); }
-	public inline function HEADER_DRAG_H(): Int { return Std.int(15 * SCALE()); }
-	public inline function SCALE(): Float { return ops.scaleFactor; }
-	inline function FLASH_SPEED(): Float { return 0.5; }
-	inline function TOOLTIP_DELAY(): Float { return 1.0; }
+	public inline function ELEMENT_W(): Float {
+		return t.ELEMENT_W * SCALE();
+	}
+	public inline function ELEMENT_H(): Float {
+		return t.ELEMENT_H * SCALE();
+	}
+	public inline function ELEMENT_OFFSET(): Float {
+		return t.ELEMENT_OFFSET * SCALE();
+	}
+	public inline function ARROW_SIZE(): Float {
+		return t.ARROW_SIZE * SCALE();
+	}
+	public inline function BUTTON_H(): Float {
+		return t.BUTTON_H * SCALE();
+	}
+	public inline function CHECK_SIZE(): Float {
+		return t.CHECK_SIZE * SCALE();
+	}
+	public inline function CHECK_SELECT_SIZE(): Float {
+		return t.CHECK_SELECT_SIZE * SCALE();
+	}
+	public inline function FONT_SIZE(): Int {
+		return Std.int(t.FONT_SIZE * SCALE());
+	}
+	public inline function SCROLL_W(): Int {
+		return Std.int(t.SCROLL_W * SCALE());
+	}
+	public inline function TEXT_OFFSET(): Float {
+		return t.TEXT_OFFSET * SCALE();
+	}
+	public inline function TAB_W(): Int {
+		return Std.int(t.TAB_W * SCALE());
+	}
+	public inline function HEADER_DRAG_H(): Int {
+		return Std.int(15 * SCALE());
+	}
+	public inline function SCALE(): Float {
+		return ops.scaleFactor;
+	}
+	inline function FLASH_SPEED(): Float {
+		return 0.5;
+	}
+	inline function TOOLTIP_DELAY(): Float {
+		return 1.0;
+	}
 
 	public function resize(handle: Handle, w: Int, h: Int, khaWindowId = 0) {
 		handle.redraws = 2;
