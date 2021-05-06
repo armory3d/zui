@@ -562,9 +562,11 @@ class Zui {
 		if (currentWindow == null) return;
 		var tabX = 0.0;
 		var tabY = 0.0;
-		var tabH = Std.int(BUTTON_H() * 1.1);
+		var tabHMin = Std.int(BUTTON_H() * 1.1);
+		var headerH = currentWindow.dragEnabled ? HEADER_DRAG_H() : 0;
+		var tabH = t.FULL_TABS && tabVertical ? Std.int((_windowH - headerH) / tabNames.length) : tabHMin;
 		var origy = _y;
-		_y = currentWindow.dragEnabled ? HEADER_DRAG_H() : 0;
+		_y = headerH;
 		tabHandle.changed = false;
 
 		if (isCtrlDown && isTabDown) { // Next tab
@@ -591,12 +593,12 @@ class Zui {
 		for (i in 0...tabNames.length) {
 			_x = tabX;
 			_y = basey + tabY;
-			_w = tabVertical ?
-					Std.int(ELEMENT_W() - 1 * SCALE()) :
-					Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 18 * SCALE());
-			var released = getReleased();
-			var pushed = getPushed();
-			var hover = getHover();
+			_w = tabVertical ? Std.int(ELEMENT_W() - 1 * SCALE()) :
+				 t.FULL_TABS ? Std.int(_windowW / tabNames.length) :
+							   Std.int(ops.font.width(fontSize, tabNames[i]) + buttonOffsetY * 2 + 18 * SCALE());
+			var released = getReleased(tabH);
+			var pushed = getPushed(tabH);
+			var hover = getHover(tabH);
 			if (released) {
 				var h = tabHandle.nest(tabHandle.position); // Restore tab scroll
 				h.scrollOffset = currentWindow.scrollOffset;
@@ -617,7 +619,7 @@ class Zui {
 				tabX += _w + 1;
 			drawRect(g, true, _x + buttonOffsetY, _y + buttonOffsetY, _w, tabH);
 			g.color = selected ? t.BUTTON_TEXT_COL : t.LABEL_COL;
-			drawString(g, tabNames[i], null, 0, Align.Left);
+			drawString(g, tabNames[i], null, (tabH - tabHMin) / 2, t.FULL_TABS ? Align.Center : Align.Left);
 
 			if (selected && !tabVertical) { // Hide underline for active tab
 				g.color = t.WINDOW_BG_COL;

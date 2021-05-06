@@ -41,9 +41,13 @@ class Nodes {
 	public static var onCanvasControl: Void->CanvasControl = null; // Pan, zoom
 
 	#if zui_translate
-	public static dynamic function tr(id: String, vars: Map<String, String> = null) { return id; }
+	public static dynamic function tr(id: String, vars: Map<String, String> = null) {
+		return id;
+	}
 	#else
-	public static inline function tr(id: String, vars: Map<String, String> = null) { return id; }
+	public static inline function tr(id: String, vars: Map<String, String> = null) {
+		return id;
+	}
 	#end
 
 	public function new() {}

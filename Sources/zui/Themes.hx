@@ -34,6 +34,7 @@ class Themes {
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
 		LINK_STYLE: Line,
+		FULL_TABS: false
 	};
 
 	// 2x scaled, for games
@@ -69,6 +70,7 @@ class Themes {
 		FILL_BUTTON_BG: true,
 		FILL_ACCENT_BG: false,
 		LINK_STYLE: Line,
+		FULL_TABS: false
 	};
 }
 
@@ -99,11 +101,12 @@ typedef TTheme = {
 	var CHECK_SELECT_SIZE: Int;
 	var SCROLL_W: Int;
 	var TEXT_OFFSET: Int;
-	var TAB_W: Int;
+	var TAB_W: Int; // Indentation
 	var FILL_WINDOW_BG: Bool;
 	var FILL_BUTTON_BG: Bool;
 	var FILL_ACCENT_BG: Bool;
 	var LINK_STYLE: LinkStyle;
+	var FULL_TABS: Bool; // Make tabs take full window width
 }
 
 @:enum abstract LinkStyle(Int) from Int {

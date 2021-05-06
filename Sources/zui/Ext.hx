@@ -429,8 +429,12 @@ class Ext {
 
 		if (keyPressed) {
 			// Move cursor vertically
-			if (ui.key == KeyCode.Down && handle.position < lines.length - 1) { handle.position++; }
-			if (ui.key == KeyCode.Up && handle.position > 0) { handle.position--; }
+			if (ui.key == KeyCode.Down && handle.position < lines.length - 1) {
+				handle.position++;
+			}
+			if (ui.key == KeyCode.Up && handle.position > 0) {
+				handle.position--;
+			}
 			// New line
 			if (editable && ui.key == KeyCode.Return) {
 				handle.position++;
