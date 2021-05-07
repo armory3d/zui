@@ -5,7 +5,6 @@ import zui.*;
 
 class Elements {
 	var ui: Zui;
-	var itemList = ["Item 1", "Item 2", "Item 3"];
 
 	public function new() {
 		Assets.loadEverything(loadingFinished);
@@ -47,15 +46,12 @@ class Elements {
 					ui.button("A");
 					ui.button("B");
 					ui.check(Id.handle(), "C");
-					ui.text("Simple list");
-					Ext.list(ui, Id.handle(), itemList);
 					ui.unindent();
 				}
 				Ext.floatInput(ui, Id.handle({value: 42.0}), "Float Input");
 				ui.slider(Id.handle({value: 0.2}), "Slider", 0, 1);
 				if (ui.isHovered) ui.tooltip("Slider tooltip");
 				ui.slider(Id.handle({value: 0.4}), "Slider 2", 0, 1.2, true);
-				Ext.colorPicker(ui, Id.handle());
 				ui.separator();
 				ui.unindent();
 			}
