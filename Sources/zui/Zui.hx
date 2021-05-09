@@ -50,6 +50,10 @@ class Zui {
 	public static var touchControls = false;
 	#end
 	var touchHold = false;
+	var sliderTooltip = false;
+	var sliderTooltipX = 0.0;
+	var sliderTooltipY = 0.0;
+	var sliderTooltipW = 0.0;
 	static var keyRepeatTime = 0.0;
 
 	public var inputRegistered = false;
@@ -1090,6 +1094,12 @@ class Zui {
 		if (getStarted()) {
 			scrollHandle = handle;
 			isScrolling = true;
+			if (touchControls) {
+				sliderTooltip = true;
+				sliderTooltipX = _x + _windowX;
+				sliderTooltipY = _y + _windowY;
+				sliderTooltipW = _w;
+			}
 		}
 
 		handle.changed = false;
@@ -1322,6 +1332,21 @@ class Zui {
 	}
 
 	function drawTooltip(bindGlobalG: Bool) {
+		if (sliderTooltip) {
+			if (bindGlobalG) globalG.begin(false);
+			globalG.font = ops.font;
+			globalG.fontSize = fontSize * 2;
+			var text = (Math.round(scrollHandle.value * 100) / 100) + "";
+			var xoff = ops.font.width(globalG.fontSize, text) / 2;
+			var yoff = ops.font.height(globalG.fontSize);
+			var x = Math.min(Math.max(sliderTooltipX, inputX), sliderTooltipX + sliderTooltipW);
+			globalG.color = t.ACCENT_COL;
+			globalG.fillRect(x - xoff, sliderTooltipY - yoff, xoff * 2, yoff);
+			globalG.color = t.TEXT_COL;
+			globalG.drawString(text, x - xoff, sliderTooltipY - yoff);
+			if (bindGlobalG) globalG.end();
+		}
+
 		if (tooltipText != "" || tooltipImg != null) {
 			if (inputChanged()) {
 				tooltipShown = false;
@@ -1537,6 +1562,7 @@ class Zui {
 		if (isScrolling) { // Prevent action when scrolling is active
 			isScrolling = false;
 			scrollHandle = null;
+			sliderTooltip = false;
 			if (x == inputStartedX && y == inputStartedY) { // Mouse not moved
 				button == 0 ? inputReleased = true : inputReleasedR = true;
 			}
