@@ -45,7 +45,7 @@ class Zui {
 	public static var keyRepeat = true; // Emulate key repeat for non-character keys
 	public static var dynamicGlyphLoad = true; // Allow text input fields to push new glyphs into the font atlas
 	#if (kha_android || kha_ios)
-	public static var touchControls = true; // Pan with two fingers to scroll, hold finger for right click
+	public static var touchControls = true; // Pan with finger to scroll, hold finger for right click
 	#else
 	public static var touchControls = false;
 	#end
@@ -485,7 +485,7 @@ class Zui {
 				}
 
 				var scrollDelta: Float = inputWheelDelta;
-				if (touchControls && inputDownR && inputDY != 0) {
+				if (touchControls && inputDown && inputDY != 0) {
 					isScrolling = true;
 					scrollDelta = -inputDY / 20;
 				}
