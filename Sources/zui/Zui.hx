@@ -1264,8 +1264,8 @@ class Zui {
 		globalG.begin(false);
 
 		var comboH = (comboSelectedTexts.length + (comboSelectedLabel != "" ? 1 : 0)) * Std.int(ELEMENT_H());
-		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H());
-		var distBottom = kha.System.windowHeight() - (comboSelectedY + comboH);
+		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H()) - windowBorderTop;
+		var distBottom = kha.System.windowHeight() - windowBorderBottom - (comboSelectedY + comboH );
 		var unrollUp = distBottom < 0 && distBottom < distTop;
 		beginRegion(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
 		if (isKeyPressed) {
