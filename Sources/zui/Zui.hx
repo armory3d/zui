@@ -1044,6 +1044,11 @@ class Zui {
 				comboSelectedX = Std.int(_x + _windowX);
 				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H());
 				comboSelectedW = Std.int(_w);
+				for (t in texts) { // Adapt combo list width to combo item width
+					var w = Std.int(ops.font.width(fontSize, t)) + 10;
+					if (comboSelectedW < w) comboSelectedW = w;
+				}
+				if (comboSelectedW > _w * 2) comboSelectedW = Std.int(_w * 2);
 				comboToSubmit = handle.position;
 			}
 		}
