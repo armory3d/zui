@@ -1403,11 +1403,14 @@ class Zui {
 
 	function drawString(g: Graphics, text: String,
 						xOffset: Null<Float> = null, yOffset: Float = 0, align = Align.Left) {
-		var fullLength = text.length;
+		var fullText = text;
 		while (text.length > 0 && ops.font.width(fontSize, text) > _w - 6) {
 			text = text.substr(0, text.length - 1);
 		}
-		if (text.length < fullLength) text += "..";
+		if (text.length < fullText.length) {
+			text += "..";
+			if (isHovered) tooltip(fullText);
+		}
 
 		if (xOffset == null) xOffset = t.TEXT_OFFSET;
 		xOffset *= SCALE();
