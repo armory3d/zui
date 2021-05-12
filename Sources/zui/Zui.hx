@@ -1049,6 +1049,7 @@ class Zui {
 					if (comboSelectedW < w) comboSelectedW = w;
 				}
 				if (comboSelectedW > _w * 2) comboSelectedW = Std.int(_w * 2);
+				if (comboSelectedW > _w) comboSelectedW += Std.int(TEXT_OFFSET());
 				comboToSubmit = handle.position;
 			}
 		}
