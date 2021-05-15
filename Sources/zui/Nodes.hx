@@ -673,7 +673,7 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				var soc = but.output != null ? node.outputs[but.output] : null;
-				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : ""}), tr(but.name));
+				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : but.default_value != null ? but.default_value : ""}), tr(but.name));
 				if (soc != null) soc.default_value = but.default_value;
 			}
 			else if (but.type == "ENUM") {
