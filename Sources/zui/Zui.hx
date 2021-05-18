@@ -937,7 +937,7 @@ class Zui {
 		}
 
 		g.color = t.TEXT_COL; // Text
-		textSelectedHandle != handle ? drawString(g, handle.text, null, 0, align) : drawString(g, textSelected, null, 0, align);
+		textSelectedHandle != handle ? drawString(g, handle.text, null, 0, align) : drawString(g, textSelected, null, 0, align, false);
 
 		endElement();
 		return handle.text;
@@ -1407,15 +1407,16 @@ class Zui {
 		if (bindGlobalG) globalG.end();
 	}
 
-	function drawString(g: Graphics, text: String,
-						xOffset: Null<Float> = null, yOffset: Float = 0, align = Align.Left) {
+	function drawString(g: Graphics, text: String, xOffset: Null<Float> = null, yOffset: Float = 0, align = Align.Left, truncation = true) {
 		var fullText = text;
-		while (text.length > 0 && ops.font.width(fontSize, text) > _w - 6) {
-			text = text.substr(0, text.length - 1);
-		}
-		if (text.length < fullText.length) {
-			text += "..";
-			if (isHovered) tooltip(fullText);
+		if (truncation) {
+			while (text.length > 0 && ops.font.width(fontSize, text) > _w - 6) {
+				text = text.substr(0, text.length - 1);
+			}
+			if (text.length < fullText.length) {
+				text += "..";
+				if (isHovered) tooltip(fullText);
+			}
 		}
 
 		if (xOffset == null) xOffset = t.TEXT_OFFSET;
