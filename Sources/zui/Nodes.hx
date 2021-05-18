@@ -291,7 +291,7 @@ class Nodes {
 			var nodeh = NODE_H(canvas, node);
 			if (ui.inputEnabled && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
 				if (ui.inputStarted) {
-					if (ui.isShiftDown) {
+					if (ui.isShiftDown || ui.isCtrlDown) {
 						// Add to selection or deselect
 						isSelected(node) ?
 							nodesSelected.remove(node) :
@@ -305,7 +305,7 @@ class Nodes {
 					nodesDrag = true;
 					dragged = false;
 				}
-				else if (ui.inputReleased && !ui.isShiftDown && !dragged) {
+				else if (ui.inputReleased && !ui.isShiftDown && !ui.isCtrlDown && !dragged) {
 					// No drag performed, select single node
 					nodesSelected = [node];
 					if (onHeaderReleased != null) {
@@ -407,7 +407,7 @@ class Nodes {
 			ui.g.drawRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
 			ui.g.color = 0xffffffff;
 		}
-		if (ui.inputEnabled && ui.inputStarted && !ui.isAltDown && !ui.isCtrlDown && linkDrag == null && !nodesDrag && !ui.changed) {
+		if (ui.inputEnabled && ui.inputStarted && !ui.isAltDown && linkDrag == null && !nodesDrag && !ui.changed) {
 			boxSelect = true;
 			boxSelectX = Std.int(ui.inputX - ui._windowX);
 			boxSelectY = Std.int(ui.inputY - ui._windowY);
@@ -435,7 +435,7 @@ class Nodes {
 					nodes.push(n);
 				}
 			}
-			ui.isShiftDown ? for (n in nodes) nodesSelected.push(n) : nodesSelected = nodes;
+			(ui.isShiftDown || ui.isCtrlDown) ? for (n in nodes) nodesSelected.push(n) : nodesSelected = nodes;
 		}
 
 		// Place selected node on top
