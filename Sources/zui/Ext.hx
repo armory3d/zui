@@ -252,7 +252,7 @@ class Ext {
 				handle.position = i; // Set active line
 				handle.text = lines[i];
 				ui.textInput(handle, "", align, editable);
-				if (keyPressed && ui.key != KeyCode.Return) { // Edit text
+				if (keyPressed && ui.key != KeyCode.Return && ui.key != KeyCode.Escape) { // Edit text
 					lines[i] = ui.textSelected;
 				}
 			}
