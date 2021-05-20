@@ -27,6 +27,7 @@ class Nodes {
 	var handle = new Zui.Handle();
 	static var elementsBaked = false;
 	static var socketImage: kha.Image = null;
+	static var socketReleased = false;
 	static var clipboard = "";
 	static var boxSelect = false;
 	static var boxSelectX = 0;
@@ -37,6 +38,7 @@ class Nodes {
 	public static var onLinkDrag: TNodeLink->Bool->Void = null;
 	public static var onHeaderReleased: TNode->Void = null;
 	public static var onSocketReleased: TNodeSocket->Void = null;
+	public static var onCanvasReleased: Void->Void = null;
 	public static var onNodeRemove: TNode->Void = null;
 	public static var onCanvasControl: Void->CanvasControl = null; // Pan, zoom
 
@@ -170,6 +172,7 @@ class Nodes {
 			panY: ui.inputDownR ? ui.inputDY : 0.0,
 			zoom: -ui.inputWheelDelta / 10.0
 		};
+		socketReleased = false;
 
 		// Pan canvas
 		if (ui.inputEnabled && (controls.panX != 0.0 || controls.panY != 0.0)) {
@@ -400,6 +403,10 @@ class Nodes {
 			drawNode(ui, node, canvas);
 		}
 
+		if (onCanvasReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR) && !socketReleased) {
+			onCanvasReleased();
+		}
+
 		if (boxSelect) {
 			ui.g.color = 0x223333dd;
 			ui.g.fillRect(boxSelectX, boxSelectY, ui.inputX - boxSelectX - ui._windowX, ui.inputY - boxSelectY - ui._windowY);
@@ -614,6 +621,7 @@ class Nodes {
 			if (onSocketReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR)) {
 				if (ui.inputX > wx + nx && ui.inputX < wx + nx + w && ui.inputY > wy + ny && ui.inputY < wy + ny + lineh) {
 					onSocketReleased(out);
+					socketReleased = true;
 				}
 			}
 		}
@@ -779,6 +787,7 @@ class Nodes {
 			if (onSocketReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR)) {
 				if (ui.inputX > wx + nx && ui.inputX < wx + nx + w && ui.inputY > wy + ny && ui.inputY < wy + ny + lineh) {
 					onSocketReleased(inp);
+					socketReleased = true;
 				}
 			}
 		}
