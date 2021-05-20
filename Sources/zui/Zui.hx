@@ -1563,7 +1563,9 @@ class Zui {
 		button == 0 ? inputStarted = true : inputStartedR = true;
 		button == 0 ? inputDown = true : inputDownR = true;
 		inputStartedTime = kha.Scheduler.time();
+		#if (kha_android || kha_ios)
 		setInputPosition(x, y);
+		#end
 		inputStartedX = x;
 		inputStartedY = y;
 	}
@@ -1581,7 +1583,9 @@ class Zui {
 			button == 0 ? inputReleased = true : inputReleasedR = true;
 		}
 		button == 0 ? inputDown = false : inputDownR = false;
+		#if (kha_android || kha_ios)
 		setInputPosition(x, y);
+		#end
 		deselectText();
 		if (touchHold) {
 			touchHold = false;
