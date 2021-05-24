@@ -59,12 +59,8 @@ var state = ui.check(Id.handle(), "Check Box");
 
 Ext.hx - prebuilt elements:
 ``` hx
-function list(...); // See examples
-function panelList(...);
-function colorPicker(...);
-function colorWheel(...);
+function colorWheel(...); // See examples
 function fileBrowser(...);
-function keyInput(handle: Handle, label = ""): kha.input.KeyCode;
 function inlineRadio(handle: Handle, texts: Array<String>): Int;
 function textArea(handle: Handle, align = Left): String;
 ```
@@ -72,11 +68,6 @@ function textArea(handle: Handle, align = Left): String;
 Nodes.hx - drawing node systems
 ``` hx
 nodes.nodeCanvas(...); // See examples
-```
-
-Canvas.hx - drawing custom layouts
-``` hx
-Canvas.draw(...); // See examples
 ```
 
 ## Examples
