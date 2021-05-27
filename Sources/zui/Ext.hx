@@ -100,7 +100,7 @@ class Ext {
 		return handle.text;
 	}
 
-	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Center): Int {
+	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Left): Int {
 		if (!ui.isVisible(ui.ELEMENT_H())) {
 			ui.endElement();
 			return handle.position;
@@ -134,7 +134,12 @@ class Ext {
 				ui.g.drawRect(ui._x + step * i, ui._y + ui.buttonOffsetY, step, ui.BUTTON_H());
 			}
 			ui.g.color = ui.t.TEXT_COL; // Text
-			ui.drawString(ui.g, texts[i], ui.TEXT_OFFSET() + (step * i) / ui.SCALE(), 0, Align.Left);
+			ui._x += step * i;
+			var _w = ui._w;
+			ui._w = Std.int(step);
+			ui.drawString(ui.g, texts[i], null, 0, align);
+			ui._x -= step * i;
+			ui._w = _w;
 		}
 		ui.endElement();
 		return handle.position;
