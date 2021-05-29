@@ -97,7 +97,7 @@ class Nodes {
 		return Std.int(LINE_H() * 1.2 + INPUTS_H(canvas, node.inputs) + OUTPUTS_H(node.outputs) + BUTTONS_H(node));
 	}
 	inline function NODE_W(node: TNode): Int {
-		return Std.int((node.width != null ? node.width : 140 )* SCALE());
+		return Std.int((node.width != null ? node.width : 140) * SCALE());
 	}
 	inline function NODE_X(node: TNode): Float {
 		return node.x * SCALE() + PAN_X();
@@ -872,11 +872,11 @@ typedef TNode = {
 	var type: String;
 	var x: Float;
 	var y: Float;
-	@:optional var width: Null<Float>;
 	var inputs: Array<TNodeSocket>;
 	var outputs: Array<TNodeSocket>;
 	var buttons: Array<TNodeButton>;
 	var color: Int;
+	@:optional var width: Null<Float>;
 }
 
 typedef TNodeSocket = {
