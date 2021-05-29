@@ -96,8 +96,8 @@ class Nodes {
 	inline function NODE_H(canvas: TNodeCanvas, node: TNode): Int {
 		return Std.int(LINE_H() * 1.2 + INPUTS_H(canvas, node.inputs) + OUTPUTS_H(node.outputs) + BUTTONS_H(node));
 	}
-	inline function NODE_W(): Int {
-		return Std.int(140 * SCALE());
+	inline function NODE_W(node: TNode): Int {
+		return Std.int((node.width != null ? node.width : 140 )* SCALE());
 	}
 	inline function NODE_X(node: TNode): Float {
 		return node.x * SCALE() + PAN_X();
@@ -199,7 +199,7 @@ class Nodes {
 		for (link in canvas.links) {
 			var from = getNode(canvas.nodes, link.from_id);
 			var to = getNode(canvas.nodes, link.to_id);
-			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W();
+			var fromX = from == null ? ui.inputX : wx + NODE_X(from) + NODE_W(from);
 			var fromY = from == null ? ui.inputY : wy + NODE_Y(from) + OUTPUT_Y(from.outputs, link.from_socket);
 			var toX = to == null ? ui.inputX : wx + NODE_X(to);
 			var toY = to == null ? ui.inputY : wy + NODE_Y(to) + INPUT_Y(canvas, to.inputs, link.to_socket) + OUTPUTS_H(to.outputs) + BUTTONS_H(to);
@@ -232,12 +232,12 @@ class Nodes {
 					var nodeh = NODE_H(canvas, node);
 					var rx = wx + NODE_X(node) - LINE_H() / 2;
 					var ry = wy + NODE_Y(node) - LINE_H() / 2;
-					var rw = NODE_W() + LINE_H();
+					var rw = NODE_W(node) + LINE_H();
 					var rh = nodeh + LINE_H();
 					if (ui.getInputInRect(rx, ry, rw, rh)) {
 						if (from == null && node.id != to.id) { // Snap to output
 							for (i in 0...outs.length) {
-								var sx = wx + NODE_X(node) + NODE_W();
+								var sx = wx + NODE_X(node) + NODE_W(node);
 								var sy = wy + NODE_Y(node) + OUTPUT_Y(outs, i);
 								var rx = sx - LINE_H() / 2;
 								var ry = sy - LINE_H() / 2;
@@ -282,7 +282,7 @@ class Nodes {
 
 		for (node in canvas.nodes) {
 			// Cull
-			if (NODE_X(node) > ui._windowW || NODE_X(node) + NODE_W() < 0 ||
+			if (NODE_X(node) > ui._windowW || NODE_X(node) + NODE_W(node) < 0 ||
 				NODE_Y(node) > ui._windowH || NODE_Y(node) + NODE_H(canvas, node) < 0) {
 				if (!isSelected(node)) continue;
 			}
@@ -292,7 +292,7 @@ class Nodes {
 
 			// Drag node
 			var nodeh = NODE_H(canvas, node);
-			if (ui.inputEnabled && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W() + LINE_H(), LINE_H())) {
+			if (ui.inputEnabled && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node), NODE_W(node) + LINE_H(), LINE_H())) {
 				if (ui.inputStarted) {
 					if (ui.isShiftDown || ui.isCtrlDown) {
 						// Add to selection or deselect
@@ -316,11 +316,11 @@ class Nodes {
 					}
 				}
 			}
-			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node) - LINE_H() / 2, NODE_W() + LINE_H(), nodeh + LINE_H())) {
+			if (ui.inputStarted && ui.getInputInRect(wx + NODE_X(node) - LINE_H() / 2, wy + NODE_Y(node) - LINE_H() / 2, NODE_W(node) + LINE_H(), nodeh + LINE_H())) {
 				// Check sockets
 				if (linkDrag == null) {
 					for (i in 0...outs.length) {
-						var sx = wx + NODE_X(node) + NODE_W();
+						var sx = wx + NODE_X(node) + NODE_W(node);
 						var sy = wy + NODE_Y(node) + OUTPUT_Y(outs, i);
 						if (ui.getInputInRect(sx - LINE_H() / 2, sy - LINE_H() / 2, LINE_H(), LINE_H())) {
 							// New link from output
@@ -437,7 +437,7 @@ class Nodes {
 				bottom = t;
 			}
 			for (n in canvas.nodes) {
-				if (NODE_X(n) + NODE_W() > left && NODE_X(n) < right &&
+				if (NODE_X(n) + NODE_W(n) > left && NODE_X(n) < right &&
 					NODE_Y(n) + NODE_H(canvas, n) > top && NODE_Y(n) < bottom) {
 					nodes.push(n);
 				}
@@ -565,7 +565,7 @@ class Nodes {
 		var uiX = ui._x;
 		var uiY = ui._y;
 		var uiW = ui._w;
-		var w = NODE_W();
+		var w = NODE_W(node);
 		var g = ui.g;
 		var h = NODE_H(canvas, node);
 		var nx = NODE_X(node);
@@ -578,7 +578,7 @@ class Nodes {
 		if (ui.inputStarted) {
 			for (i in (canvas.nodes.indexOf(node) + 1)...canvas.nodes.length) {
 				var n = canvas.nodes[i];
-				if (NODE_X(n) < ui.inputX - ui._windowX && NODE_X(n) + NODE_W() > ui.inputX - ui._windowX &&
+				if (NODE_X(n) < ui.inputX - ui._windowX && NODE_X(n) + NODE_W(n) > ui.inputX - ui._windowX &&
 					NODE_Y(n) < ui.inputY - ui._windowY && NODE_Y(n) + NODE_H(canvas, n) > ui.inputY - ui._windowY) {
 					ui.inputStarted = false;
 					break;
@@ -872,6 +872,7 @@ typedef TNode = {
 	var type: String;
 	var x: Float;
 	var y: Float;
+	@:optional var width: Null<Float>;
 	var inputs: Array<TNodeSocket>;
 	var outputs: Array<TNodeSocket>;
 	var buttons: Array<TNodeButton>;
