@@ -1274,12 +1274,16 @@ class Zui {
 		var distBottom = kha.System.windowHeight() - windowBorderBottom - (comboSelectedY + comboH );
 		var unrollUp = distBottom < 0 && distBottom < distTop;
 		beginRegion(globalG, comboSelectedX, comboSelectedY, comboSelectedW);
-		if (isKeyPressed) {
-			if (key == (unrollUp ? KeyCode.Down : KeyCode.Up) && comboToSubmit > 0) {
+		if (isKeyPressed || inputWheelDelta != 0) {
+			var arrowUp = isKeyPressed && key == (unrollUp ? KeyCode.Down : KeyCode.Up);
+			var arrowDown = isKeyPressed && key == (unrollUp ? KeyCode.Up : KeyCode.Down);
+			var wheelUp = (unrollUp && inputWheelDelta > 0) || (!unrollUp && inputWheelDelta < 0);
+			var wheelDown = (unrollUp && inputWheelDelta < 0) || (!unrollUp && inputWheelDelta > 0);
+			if ((arrowUp || wheelUp) && comboToSubmit > 0) {
 				comboToSubmit--;
 				submitComboHandle = comboSelectedHandle;
 			}
-			else if (key == (unrollUp ? KeyCode.Up : KeyCode.Down) && comboToSubmit < comboSelectedTexts.length - 1) {
+			else if ((arrowDown || wheelDown) && comboToSubmit < comboSelectedTexts.length - 1) {
 				comboToSubmit++;
 				submitComboHandle = comboSelectedHandle;
 			}
