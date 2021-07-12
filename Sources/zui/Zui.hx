@@ -1678,9 +1678,15 @@ class Zui {
 			inputY = y;
 		}
 		// Two fingers down - right mouse button
-		if (index == 1) {
-			onMouseUp(0, Std.int(inputX), Std.int(inputY));
+		else if (index == 1) {
+			inputDown = false;
 			onMouseDown(1, Std.int(inputX), Std.int(inputY));
+			pinchStarted = true;
+		}
+		// Three fingers down - middle mouse button
+		else if (index == 2) {
+			inputDownR = false;
+			onMouseDown(2, Std.int(inputX), Std.int(inputY));
 		}
 	}
 
@@ -1688,8 +1694,24 @@ class Zui {
 		if (index == 1) onMouseUp(1, Std.int(inputX), Std.int(inputY));
 	}
 
+	var pinchDistance: Float;
+	var pinchStarted = false;
+
 	public function onTouchMove(index: Int, x: Int, y: Int) {
 		if (index == 0) setInputPosition(x, y);
+
+		// Pinch to zoom - mouse wheel
+		if (index == 1) {
+			var lastDistance = pinchDistance;
+			var dx = inputX - x;
+			var dy = inputY - y;
+			pinchDistance = Math.sqrt(dx * dx + dy * dy);
+			if (!pinchStarted) {
+				inputWheelDelta = Std.int((lastDistance - pinchDistance) / 20);
+				if (inputWheelDelta != 0) inputDownR = false;
+			}
+			pinchStarted = false;
+		}
 	}
 	#end
 
