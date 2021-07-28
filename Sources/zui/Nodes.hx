@@ -590,15 +590,13 @@ class Nodes {
 		g.color = isSelected(node) ? ui.t.LABEL_COL : ui.t.CONTEXT_COL;
 		g.fillRect(nx - 1, ny - 1, w + 2, h + 2);
 
-		// Header
-		g.color = ui.t.WINDOW_BG_COL - 0x00060606;
-		g.fillRect(nx, ny, w, lineh);
-		g.color = node.color;
-		g.fillRect(nx, ny + lineh - p(3), w, p(3));
-
 		// Body
 		g.color = ui.t.WINDOW_BG_COL;
-		g.fillRect(nx, ny + lineh, w, h - lineh);
+		g.fillRect(nx, ny, w, h);
+
+		// Header line
+		g.color = node.color;
+		g.fillRect(nx, ny + lineh - p(3), w, p(3));
 
 		// Title
 		g.color = ui.t.LABEL_COL;
