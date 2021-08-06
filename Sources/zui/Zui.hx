@@ -859,7 +859,7 @@ class Zui {
 			if (!selecting && !isCtrlDown) highlightAnchor = cursorX;
 		}
 
-		if (textToPaste != "") { // Process cut copy paste
+		if (editable && textToPaste != "") { // Process cut copy paste
 			text = text.substr(0, highlightAnchor) + textToPaste + text.substr(cursorX);
 			cursorX += textToPaste.length;
 			highlightAnchor = cursorX;
@@ -869,7 +869,7 @@ class Zui {
 		if (highlightAnchor == cursorX) textToCopy = text; // Copy
 		else if (highlightAnchor < cursorX) textToCopy = text.substring(highlightAnchor, cursorX);
 		else textToCopy = text.substring(cursorX, highlightAnchor);
-		if (isCut) { // Cut
+		if (editable && isCut) { // Cut
 			if (highlightAnchor == cursorX) text = "";
 			else if (highlightAnchor < cursorX) {
 				text = text.substr(0, highlightAnchor) + text.substr(cursorX, text.length);
