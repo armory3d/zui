@@ -856,7 +856,9 @@ class Zui {
 				}
 			}
 			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Shift);
-			if (!selecting && !isCtrlDown) highlightAnchor = cursorX;
+			// isCtrlDown && isAltDown is the condition for AltGr was pressed. 
+			// AltGr is part of the German keyboard layout and part of key combinations like AltGr + e -> €
+			if (!selecting && (!isCtrlDown || (isCtrlDown && isAltDown))) highlightAnchor = cursorX;
 		}
 
 		if (editable && textToPaste != "") { // Process cut copy paste
