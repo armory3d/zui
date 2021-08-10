@@ -325,6 +325,7 @@ class Zui {
 		g.scissor(0, Std.int(_y), Std.int(_windowW), Std.int(_windowH - _y));
 		windowHeaderH += _y - windowHeaderH;
 		_y += currentWindow.scrollOffset;
+		isHovered = false;
 	}
 
 	function endInput() {
