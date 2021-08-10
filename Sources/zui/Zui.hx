@@ -262,7 +262,6 @@ class Zui {
 		#if (kha_android || kha_ios)
 		if (Surface.get() != null) Surface.get().remove(onTouchDown, onTouchUp, onTouchMove);
 		#end
-		// kha.System.removeCutCopyPaste(onCut, onCopy, onPaste);
 		endInput();
 		isShiftDown = isCtrlDown = isAltDown = false;
 		inputX = inputY = 0;
@@ -856,7 +855,7 @@ class Zui {
 				}
 			}
 			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Shift);
-			// isCtrlDown && isAltDown is the condition for AltGr was pressed. 
+			// isCtrlDown && isAltDown is the condition for AltGr was pressed
 			// AltGr is part of the German keyboard layout and part of key combinations like AltGr + e -> €
 			if (!selecting && (!isCtrlDown || (isCtrlDown && isAltDown))) highlightAnchor = cursorX;
 		}
@@ -1785,7 +1784,6 @@ class Zui {
 		if (h < 1) h = 1;
 		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
-		// handle.texture.g2.mipmapScaleQuality = kha.graphics2.ImageScaleQuality.High;
 	}
 }
 
