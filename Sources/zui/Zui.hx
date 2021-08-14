@@ -505,8 +505,6 @@ class Zui {
 					handle.scrollOffset = wh - fullHeight;
 				}
 
-				g.color = t.WINDOW_BG_COL; // Bg
-				g.fillRect(_windowW - SCROLL_W(), wy, SCROLL_W(), wh);
 				g.color = t.ACCENT_COL; // Bar
 				var scrollbarFocus = getInputInRect(_windowX + _windowW - SCROLL_W(), wy, SCROLL_W(), wh);
 				var barW = (scrollbarFocus || handle == scrollHandle) ? SCROLL_W() : SCROLL_W() / 3;

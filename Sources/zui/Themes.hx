@@ -27,7 +27,7 @@ class Themes {
 		BUTTON_H: 22,
 		CHECK_SIZE: 15,
 		CHECK_SELECT_SIZE: 8,
-		SCROLL_W: 6,
+		SCROLL_W: 9,
 		TEXT_OFFSET: 8,
 		TAB_W: 6,
 		FILL_WINDOW_BG: false,
