@@ -623,11 +623,19 @@ class Zui {
 			g.color = selected ? t.BUTTON_TEXT_COL : t.LABEL_COL;
 			drawString(g, tabNames[i], null, (tabH - tabHMin) / 2, t.FULL_TABS ? Align.Center : Align.Left);
 
-			if (selected && !tabVertical) { // Hide underline for active tab
-				g.color = t.WINDOW_BG_COL;
-				g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY + tabH, _w - 1, 1);
-				g.color = t.HIGHLIGHT_COL;
-				g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY, _w - 1, 2);
+			if (selected) { // Hide underline for active tab
+				if (tabVertical) {
+					// g.color = t.WINDOW_BG_COL;
+					// g.fillRect(_x + buttonOffsetY + _w - 1, _y + buttonOffsetY - 1, 2, tabH + buttonOffsetY);
+					g.color = t.HIGHLIGHT_COL;
+					g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY - 1, 2, tabH + buttonOffsetY);
+				}
+				else {
+					g.color = t.WINDOW_BG_COL;
+					g.fillRect(_x + buttonOffsetY + 1, _y + buttonOffsetY + tabH, _w - 1, 1);
+					g.color = t.HIGHLIGHT_COL;
+					g.fillRect(_x + buttonOffsetY, _y + buttonOffsetY, _w, 2);
+				}
 			}
 		}
 
