@@ -1390,7 +1390,8 @@ class Zui {
 				tooltipTime = kha.Scheduler.time();
 			}
 			if (!tooltipWait && kha.Scheduler.time() - tooltipTime > TOOLTIP_DELAY()) {
-				tooltipText != "" ? drawTooltipText(bindGlobalG) : drawTooltipImage(bindGlobalG);
+				if (tooltipImg != null) drawTooltipImage(bindGlobalG);
+				if (tooltipText != "") drawTooltipText(bindGlobalG);
 			}
 		}
 		else tooltipShown = false;
@@ -1407,12 +1408,18 @@ class Zui {
 		tooltipX = Math.min(tooltipX, kha.System.windowWidth() - tooltipW - 20);
 		if (bindGlobalG) globalG.begin(false);
 		var fontHeight = ops.font.height(fontSize);
-		globalG.fillRect(tooltipX, tooltipY, tooltipW + 20, fontHeight * lines.length);
+		var off = 0;
+		if (tooltipImg != null) {
+			var w = tooltipImg.width;
+			if (tooltipImgMaxWidth != null && w > tooltipImgMaxWidth) w = tooltipImgMaxWidth;
+			off = Std.int(tooltipImg.height * (w / tooltipImg.width));
+		}
+		globalG.fillRect(tooltipX, tooltipY + off, tooltipW + 20, fontHeight * lines.length);
 		globalG.font = ops.font;
 		globalG.fontSize = fontSize;
 		globalG.color = t.ACCENT_COL;
 		for (i in 0...lines.length) {
-			globalG.drawString(lines[i], tooltipX + 5, tooltipY + i * fontSize);
+			globalG.drawString(lines[i], tooltipX + 5, tooltipY + off + i * fontSize);
 		}
 		if (bindGlobalG) globalG.end();
 	}
