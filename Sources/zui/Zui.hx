@@ -755,7 +755,7 @@ class Zui {
 		for (line in lines.split("\n")) text(line, align, bg);
 	}
 
-	function startTextEdit(handle: Handle) {
+	function startTextEdit(handle: Handle, align = Align.Left) {
 		isTyping = true;
 		submitTextHandle = textSelectedHandle;
 		textToSubmit = textSelected;
@@ -767,11 +767,7 @@ class Zui {
 			isKeyPressed = false; // Prevent text deselect after tab press
 		}
 		else if (!highlightOnSelect) { // Set cursor to click location
-			var x = inputX - (_windowX + _x + TEXT_OFFSET());
-			cursorX = 0;
-			while (cursorX < textSelected.length && ops.font.width(fontSize, textSelected.substr(0, cursorX)) < x) {
-				cursorX++;
-			}
+			setCursorToInput(align);
 		}
 		tabPressedHandle = handle;
 		highlightAnchor = highlightOnSelect ? 0 : cursorX;
@@ -934,8 +930,14 @@ class Zui {
 		g.color = hover ? t.ACCENT_HOVER_COL : t.ACCENT_COL; // Text bg
 		drawRect(g, t.FILL_ACCENT_BG, _x + buttonOffsetY, _y + buttonOffsetY, _w - buttonOffsetY * 2, BUTTON_H());
 
-		var startEdit = getReleased() || tabPressed;
-		if (textSelectedHandle != handle && startEdit) startTextEdit(handle);
+		var released = getReleased();
+		if (submitTextHandle == handle && released) { // Keep editing selected text
+			textSelectedHandle = submitTextHandle;
+			submitTextHandle = null;
+			setCursorToInput(align);
+		}
+		var startEdit = released || tabPressed;
+		if (textSelectedHandle != handle && startEdit) startTextEdit(handle, align);
 		if (textSelectedHandle == handle) updateTextEdit(align, editable);
 		if (submitTextHandle == handle) submitTextEdit();
 		else handle.changed = false;
@@ -951,6 +953,16 @@ class Zui {
 
 		endElement();
 		return handle.text;
+	}
+
+	function setCursorToInput(align: Align) {
+		var off = align == Align.Left ? TEXT_OFFSET() : _w - ops.font.width(fontSize, textSelected);
+		var x = inputX - (_windowX + _x + off);
+		cursorX = 0;
+		while (cursorX < textSelected.length && ops.font.width(fontSize, textSelected.substr(0, cursorX)) < x) {
+			cursorX++;
+		}
+		highlightAnchor = cursorX;
 	}
 
 	function deselectText() {

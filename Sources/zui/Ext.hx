@@ -256,6 +256,7 @@ class Ext {
 			if ((!selected && ui.getHover()) || (selected && i == handle.position)) {
 				handle.position = i; // Set active line
 				handle.text = lines[i];
+				ui.submitTextHandle = null;
 				ui.textInput(handle, "", align, editable);
 				if (keyPressed && ui.key != KeyCode.Return && ui.key != KeyCode.Escape) { // Edit text
 					lines[i] = ui.textSelected;
