@@ -687,7 +687,7 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				var texts = Std.is(but.data, Array) ? [for (s in cast(but.data, Array<Dynamic>)) tr(s)] : enumTexts(node.type);
+				var texts = Std.isOfType(but.data, Array) ? [for (s in cast(but.data, Array<Dynamic>)) tr(s)] : enumTexts(node.type);
 				var buthandle = nhandle.nest(buti);
 				buthandle.position = but.default_value;
 				but.default_value = ui.combo(buthandle, texts, tr(but.name));
