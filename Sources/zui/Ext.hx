@@ -236,12 +236,14 @@ class Ext {
 			handle.text = untyped (handle.color >>> 0).toString(16);
 			var hexCode = ui.textInput(handle, "#");
 			
-			if (hexCode.length >= 1 && hexCode.charAt(0) == "#") hexCode = hexCode.substr(1); //allow # at the beginning
-			if (hexCode.length == 3) //3 digit CSS style values like fa0 --> ffaa00
+			if (hexCode.length >= 1 && hexCode.charAt(0) == "#") // Allow # at the beginning
+				hexCode = hexCode.substr(1);
+			if (hexCode.length == 3) // 3 digit CSS style values like fa0 --> ffaa00
 				hexCode = hexCode.charAt(0) + hexCode.charAt(0) + hexCode.charAt(1) + hexCode.charAt(1) + hexCode.charAt(2) + hexCode.charAt(2);
-			if (hexCode.length == 4) //4 digit CSS style values 
+			if (hexCode.length == 4) // 4 digit CSS style values
 				hexCode = hexCode.charAt(0) + hexCode.charAt(0) + hexCode.charAt(1) + hexCode.charAt(1) + hexCode.charAt(2) + hexCode.charAt(2) + hexCode.charAt(3) + hexCode.charAt(3);
-			if (hexCode.length == 6) hexCode = "ff" + hexCode; //make the alpha channel optional
+			if (hexCode.length == 6) // Make the alpha channel optional
+				hexCode = "ff" + hexCode;
 			
 			handle.color = untyped parseInt(hexCode, 16);
 			#end
