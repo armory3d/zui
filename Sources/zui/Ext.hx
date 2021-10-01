@@ -234,7 +234,16 @@ class Ext {
 		else if (pos == 2) {
 			#if js
 			handle.text = untyped (handle.color >>> 0).toString(16);
-			handle.color = untyped parseInt(ui.textInput(handle, "#"), 16);
+			var hexCode = ui.textInput(handle, "#");
+			
+			if (hexCode.length >= 1 && hexCode.charAt(0) == "#") hexCode = hexCode.substr(1); //allow # at the beginning
+			if (hexCode.length == 3) //3 digit CSS style values like fa0 --> ffaa00
+				hexCode = hexCode.charAt(0) + hexCode.charAt(0) + hexCode.charAt(1) + hexCode.charAt(1) + hexCode.charAt(2) + hexCode.charAt(2);
+			if (hexCode.length == 4) //4 digit CSS style values 
+				hexCode = hexCode.charAt(0) + hexCode.charAt(0) + hexCode.charAt(1) + hexCode.charAt(1) + hexCode.charAt(2) + hexCode.charAt(2) + hexCode.charAt(3) + hexCode.charAt(3);
+			if (hexCode.length == 6) hexCode = "ff" + hexCode; //make the alpha channel optional
+			
+			handle.color = untyped parseInt(hexCode, 16);
 			#end
 		}
 		if (h0.changed || h1.changed || h2.changed) handle.changed = ui.changed = true;
