@@ -469,12 +469,14 @@ class Nodes {
 					copyLinks.push(l);
 				}
 			}
-			var copyCanvas: TNodeCanvas = {
-				name: canvas.name,
-				nodes: copyNodes,
-				links: copyLinks
-			};
-			clipboard = haxe.Json.stringify(copyCanvas);
+			if (copyNodes.length > 0) {
+				var copyCanvas: TNodeCanvas = {
+					name: canvas.name,
+					nodes: copyNodes,
+					links: copyLinks
+				};
+				clipboard = haxe.Json.stringify(copyCanvas);
+			}
 			cutSelected = Zui.isCut;
 		}
 		if (Zui.isPaste && !ui.isTyping) {
