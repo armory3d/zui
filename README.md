@@ -45,7 +45,7 @@ function slider(handle: Handle, text: String, from: Float, to: Float, filled = f
 function tooltip(text: String);
 function tooltipImage(image: Image);
 
-// Formating
+// Formatting
 function row(ratios: Array<Float>);
 function separator(h = 4, fill = true);
 function indent();
