@@ -1443,11 +1443,15 @@ class Zui {
 	function drawString(g: Graphics, text: String, xOffset: Null<Float> = null, yOffset: Float = 0, align = Align.Left, truncation = true) {
 		var fullText = text;
 		if (truncation) {
-			while (text.length > 0 && ops.font.width(fontSize, text) > _w - 6) {
+			while (text.length > 0 && ops.font.width(fontSize, text) > _w - 6 * SCALE()) {
 				text = text.substr(0, text.length - 1);
 			}
 			if (text.length < fullText.length) {
 				text += "..";
+				// Strip more to fit ".."
+				while (text.length > 2 && ops.font.width(fontSize, text) > _w - 10 * SCALE()) {
+					text = text.substr(0, text.length - 3) + "..";
+				}
 				if (isHovered) tooltip(fullText);
 			}
 		}
