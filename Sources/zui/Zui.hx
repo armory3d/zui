@@ -851,11 +851,6 @@ class Zui {
 					 char.charCodeAt(0) >= 32) {
 				text = text.substr(0, highlightAnchor) + char + text.substr(cursorX);
 				cursorX = cursorX + 1 > text.length ? text.length : cursorX + 1;
-
-				if (dynamicGlyphLoad && char.charCodeAt(0) > 126 && Graphics.fontGlyphs.indexOf(char.charCodeAt(0)) == -1) {
-					Graphics.fontGlyphs.push(char.charCodeAt(0));
-					Graphics.fontGlyphs = Graphics.fontGlyphs.copy(); // Trigger atlas update
-				}
 			}
 			var selecting = isShiftDown && (key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Shift);
 			// isCtrlDown && isAltDown is the condition for AltGr was pressed
@@ -1453,6 +1448,15 @@ class Zui {
 					text = text.substr(0, text.length - 3) + "..";
 				}
 				if (isHovered) tooltip(fullText);
+			}
+		}
+
+		if (dynamicGlyphLoad) {
+			for (i in 0...text.length) {
+				if (text.charCodeAt(i) > 126 && Graphics.fontGlyphs.indexOf(text.charCodeAt(i)) == -1) {
+					Graphics.fontGlyphs.push(text.charCodeAt(i));
+					Graphics.fontGlyphs = Graphics.fontGlyphs.copy(); // Trigger atlas update
+				}
 			}
 		}
 
