@@ -637,7 +637,7 @@ class Nodes {
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
-				var val = node.outputs[but.output].default_value;
+				var val: kha.arrays.Float32Array = node.outputs[but.output].default_value;
 				nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				Ext.colorWheel(ui, nhandle);
 				val[0] = nhandle.color.R;
@@ -654,9 +654,10 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
 				ui.text(tr(but.name));
-				but.default_value[0] = ui.slider(nhandle.nest(buti).nest(0, {value: but.default_value[0]}), "X", min, max, true, 100, true, Left);
-				but.default_value[1] = ui.slider(nhandle.nest(buti).nest(1, {value: but.default_value[1]}), "Y", min, max, true, 100, true, Left);
-				but.default_value[2] = ui.slider(nhandle.nest(buti).nest(2, {value: but.default_value[2]}), "Z", min, max, true, 100, true, Left);
+				var val: kha.arrays.Float32Array = but.default_value;
+				val[0] = ui.slider(nhandle.nest(buti).nest(0, {value: val[0]}), "X", min, max, true, 100, true, Left);
+				val[1] = ui.slider(nhandle.nest(buti).nest(1, {value: val[1]}), "Y", min, max, true, 100, true, Left);
+				val[2] = ui.slider(nhandle.nest(buti).nest(2, {value: val[2]}), "Z", min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 				if (but.output != null) node.outputs[but.output].default_value = but.default_value;
 				ny += lineh * 3;
@@ -750,7 +751,8 @@ class Nodes {
 				var soc = inp;
 				g.color = 0xff000000;
 				g.fillRect(nx + w - p(38), ny - p(6), p(36), p(18));
-				g.color = kha.Color.fromFloats(soc.default_value[0], soc.default_value[1], soc.default_value[2]);
+				var val: kha.arrays.Float32Array = soc.default_value;
+				g.color = kha.Color.fromFloats(val[0], val[1], val[2]);
 				var rx = nx + w - p(37);
 				var ry = ny - p(5);
 				var rw = p(34);
@@ -774,9 +776,10 @@ class Nodes {
 				var max = inp.max != null ? inp.max : 1.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
-				inp.default_value[0] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(0, {value: inp.default_value[0]}), "X", min, max, true, 100, true, Left);
-				inp.default_value[1] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(1, {value: inp.default_value[1]}), "Y", min, max, true, 100, true, Left);
-				inp.default_value[2] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(2, {value: inp.default_value[2]}), "Z", min, max, true, 100, true, Left);
+				var val: kha.arrays.Float32Array = inp.default_value;
+				val[0] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(0, {value: val[0]}), "X", min, max, true, 100, true, Left);
+				val[1] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(1, {value: val[1]}), "Y", min, max, true, 100, true, Left);
+				val[2] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(2, {value: val[2]}), "Z", min, max, true, 100, true, Left);
 				ui.t.TEXT_OFFSET = textOff;
 				ny += lineh * 2.5;
 			}
