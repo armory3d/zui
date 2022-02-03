@@ -1719,6 +1719,8 @@ class Zui {
 			inputDown = false;
 			onMouseDown(1, Std.int(inputX), Std.int(inputY));
 			pinchStarted = true;
+			pinchTotal = 0.0;
+			pinchDistance = 0.0;
 		}
 		// Three fingers down - middle mouse button
 		else if (index == 2) {
@@ -1731,7 +1733,8 @@ class Zui {
 		if (index == 1) onMouseUp(1, Std.int(inputX), Std.int(inputY));
 	}
 
-	var pinchDistance: Float;
+	var pinchDistance = 0.0;
+	var pinchTotal = 0.0;
 	var pinchStarted = false;
 
 	public function onTouchMove(index: Int, x: Int, y: Int) {
@@ -1743,9 +1746,12 @@ class Zui {
 			var dx = inputX - x;
 			var dy = inputY - y;
 			pinchDistance = Math.sqrt(dx * dx + dy * dy);
+			pinchTotal += lastDistance != 0 ? lastDistance - pinchDistance : 0;
 			if (!pinchStarted) {
-				inputWheelDelta = Std.int((lastDistance - pinchDistance) / 20);
-				if (inputWheelDelta != 0) inputDownR = false;
+				inputWheelDelta = Std.int(pinchTotal / 50);
+				if (inputWheelDelta != 0) {
+					pinchTotal = 0.0;
+				}
 			}
 			pinchStarted = false;
 		}
