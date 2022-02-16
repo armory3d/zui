@@ -1118,6 +1118,7 @@ class Zui {
 		if (getStarted()) {
 			scrollHandle = handle;
 			isScrolling = true;
+			changed = true;
 			if (touchControls) {
 				sliderTooltip = true;
 				sliderTooltipX = _x + _windowX;
