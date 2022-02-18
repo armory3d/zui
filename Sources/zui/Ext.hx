@@ -146,7 +146,7 @@ class Ext {
 	}
 
 	static var wheelSelectedHande: Handle = null;
-	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, colorPreview = true): kha.Color {
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
 		var chue = ar[0];
@@ -249,6 +249,10 @@ class Ext {
 			#end
 		}
 		if (h0.changed || h1.changed || h2.changed) handle.changed = ui.changed = true;
+
+		if (ui.getInputInRect(ui._windowX + px, ui._windowY + py, w, h == null ? (ui._y - py) : h) && ui.inputReleased) //do not close if user clicks
+		   ui.changed = true;
+
 		return handle.color;
 	}
 
