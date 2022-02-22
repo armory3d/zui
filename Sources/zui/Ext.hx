@@ -250,7 +250,7 @@ class Ext {
 		}
 		if (h0.changed || h1.changed || h2.changed) handle.changed = ui.changed = true;
 
-		if (ui.getInputInRect(ui._windowX + px, ui._windowY + py, w, h == null ? (ui._y - py) : h) && ui.inputReleased) //do not close if user clicks
+		if (ui.getInputInRect(ui._windowX + px, ui._windowY + py, w, h == null ? (ui._y - py) : h) && ui.inputReleased) // Do not close if user clicks
 		   ui.changed = true;
 
 		return handle.color;
