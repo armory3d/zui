@@ -71,7 +71,6 @@ class Zui {
 	public var inputReleasedR: Bool;
 	public var inputDown: Bool;
 	public var inputDownR: Bool;
-	public var inputDownMove = false;
 	public var isKeyPressed = false; // Keys
 	public var isKeyDown = false;
 	public var isShiftDown = false;
@@ -1129,7 +1128,7 @@ class Zui {
 		else handle.changed = false;
 		
 		#if (!kha_android && !kha_ios)
-		if (handle == scrollHandle && inputDownMove) { // Scroll
+		if (handle == scrollHandle && inputDX != 0) { // Scroll
 		#else
 		if (handle == scrollHandle) { // Scroll
 		#end
@@ -1615,7 +1614,6 @@ class Zui {
 		#end
 		inputStartedX = x;
 		inputStartedY = y;
-		inputDownMove = false;
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
@@ -1631,7 +1629,6 @@ class Zui {
 			button == 0 ? inputReleased = true : inputReleasedR = true;
 		}
 		button == 0 ? inputDown = false : inputDownR = false;
-		inputDownMove = false;
 		#if (kha_android || kha_ios)
 		setInputPosition(x, y);
 		#end
@@ -1646,7 +1643,6 @@ class Zui {
 	public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
 		#if (!kha_android && !kha_ios)
 		setInputPosition(x, y);
-		inputDownMove = inputDown;
 		#end
 	}
 
