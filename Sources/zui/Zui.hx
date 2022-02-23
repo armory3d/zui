@@ -1117,6 +1117,7 @@ class Zui {
 		if (getStarted()) {
 			scrollHandle = handle;
 			isScrolling = true;
+			changed = handle.changed = true;
 			if (touchControls) {
 				sliderTooltip = true;
 				sliderTooltipX = _x + _windowX;
@@ -1124,9 +1125,13 @@ class Zui {
 				sliderTooltipW = _w;
 			}
 		}
-
-		handle.changed = false;
+		else handle.changed = false;
+		
+		#if (!kha_android && !kha_ios)
+		if (handle == scrollHandle && inputDX != 0) { // Scroll
+		#else
 		if (handle == scrollHandle) { // Scroll
+		#end
 			var range = to - from;
 			var sliderX = _x + _windowX + buttonOffsetY;
 			var sliderW = _w - buttonOffsetY * 2;
