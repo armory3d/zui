@@ -604,6 +604,11 @@ class Nodes {
 		g.color = ui.t.LABEL_COL;
 		var textw = g.font.width(ui.fontSize, text);
 		g.drawString(text, nx + p(10), ny + p(6));
+		ui._x = nx; //use the whole line for hovering and not just the drawn string.
+		ui._y = ny;
+		ui._w = w;
+		if (ui.getHover(lineh) && node.tooltip != null) ui.tooltip(tr(node.tooltip));
+
 		ny += lineh * 0.5;
 
 		// Outputs
@@ -618,6 +623,11 @@ class Nodes {
 			ny += lineh;
 			var strw = ui.ops.font.width(ui.fontSize, tr(out.name));
 			g.drawString(tr(out.name), nx + w - strw - p(12), ny - p(3));
+			ui._x = nx;
+			ui._y = ny;
+			ui._w = w;
+			if (ui.getHover(lineh) && out.tooltip != null) ui.tooltip(tr(out.tooltip));
+
 			if (onSocketReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR)) {
 				if (ui.inputX > wx + nx && ui.inputX < wx + nx + w && ui.inputY > wy + ny && ui.inputY < wy + ny + lineh) {
 					onSocketReleased(out);
@@ -654,10 +664,14 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
 				ui.text(tr(but.name));
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 				var val: kha.arrays.Float32Array = but.default_value;
 				val[0] = ui.slider(nhandle.nest(buti).nest(0, {value: val[0]}), "X", min, max, true, 100, true, Left);
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 				val[1] = ui.slider(nhandle.nest(buti).nest(1, {value: val[1]}), "Y", min, max, true, 100, true, Left);
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 				val[2] = ui.slider(nhandle.nest(buti).nest(2, {value: val[2]}), "Z", min, max, true, 100, true, Left);
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 				ui.t.TEXT_OFFSET = textOff;
 				if (but.output != null) node.outputs[but.output].default_value = but.default_value;
 				ny += lineh * 3;
@@ -674,6 +688,7 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(buti, {value: soc.default_value}), "Value", min, max, true, prec, true, Left);
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (but.type == "STRING") {
@@ -684,6 +699,7 @@ class Nodes {
 				var soc = but.output != null ? node.outputs[but.output] : null;
 				but.default_value = ui.textInput(nhandle.nest(buti, {text: soc != null ? soc.default_value : but.default_value != null ? but.default_value : ""}), tr(but.name));
 				if (soc != null) soc.default_value = but.default_value;
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 			}
 			else if (but.type == "ENUM") {
 				ny += lineh;
@@ -694,6 +710,7 @@ class Nodes {
 				var buthandle = nhandle.nest(buti);
 				buthandle.position = but.default_value;
 				but.default_value = ui.combo(buthandle, texts, tr(but.name));
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 			}
 			else if (but.type == "BOOL") {
 				ny += lineh;
@@ -701,6 +718,7 @@ class Nodes {
 				ui._y = ny;
 				ui._w = w;
 				but.default_value = ui.check(nhandle.nest(buti, {selected: but.default_value}), tr(but.name));
+				if (ui.isHovered && but.tooltip != null) ui.tooltip(tr(but.tooltip));
 			}
 			else if (but.type == "CUSTOM") { // Calls external function for custom button drawing
 				ny += lineh;
@@ -733,6 +751,7 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.slider(nhandle.nest(maxButtons).nest(i, {value: soc.default_value}), tr(inp.name), min, max, true, prec, true, Left);
+				if (ui.isHovered && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (!isLinked && inp.type == "STRING") {
@@ -743,11 +762,16 @@ class Nodes {
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
 				soc.default_value = ui.textInput(nhandle.nest(maxButtons).nest(i, {text: soc.default_value}), tr(inp.name), Left);
+				if (ui.isHovered && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 				ui.t.TEXT_OFFSET = textOff;
 			}
 			else if (!isLinked && inp.type == "RGBA") {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				if (ui.getHover(lineh) && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 				var soc = inp;
 				g.color = 0xff000000;
 				g.fillRect(nx + w - p(38), ny - p(6), p(36), p(18));
@@ -768,24 +792,34 @@ class Nodes {
 			else if (!isLinked && inp.type == "VECTOR" && inp.display == 1) {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
-				ny += lineh / 2;
 				ui._x = nx;
 				ui._y = ny;
 				ui._w = w;
+				if (ui.getHover(lineh) && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
+
+				ny += lineh / 2;
+				ui._y = ny;
 				var min = inp.min != null ? inp.min : 0.0;
 				var max = inp.max != null ? inp.max : 1.0;
 				var textOff = ui.t.TEXT_OFFSET;
 				ui.t.TEXT_OFFSET = 6;
 				var val: kha.arrays.Float32Array = inp.default_value;
 				val[0] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(0, {value: val[0]}), "X", min, max, true, 100, true, Left);
+				if (ui.isHovered && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 				val[1] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(1, {value: val[1]}), "Y", min, max, true, 100, true, Left);
+				if (ui.isHovered && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 				val[2] = ui.slider(nhandle.nest(maxButtons).nest(i).nest(2, {value: val[2]}), "Z", min, max, true, 100, true, Left);
+				if (ui.isHovered && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 				ui.t.TEXT_OFFSET = textOff;
 				ny += lineh * 2.5;
 			}
 			else {
 				g.color = ui.t.LABEL_COL;
 				g.drawString(tr(inp.name), nx + p(12), ny - p(3));
+				ui._x = nx;
+				ui._y = ny;
+				ui._w = w;
+				if (ui.getHover(lineh) && inp.tooltip != null) ui.tooltip(tr(inp.tooltip));
 			}
 			if (onSocketReleased != null && ui.inputEnabled && (ui.inputReleased || ui.inputReleasedR)) {
 				if (ui.inputX > wx + nx && ui.inputX < wx + nx + w && ui.inputY > wy + ny && ui.inputY < wy + ny + lineh) {
@@ -880,6 +914,7 @@ typedef TNode = {
 	var buttons: Array<TNodeButton>;
 	var color: Int;
 	@:optional var width: Null<Float>;
+	@:optional var tooltip: Null<String>;
 }
 
 typedef TNodeSocket = {
@@ -893,6 +928,7 @@ typedef TNodeSocket = {
 	@:optional var max: Null<Float>;
 	@:optional var precision: Null<Float>;
 	@:optional var display: Null<Int>;
+	@:optional var tooltip: Null<String>;
 }
 
 typedef TNodeLink = {
@@ -913,4 +949,5 @@ typedef TNodeButton = {
 	@:optional var max: Null<Float>;
 	@:optional var precision: Null<Float>;
 	@:optional var height: Null<Float>;
+	@:optional var tooltip: Null<String>;
 }
