@@ -146,6 +146,7 @@ class Ext {
 	}
 
 	static var wheelSelectedHande: Handle = null;
+	static var gradientSelectedHandle: Handle = null;
 	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
@@ -170,6 +171,10 @@ class Ext {
 		var cwh = cw / 2;
 		var cx = ox;
 		var cy = oy + csat * cwh; // Sat is distance from center
+		var gradTx = px + 0.897*w ;
+		var gradTy = oy - cwh;
+		var gradW = 0.0777*w;
+		var gradH = cw;
 		// Rotate around origin by hue
 		var theta = chue * (Math.PI * 2.0);
 		var cx2 = Math.cos(theta) * (cx - ox) - Math.sin(theta) * (cy - oy) + ox;
@@ -177,17 +182,26 @@ class Ext {
 		cx = cx2;
 		cy = cy2;
 
+		ui._x = px - (scroll ? 0 : ui.SCROLL_W() / 2);
+		ui._y = py;
+		ui.image(ui.ops.black_white_gradient);
+
 		ui.g.color = 0xff000000;
 		ui.g.fillRect(cx - 3 * ui.SCALE(), cy - 3 * ui.SCALE(), 6 * ui.SCALE(), 6 * ui.SCALE());
 		ui.g.color = 0xffffffff;
 		ui.g.fillRect(cx - 2 * ui.SCALE(), cy - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE());
+
+		ui.g.color = 0xff000000;
+		ui.g.fillRect(gradTx + gradW/2 - 3 * ui.SCALE(), gradTy + (1-cval)*gradH - 3 * ui.SCALE(), 6 * ui.SCALE(), 6 * ui.SCALE());
+		ui.g.color = 0xffffffff;
+		ui.g.fillRect(gradTx + gradW/2 - 2 * ui.SCALE(), gradTy + (1-cval)*gradH - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE()); 
 
 		if (alpha) {
 			var alphaHandle = handle.nest(1, {value: Math.round(calpha * 100) / 100});
 			calpha = ui.slider(alphaHandle, "Alpha", 0.0, 1.0, true);
 			if (alphaHandle.changed) handle.changed = ui.changed = true;
 		}
-		// Mouse picking
+		// Mouse picking for color wheel
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
 		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) wheelSelectedHande = handle;
@@ -198,6 +212,13 @@ class Ext {
 			if (angle < 0) angle = Math.PI + (Math.PI - Math.abs(angle));
 			angle = Math.PI * 2 - angle;
 			chue = angle / (Math.PI * 2);
+			handle.changed = ui.changed = true;
+		}
+		// Mouse picking for cval
+		if (ui.inputStarted && ui.getInputInRect(gradTx + ui._windowX, gradTy + ui._windowY, gradW, gradH)) gradientSelectedHandle = handle;
+		if (ui.inputReleased) gradientSelectedHandle = null;
+		if (ui.inputDown && gradientSelectedHandle == handle) {
+			cval = Math.max(0.01,Math.min(1,1 - (ui.inputY-gradTy - ui._windowY) / gradH));
 			handle.changed = ui.changed = true;
 		}
 		// Save as rgb
