@@ -205,7 +205,7 @@ class Ext {
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
 		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) wheelSelectedHande = handle;
-		if (ui.inputReleased) wheelSelectedHande = null;
+		if (ui.inputReleased && wheelSelectedHande != null) {wheelSelectedHande = null; handle.changed = ui.changed = true;}
 		if (ui.inputDown && wheelSelectedHande == handle) {
 			csat = Math.min(dist(gx, gy, ui.inputX, ui.inputY), cwh) / cwh;
 			var angle = Math.atan2(ui.inputX - gx, ui.inputY - gy);
@@ -216,7 +216,7 @@ class Ext {
 		}
 		// Mouse picking for cval
 		if (ui.inputStarted && ui.getInputInRect(gradTx + ui._windowX, gradTy + ui._windowY, gradW, gradH)) gradientSelectedHandle = handle;
-		if (ui.inputReleased) gradientSelectedHandle = null;
+		if (ui.inputReleased && gradientSelectedHandle != null) {gradientSelectedHandle = null; handle.changed = ui.changed = true;}
 		if (ui.inputDown && gradientSelectedHandle == handle) {
 			cval = Math.max(0.01,Math.min(1,1 - (ui.inputY-gradTy - ui._windowY) / gradH));
 			handle.changed = ui.changed = true;
