@@ -145,7 +145,7 @@ class Ext {
 		return handle.position;
 	}
 
-	static var wheelSelectedHande: Handle = null;
+	static var wheelSelectedHandle: Handle = null;
 	static var gradientSelectedHandle: Handle = null;
 	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true): kha.Color {
 		if (w == null) w = ui._w;
@@ -204,9 +204,9 @@ class Ext {
 		// Mouse picking for color wheel
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
-		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) wheelSelectedHande = handle;
-		if (ui.inputReleased && wheelSelectedHande != null) {wheelSelectedHande = null; handle.changed = ui.changed = true;}
-		if (ui.inputDown && wheelSelectedHande == handle) {
+		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) wheelSelectedHandle = handle;
+		if (ui.inputReleased && wheelSelectedHandle != null) {wheelSelectedHandle = null; handle.changed = ui.changed = true;}
+		if (ui.inputDown && wheelSelectedHandle == handle) {
 			csat = Math.min(dist(gx, gy, ui.inputX, ui.inputY), cwh) / cwh;
 			var angle = Math.atan2(ui.inputX - gx, ui.inputY - gy);
 			if (angle < 0) angle = Math.PI + (Math.PI - Math.abs(angle));
