@@ -16,7 +16,8 @@ typedef ZuiOptions = {
 	?khaWindowId: Int,
 	?scaleFactor: Float,
 	?autoNotifyInput: Bool,
-	?color_wheel: kha.Image
+	?color_wheel: kha.Image,
+	?black_white_gradient: kha.Image,
 }
 
 class Zui {
