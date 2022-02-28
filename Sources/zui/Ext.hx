@@ -171,9 +171,9 @@ class Ext {
 		var cwh = cw / 2;
 		var cx = ox;
 		var cy = oy + csat * cwh; // Sat is distance from center
-		var gradTx = px + 0.897*w ;
+		var gradTx = px + 0.897 * w ;
 		var gradTy = oy - cwh;
-		var gradW = 0.0777*w;
+		var gradW = 0.0777 * w;
 		var gradH = cw;
 		// Rotate around origin by hue
 		var theta = chue * (Math.PI * 2.0);
@@ -192,9 +192,9 @@ class Ext {
 		ui.g.fillRect(cx - 2 * ui.SCALE(), cy - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE());
 
 		ui.g.color = 0xff000000;
-		ui.g.fillRect(gradTx + gradW/2 - 3 * ui.SCALE(), gradTy + (1-cval)*gradH - 3 * ui.SCALE(), 6 * ui.SCALE(), 6 * ui.SCALE());
+		ui.g.fillRect(gradTx + gradW / 2 - 3 * ui.SCALE(), gradTy + (1 - cval) * gradH - 3 * ui.SCALE(), 6 * ui.SCALE(), 6 * ui.SCALE());
 		ui.g.color = 0xffffffff;
-		ui.g.fillRect(gradTx + gradW/2 - 2 * ui.SCALE(), gradTy + (1-cval)*gradH - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE()); 
+		ui.g.fillRect(gradTx + gradW / 2 - 2 * ui.SCALE(), gradTy + (1 - cval) * gradH - 2 * ui.SCALE(), 4 * ui.SCALE(), 4 * ui.SCALE());
 
 		if (alpha) {
 			var alphaHandle = handle.nest(1, {value: Math.round(calpha * 100) / 100});
@@ -205,7 +205,7 @@ class Ext {
 		var gx = ox + ui._windowX;
 		var gy = oy + ui._windowY;
 		if (ui.inputStarted && ui.getInputInRect(gx - cwh, gy - cwh, cw, cw)) wheelSelectedHandle = handle;
-		if (ui.inputReleased && wheelSelectedHandle != null) {wheelSelectedHandle = null; handle.changed = ui.changed = true;}
+		if (ui.inputReleased && wheelSelectedHandle != null) { wheelSelectedHandle = null; handle.changed = ui.changed = true; }
 		if (ui.inputDown && wheelSelectedHandle == handle) {
 			csat = Math.min(dist(gx, gy, ui.inputX, ui.inputY), cwh) / cwh;
 			var angle = Math.atan2(ui.inputX - gx, ui.inputY - gy);
@@ -216,9 +216,9 @@ class Ext {
 		}
 		// Mouse picking for cval
 		if (ui.inputStarted && ui.getInputInRect(gradTx + ui._windowX, gradTy + ui._windowY, gradW, gradH)) gradientSelectedHandle = handle;
-		if (ui.inputReleased && gradientSelectedHandle != null) {gradientSelectedHandle = null; handle.changed = ui.changed = true;}
+		if (ui.inputReleased && gradientSelectedHandle != null) { gradientSelectedHandle = null; handle.changed = ui.changed = true; }
 		if (ui.inputDown && gradientSelectedHandle == handle) {
-			cval = Math.max(0.01,Math.min(1,1 - (ui.inputY-gradTy - ui._windowY) / gradH));
+			cval = Math.max(0.01, Math.min(1, 1 - (ui.inputY - gradTy - ui._windowY) / gradH));
 			handle.changed = ui.changed = true;
 		}
 		// Save as rgb
