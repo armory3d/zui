@@ -604,7 +604,7 @@ class Nodes {
 		g.color = ui.t.LABEL_COL;
 		var textw = g.font.width(ui.fontSize, text);
 		g.drawString(text, nx + p(10), ny + p(6));
-		ui._x = nx; //use the whole line for hovering and not just the drawn string.
+		ui._x = nx; // Use the whole line for hovering and not just the drawn string.
 		ui._y = ny;
 		ui._w = w;
 		if (ui.getHover(lineh) && node.tooltip != null) ui.tooltip(tr(node.tooltip));
@@ -914,7 +914,7 @@ typedef TNode = {
 	var buttons: Array<TNodeButton>;
 	var color: Int;
 	@:optional var width: Null<Float>;
-	@:optional var tooltip: Null<String>;
+	@:optional var tooltip: String;
 }
 
 typedef TNodeSocket = {
@@ -928,7 +928,7 @@ typedef TNodeSocket = {
 	@:optional var max: Null<Float>;
 	@:optional var precision: Null<Float>;
 	@:optional var display: Null<Int>;
-	@:optional var tooltip: Null<String>;
+	@:optional var tooltip: String;
 }
 
 typedef TNodeLink = {
@@ -949,5 +949,5 @@ typedef TNodeButton = {
 	@:optional var max: Null<Float>;
 	@:optional var precision: Null<Float>;
 	@:optional var height: Null<Float>;
-	@:optional var tooltip: Null<String>;
+	@:optional var tooltip: String;
 }
