@@ -100,7 +100,7 @@ class Ext {
 		return handle.text;
 	}
 
-	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Left): Int {
+	public static function inlineRadio(ui: Zui, handle: Handle, texts: Array<String>, align: Align = Left, tooltips: Array<String> = null): Int {
 		if (!ui.isVisible(ui.ELEMENT_H())) {
 			ui.endElement();
 			return handle.position;
@@ -133,6 +133,9 @@ class Ext {
 				if (!ui.enabled) ui.fadeColor();
 				ui.g.drawRect(ui._x + step * i, ui._y + ui.buttonOffsetY, step, ui.BUTTON_H());
 			}
+
+			if (hovered == i && tooltips != null && tooltips.length >= i) ui.tooltip(tooltips[i]);
+			
 			ui.g.color = ui.t.TEXT_COL; // Text
 			ui._x += step * i;
 			var _w = ui._w;
