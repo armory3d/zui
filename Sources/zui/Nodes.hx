@@ -13,6 +13,7 @@ class Nodes {
 	public var uiw = 0;
 	public var uih = 0;
 	public var _inputStarted = false;
+	public var colorPickerCallback: kha.Color->Void = null;
 	var scaleFactor = 1.0;
 	var ELEMENT_H = 25;
 	var dragged = false;
@@ -649,7 +650,14 @@ class Nodes {
 				ui._w = w;
 				var val: kha.arrays.Float32Array = node.outputs[but.output].default_value;
 				nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
-				Ext.colorWheel(ui, nhandle);
+				Ext.colorWheel(ui, nhandle, false, null, null, true,  function () {
+					colorPickerCallback = function (color: kha.Color) {
+						node.outputs[but.output].default_value[0] = color.R;
+						node.outputs[but.output].default_value[1] = color.G;
+						node.outputs[but.output].default_value[2] = color.B;
+						ui.changed = true;
+					};
+				});
 				val[0] = nhandle.color.R;
 				val[1] = nhandle.color.G;
 				val[2] = nhandle.color.B;
@@ -838,7 +846,14 @@ class Nodes {
 	public function rgbaPopup(ui: Zui, nhandle: zui.Zui.Handle, val: kha.arrays.Float32Array, x: Int, y: Int) {
 		popup(x, y, Std.int(140 * scaleFactor), Std.int(ui.t.ELEMENT_H * 10), function(ui: Zui) {
 			nhandle.color = kha.Color.fromFloats(val[0], val[1], val[2]);
-			Ext.colorWheel(ui, nhandle, false, null, true);
+			Ext.colorWheel(ui, nhandle, false, null, true, function () {
+				colorPickerCallback = function (color: kha.Color) {
+					val[0] = color.R;
+					val[1] = color.G;
+					val[2] = color.B;
+					ui.changed = true;
+				};
+			});
 			val[0] = nhandle.color.R; val[1] = nhandle.color.G; val[2] = nhandle.color.B;
 		});
 	}

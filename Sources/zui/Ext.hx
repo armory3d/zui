@@ -147,7 +147,7 @@ class Ext {
 
 	static var wheelSelectedHandle: Handle = null;
 	static var gradientSelectedHandle: Handle = null;
-	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true): kha.Color {
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true, picker: Void -> Void = null): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
 		var chue = ar[0];
@@ -162,6 +162,19 @@ class Ext {
 			w -= ui.SCROLL_W();
 			px += ui.SCROLL_W() / 2;
 		}
+		var _x = ui._x;
+		var _y = ui._y;
+		var _w = ui._w;
+		ui._w = 28;
+		if (picker != null && ui.button("P")) {
+			picker();
+			ui.changed = false;
+			handle.changed = false;
+			return handle.color;
+		}
+		ui._x = _x;
+		ui._y = _y;
+		ui._w = _w;
 		ui.image(ui.ops.color_wheel, kha.Color.fromFloats(cval, cval, cval));
 		// Picker
 		var ph = ui._y - py;
