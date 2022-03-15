@@ -147,7 +147,7 @@ class Ext {
 
 	static var wheelSelectedHandle: Handle = null;
 	static var gradientSelectedHandle: Handle = null;
-	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true, picker: Void -> Void = null): kha.Color {
+	public static function colorWheel(ui: Zui, handle: Handle, alpha = false, w: Null<Float> = null, h: Null<Float> = null, colorPreview = true, picker: Void->Void = null): kha.Color {
 		if (w == null) w = ui._w;
 		rgbToHsv(handle.color.R, handle.color.G, handle.color.B, ar);
 		var chue = ar[0];
