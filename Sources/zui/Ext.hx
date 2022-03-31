@@ -165,7 +165,7 @@ class Ext {
 		var _x = ui._x;
 		var _y = ui._y;
 		var _w = ui._w;
-		ui._w = Std.int(28*ui.SCALE());
+		ui._w = Std.int(28 * ui.SCALE());
 		if (picker != null && ui.button("P")) {
 			picker();
 			ui.changed = false;

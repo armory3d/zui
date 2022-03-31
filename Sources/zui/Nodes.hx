@@ -493,8 +493,8 @@ class Nodes {
 					l.id = getLinkId(canvas.links);
 					canvas.links.push(l);
 				}
-				var offsetX = Std.int((Std.int(ui.inputX / ui.SCALE())*SCALE() - wx - PAN_X()) / SCALE()) - pasteCanvas.nodes[pasteCanvas.nodes.length-1].x;
-				var offsetY = Std.int((Std.int(ui.inputY / ui.SCALE())*SCALE() - wy - PAN_Y()) / SCALE()) - pasteCanvas.nodes[pasteCanvas.nodes.length-1].y;
+				var offsetX = Std.int((Std.int(ui.inputX / ui.SCALE()) * SCALE() - wx - PAN_X()) / SCALE()) - pasteCanvas.nodes[pasteCanvas.nodes.length - 1].x;
+				var offsetY = Std.int((Std.int(ui.inputY / ui.SCALE()) * SCALE() - wy - PAN_Y()) / SCALE()) - pasteCanvas.nodes[pasteCanvas.nodes.length - 1].y;
 				for (n in pasteCanvas.nodes) {
 					// Assign unique node id
 					var old_id = n.id;
