@@ -1000,7 +1000,7 @@ class Zui {
 		return released;
 	}
 
-	public function check(handle: Handle, text: String): Bool {
+	public function check(handle: Handle, text: String, label: String = ""): Bool {
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.selected;
@@ -1017,12 +1017,17 @@ class Zui {
 		g.color = t.TEXT_COL; // Text
 		drawString(g, text, titleOffsetX, 0, Align.Left);
 
+		if (label != "") {
+			g.color = t.LABEL_COL;
+			drawString(g, label, null, 0, Align.Right);
+		}
+
 		endElement();
 
 		return handle.selected;
 	}
 
-	public function radio(handle: Handle, position: Int, text: String): Bool {
+	public function radio(handle: Handle, position: Int, text: String, label: String = ""): Bool {
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.position == position;
@@ -1040,6 +1045,11 @@ class Zui {
 
 		g.color = t.TEXT_COL; // Text
 		drawString(g, text, titleOffsetX, 0);
+
+		if (label != "") {
+			g.color = t.LABEL_COL;
+			drawString(g, label, null, 0, Align.Right);
+		}
 
 		endElement();
 
