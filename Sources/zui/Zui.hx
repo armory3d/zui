@@ -1058,7 +1058,7 @@ class Zui {
 		return handle.position == position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left, searchBar = false): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left, searchBar = true): Int {
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.position;
