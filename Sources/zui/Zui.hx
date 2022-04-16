@@ -1414,6 +1414,7 @@ class Zui {
 		if ((inputReleased || isEscapeDown || isReturnDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
+			comboSearchLast = "";
 		}
 		else comboFirst = false;
 		inputEnabled = comboSelectedHandle == null;
