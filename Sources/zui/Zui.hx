@@ -160,6 +160,7 @@ class Zui {
 	var comboSearchBar = false;
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
+	var comboInitialValue = 0;
 	var tooltipText = "";
 	var tooltipImg: kha.Image = null;
 	var tooltipImgMaxWidth: Null<Int> = null;
@@ -1082,9 +1083,15 @@ class Zui {
 				if (comboSelectedW > _w * 2) comboSelectedW = Std.int(_w * 2);
 				if (comboSelectedW > _w) comboSelectedW += Std.int(TEXT_OFFSET());
 				comboToSubmit = handle.position;
+				comboInitialValue = handle.position;
 			}
 		}
-		if (handle == submitComboHandle) {
+		if (handle == comboSelectedHandle && (isEscapeDown || inputReleasedR)) {
+			handle.position = comboInitialValue;
+			handle.changed = changed = true;
+			submitComboHandle = null;
+		}
+		else if (handle == submitComboHandle) {
 			handle.position = comboToSubmit;
 			submitComboHandle = null;
 			handle.changed = changed = true;
@@ -1411,7 +1418,7 @@ class Zui {
 			}
 		}
 
-		if ((inputReleased || isEscapeDown || isReturnDown) && !comboFirst) {
+		if ((inputReleased || inputReleasedR || isEscapeDown || isReturnDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
 			comboSearchLast = "";
