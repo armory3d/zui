@@ -156,8 +156,11 @@ class Zui {
 	var comboSelectedX: Int;
 	var comboSelectedY: Int;
 	var comboSelectedW: Int;
+	var comboSearchLast: String;
+	var comboSearchBar = false;
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
+	var comboInitialValue = 0;
 	var tooltipText = "";
 	var tooltipImg: kha.Image = null;
 	var tooltipImgMaxWidth: Null<Int> = null;
@@ -1056,7 +1059,7 @@ class Zui {
 		return handle.position == position;
 	}
 
-	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left): Int {
+	public function combo(handle: Handle, texts: Array<String>, label = "", showLabel = false, align = Align.Left, searchBar = true): Int {
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.position;
@@ -1072,6 +1075,7 @@ class Zui {
 				comboSelectedX = Std.int(_x + _windowX);
 				comboSelectedY = Std.int(_y + _windowY + ELEMENT_H());
 				comboSelectedW = Std.int(_w);
+				comboSearchBar = searchBar;
 				for (t in texts) { // Adapt combo list width to combo item width
 					var w = Std.int(ops.font.width(fontSize, t)) + 10;
 					if (comboSelectedW < w) comboSelectedW = w;
@@ -1079,9 +1083,15 @@ class Zui {
 				if (comboSelectedW > _w * 2) comboSelectedW = Std.int(_w * 2);
 				if (comboSelectedW > _w) comboSelectedW += Std.int(TEXT_OFFSET());
 				comboToSubmit = handle.position;
+				comboInitialValue = handle.position;
 			}
 		}
-		if (handle == submitComboHandle) {
+		if (handle == comboSelectedHandle && (isEscapeDown || inputReleasedR)) {
+			handle.position = comboInitialValue;
+			handle.changed = changed = true;
+			submitComboHandle = null;
+		}
+		else if (handle == submitComboHandle) {
 			handle.position = comboToSubmit;
 			submitComboHandle = null;
 			handle.changed = changed = true;
@@ -1302,7 +1312,7 @@ class Zui {
 		globalG.color = t.SEPARATOR_COL;
 		globalG.begin(false);
 
-		var comboH = (comboSelectedTexts.length + (comboSelectedLabel != "" ? 1 : 0)) * Std.int(ELEMENT_H());
+		var comboH = (comboSelectedTexts.length + (comboSelectedLabel != "" ? 1 : 0) + (comboSearchBar ? 1 : 0)) * Std.int(ELEMENT_H());
 		var distTop = comboSelectedY - comboH - Std.int(ELEMENT_H()) - windowBorderTop;
 		var distBottom = kha.System.windowHeight() - windowBorderBottom - (comboSelectedY + comboH );
 		var unrollUp = distBottom < 0 && distBottom < distTop;
@@ -1313,11 +1323,30 @@ class Zui {
 			var wheelUp = (unrollUp && inputWheelDelta > 0) || (!unrollUp && inputWheelDelta < 0);
 			var wheelDown = (unrollUp && inputWheelDelta < 0) || (!unrollUp && inputWheelDelta > 0);
 			if ((arrowUp || wheelUp) && comboToSubmit > 0) {
-				comboToSubmit--;
+				var step = 1;
+				if (comboSearchBar && textSelected.length > 0) {
+					var search = textSelected.toLowerCase();
+					while (comboSelectedTexts[comboToSubmit-step].toLowerCase().indexOf(search) < 0 && comboToSubmit-step > 0)
+						++step;
+					
+					// Corner case: Current position is the top one according to the search pattern.
+					if (comboSelectedTexts[comboToSubmit-step].toLowerCase().indexOf(search) < 0) step = 0;
+				}
+				comboToSubmit -= step;
 				submitComboHandle = comboSelectedHandle;
 			}
 			else if ((arrowDown || wheelDown) && comboToSubmit < comboSelectedTexts.length - 1) {
-				comboToSubmit++;
+				var step = 1;
+				if (comboSearchBar && textSelected.length > 0) {
+					var search = textSelected.toLowerCase();
+					while (comboSelectedTexts[comboToSubmit+step].toLowerCase().indexOf(search) < 0 && comboToSubmit+step < comboSelectedTexts.length - 1)
+						++step;
+
+					// Corner case: Current position is the lowest one according to the search pattern.
+					if (comboSelectedTexts[comboToSubmit+step].toLowerCase().indexOf(search) < 0) step = 0;
+				}
+				
+				comboToSubmit += step;
 				submitComboHandle = comboSelectedHandle;
 			}
 			if (comboSelectedWindow != null) comboSelectedWindow.redraws = 2;
@@ -1328,7 +1357,33 @@ class Zui {
 		var _ELEMENT_OFFSET = t.ELEMENT_OFFSET;
 		t.ELEMENT_OFFSET = 0;
 		var unrollRight = _x + comboSelectedW * 2 < kha.System.windowWidth() - windowBorderRight ? 1 : -1;
+		var resetPosition = false;
+		var search = "";
+		if (comboSearchBar) {
+			if (unrollUp) _y -= ELEMENT_H() * 2;
+			var comboSearchHandle = Id.handle();
+			if (comboFirst) comboSearchHandle.text = "";
+			fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
+			textInput(comboSearchHandle);
+			if (comboFirst) {
+				startTextEdit(comboSearchHandle); // Focus search bar
+			}
+			search = textSelected.length == 0 ? comboSearchHandle.text.toLowerCase() : textSelected.toLowerCase();
+			if (search != comboSearchLast) {
+				comboSearchLast = search;
+				resetPosition = true;
+			}
+		}
+
 		for (i in 0...comboSelectedTexts.length) {
+			if(search.length > 0 && comboSelectedTexts[i].toLowerCase().indexOf(search) < 0)
+				continue; // Don't show items that don't fit the current search pattern
+
+			if (resetPosition) { // The search has changed, select first entry that matches
+				comboToSubmit = comboSelectedHandle.position = i;
+				submitComboHandle = comboSelectedHandle;
+				resetPosition = false;
+			}
 			if (unrollUp) _y -= ELEMENT_H() * 2;
 			t.BUTTON_COL = i == comboSelectedHandle.position ? t.ACCENT_SELECT_COL : t.SEPARATOR_COL;
 			fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
@@ -1363,9 +1418,10 @@ class Zui {
 			}
 		}
 
-		if ((inputReleased || isEscapeDown || isReturnDown) && !comboFirst) {
+		if ((inputReleased || inputReleasedR || isEscapeDown || isReturnDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
+			comboSearchLast = "";
 		}
 		else comboFirst = false;
 		inputEnabled = comboSelectedHandle == null;
