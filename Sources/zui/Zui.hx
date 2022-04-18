@@ -1326,11 +1326,11 @@ class Zui {
 				var step = 1;
 				if (comboSearchBar && textSelected.length > 0) {
 					var search = textSelected.toLowerCase();
-					while (comboSelectedTexts[comboToSubmit-step].toLowerCase().indexOf(search) < 0 && comboToSubmit-step > 0)
+					while (comboSelectedTexts[comboToSubmit - step].toLowerCase().indexOf(search) < 0 && comboToSubmit - step > 0)
 						++step;
 					
 					// Corner case: Current position is the top one according to the search pattern.
-					if (comboSelectedTexts[comboToSubmit-step].toLowerCase().indexOf(search) < 0) step = 0;
+					if (comboSelectedTexts[comboToSubmit - step].toLowerCase().indexOf(search) < 0) step = 0;
 				}
 				comboToSubmit -= step;
 				submitComboHandle = comboSelectedHandle;
@@ -1339,11 +1339,11 @@ class Zui {
 				var step = 1;
 				if (comboSearchBar && textSelected.length > 0) {
 					var search = textSelected.toLowerCase();
-					while (comboSelectedTexts[comboToSubmit+step].toLowerCase().indexOf(search) < 0 && comboToSubmit+step < comboSelectedTexts.length - 1)
+					while (comboSelectedTexts[comboToSubmit + step].toLowerCase().indexOf(search) < 0 && comboToSubmit + step < comboSelectedTexts.length - 1)
 						++step;
 
 					// Corner case: Current position is the lowest one according to the search pattern.
-					if (comboSelectedTexts[comboToSubmit+step].toLowerCase().indexOf(search) < 0) step = 0;
+					if (comboSelectedTexts[comboToSubmit + step].toLowerCase().indexOf(search) < 0) step = 0;
 				}
 				
 				comboToSubmit += step;
@@ -1376,7 +1376,7 @@ class Zui {
 		}
 
 		for (i in 0...comboSelectedTexts.length) {
-			if(search.length > 0 && comboSelectedTexts[i].toLowerCase().indexOf(search) < 0)
+			if (search.length > 0 && comboSelectedTexts[i].toLowerCase().indexOf(search) < 0)
 				continue; // Don't show items that don't fit the current search pattern
 
 			if (resetPosition) { // The search has changed, select first entry that matches
