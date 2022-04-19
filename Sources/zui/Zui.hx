@@ -174,6 +174,8 @@ class Zui {
 	var tabVertical = false;
 	var sticky = false;
 	var scissor = false;
+	var groupType: GroupType;
+	var groupHandles: Array<Handle> = null;
 
 	var elementsBaked = false;
 	var checkSelectImage: kha.Image = null;
@@ -327,6 +329,27 @@ class Zui {
 		windowHeaderH += _y - windowHeaderH;
 		_y += currentWindow.scrollOffset;
 		isHovered = false;
+	}
+
+	public function beginGroup(type: GroupType) {
+		groupType = type;
+		groupHandles = [];
+	}
+
+	public function endGroup() {
+		var changed = false;
+		for (handle in groupHandles) changed = changed || handle.changed;
+
+		if (changed && ((groupType == AltExclusive && isAltDown) || groupType == Exclusive)) {
+			for (handle in groupHandles) {
+				if (!handle.changed){
+					handle.selected = false;
+					handle.changed = true;
+				}
+			}
+		}
+		groupHandles = null;
+		return changed;
 	}
 
 	function endInput() {
@@ -1001,12 +1024,17 @@ class Zui {
 	}
 
 	public function check(handle: Handle, text: String, label: String = ""): Bool {
+		if (groupHandles != null) {
+			groupHandles.push(handle);
+		}
+
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.selected;
 		}
 		if (getReleased()) {
-			handle.selected = !handle.selected;
+			if (groupHandles != null && ((groupType == AltExclusive && isAltDown) || groupType == Exclusive)) handle.selected = true;
+			else handle.selected = !handle.selected;
 			handle.changed = changed = true;
 		}
 		else handle.changed = false;
@@ -1918,4 +1946,9 @@ class Handle {
 	var Down = 2;
 	var Released = 3;
 	var Hovered = 4;
+}
+
+@:enum abstract GroupType(Int) from Int {
+	var Exclusive = 0;
+	var AltExclusive = 1;
 }
