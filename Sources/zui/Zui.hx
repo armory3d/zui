@@ -779,14 +779,14 @@ class Zui {
 	}
 
 	function submitTextEdit() {
+		submitTextHandle.changed = submitTextHandle.text != textToSubmit;
 		submitTextHandle.text = textToSubmit;
-		submitTextHandle.changed = changed = true;
 		submitTextHandle = null;
 		textToSubmit = "";
 		textSelected = "";
 	}
 
-	function updateTextEdit(align = Align.Left, editable = true) {
+	function updateTextEdit(align = Align.Left, editable = true, liveUpdate = false) {
 		var text = textSelected;
 		if (isKeyPressed) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
@@ -916,9 +916,13 @@ class Zui {
 		}
 
 		textSelected = text;
+		if (liveUpdate && textSelectedHandle != null) {
+			textSelectedHandle.changed = textSelectedHandle.text != textSelected;
+			textSelectedHandle.text = textSelected;
+		}
 	}
 
-	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true): String {
+	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true, liveUpdate = false): String {
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.text;
@@ -936,10 +940,11 @@ class Zui {
 			setCursorToInput(align);
 		}
 		var startEdit = released || tabPressed;
+		handle.changed = false;
+
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle, align);
-		if (textSelectedHandle == handle) updateTextEdit(align, editable);
+		if (textSelectedHandle == handle) updateTextEdit(align, editable, liveUpdate);
 		if (submitTextHandle == handle) submitTextEdit();
-		else handle.changed = false;
 
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
