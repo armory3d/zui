@@ -156,7 +156,6 @@ class Zui {
 	var comboSelectedX: Int;
 	var comboSelectedY: Int;
 	var comboSelectedW: Int;
-	var comboSearchLast: String;
 	var comboSearchBar = false;
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
@@ -1369,15 +1368,11 @@ class Zui {
 			var comboSearchHandle = Id.handle();
 			if (comboFirst) comboSearchHandle.text = "";
 			fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
-			textInput(comboSearchHandle);
+			search = textInput(comboSearchHandle, "", Align.Left, true, true).toLowerCase();
 			if (comboFirst) {
 				startTextEdit(comboSearchHandle); // Focus search bar
 			}
-			search = textSelected.length == 0 ? comboSearchHandle.text.toLowerCase() : textSelected.toLowerCase();
-			if (search != comboSearchLast) {
-				comboSearchLast = search;
-				resetPosition = true;
-			}
+			resetPosition = comboSearchHandle.changed;
 		}
 
 		for (i in 0...comboSelectedTexts.length) {
@@ -1426,7 +1421,6 @@ class Zui {
 		if ((inputReleased || inputReleasedR || isEscapeDown || isReturnDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
-			comboSearchLast = "";
 		}
 		else comboFirst = false;
 		inputEnabled = comboSelectedHandle == null;
