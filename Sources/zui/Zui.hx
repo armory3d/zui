@@ -156,7 +156,6 @@ class Zui {
 	var comboSelectedX: Int;
 	var comboSelectedY: Int;
 	var comboSelectedW: Int;
-	var comboSearchLast: String;
 	var comboSearchBar = false;
 	var submitComboHandle: Handle = null;
 	var comboToSubmit = 0;
@@ -779,14 +778,14 @@ class Zui {
 	}
 
 	function submitTextEdit() {
+		submitTextHandle.changed = submitTextHandle.text != textToSubmit;
 		submitTextHandle.text = textToSubmit;
-		submitTextHandle.changed = changed = true;
 		submitTextHandle = null;
 		textToSubmit = "";
 		textSelected = "";
 	}
 
-	function updateTextEdit(align = Align.Left, editable = true) {
+	function updateTextEdit(align = Align.Left, editable = true, liveUpdate = false) {
 		var text = textSelected;
 		if (isKeyPressed) { // Process input
 			if (key == KeyCode.Left) { // Move cursor
@@ -916,9 +915,13 @@ class Zui {
 		}
 
 		textSelected = text;
+		if (liveUpdate && textSelectedHandle != null) {
+			textSelectedHandle.changed = textSelectedHandle.text != textSelected;
+			textSelectedHandle.text = textSelected;
+		}
 	}
 
-	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true): String {
+	public function textInput(handle: Handle, label = "", align = Align.Left, editable = true, liveUpdate = false): String {
 		if (!isVisible(ELEMENT_H())) {
 			endElement();
 			return handle.text;
@@ -936,10 +939,11 @@ class Zui {
 			setCursorToInput(align);
 		}
 		var startEdit = released || tabPressed;
+		handle.changed = false;
+
 		if (textSelectedHandle != handle && startEdit) startTextEdit(handle, align);
-		if (textSelectedHandle == handle) updateTextEdit(align, editable);
+		if (textSelectedHandle == handle) updateTextEdit(align, editable, liveUpdate);
 		if (submitTextHandle == handle) submitTextEdit();
-		else handle.changed = false;
 
 		if (label != "") {
 			g.color = t.LABEL_COL; // Label
@@ -1364,15 +1368,11 @@ class Zui {
 			var comboSearchHandle = Id.handle();
 			if (comboFirst) comboSearchHandle.text = "";
 			fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
-			textInput(comboSearchHandle);
+			search = textInput(comboSearchHandle, "", Align.Left, true, true).toLowerCase();
 			if (comboFirst) {
 				startTextEdit(comboSearchHandle); // Focus search bar
 			}
-			search = textSelected.length == 0 ? comboSearchHandle.text.toLowerCase() : textSelected.toLowerCase();
-			if (search != comboSearchLast) {
-				comboSearchLast = search;
-				resetPosition = true;
-			}
+			resetPosition = comboSearchHandle.changed;
 		}
 
 		for (i in 0...comboSelectedTexts.length) {
@@ -1421,7 +1421,6 @@ class Zui {
 		if ((inputReleased || inputReleasedR || isEscapeDown || isReturnDown) && !comboFirst) {
 			comboSelectedHandle = null;
 			comboFirst = true;
-			comboSearchLast = "";
 		}
 		else comboFirst = false;
 		inputEnabled = comboSelectedHandle == null;
