@@ -934,6 +934,7 @@ class Zui {
 
 		var released = getReleased();
 		if (submitTextHandle == handle && released) { // Keep editing selected text
+			isTyping = true;
 			textSelectedHandle = submitTextHandle;
 			submitTextHandle = null;
 			setCursorToInput(align);
