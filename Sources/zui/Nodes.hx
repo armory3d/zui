@@ -522,7 +522,7 @@ class Nodes {
 		}
 
 		// Select all nodes
-		if (ui.isCtrlDown && ui.key == kha.input.KeyCode.A) {
+		if (ui.isCtrlDown && ui.key == kha.input.KeyCode.A && !ui.isTyping) {
 			nodesSelected = [];
 			for (n in canvas.nodes) nodesSelected.push(n);
 		}
