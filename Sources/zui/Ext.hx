@@ -290,9 +290,10 @@ class Ext {
 		return handle.color;
 	}
 
-	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true): String {
+	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true, label = ""): String {
 		handle.text = StringTools.replace(handle.text, "\t", "    ");
 		var lines = handle.text.split("\n");
+		var showLabel = (lines.length == 1 && lines[0] == "");
 		var selected = ui.textSelectedHandle == handle; // Text being edited
 		var cursorStartX = ui.cursorX;
 		var keyPressed = selected && ui.isKeyPressed;
@@ -306,13 +307,21 @@ class Ext {
 				handle.position = i; // Set active line
 				handle.text = lines[i];
 				ui.submitTextHandle = null;
-				ui.textInput(handle, "", align, editable);
+				ui.textInput(handle, showLabel ? label : "", align, editable);
 				if (keyPressed && ui.key != KeyCode.Return && ui.key != KeyCode.Escape) { // Edit text
 					lines[i] = ui.textSelected;
 				}
 			}
 			else {
-				ui.text(lines[i], align);
+				if (showLabel) {
+					var TEXT_COL = ui.t.TEXT_COL;
+					ui.t.TEXT_COL = ui.t.LABEL_COL;
+					ui.text(label, Right);
+					ui.t.TEXT_COL = TEXT_COL;
+				}
+				else {
+					ui.text(lines[i], align);
+				}
 			}
 			ui._y -= ui.ELEMENT_OFFSET();
 		}
