@@ -290,17 +290,37 @@ class Ext {
 		return handle.color;
 	}
 
-	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true, label = ""): String {
+	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true, label = "", wordWrap = false): String {
 		handle.text = StringTools.replace(handle.text, "\t", "    ");
+		var selected = ui.textSelectedHandle == handle; // Text being edited
 		var lines = handle.text.split("\n");
 		var showLabel = (lines.length == 1 && lines[0] == "");
-		var selected = ui.textSelectedHandle == handle; // Text being edited
 		var cursorStartX = ui.cursorX;
 		var keyPressed = selected && ui.isKeyPressed;
 		ui.highlightOnSelect = false;
 		ui.tabSwitchEnabled = false;
 		ui.g.color = ui.t.SEPARATOR_COL;
 		ui.drawRect(ui.g, true, ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, lines.length * ui.ELEMENT_H() - ui.buttonOffsetY * 2);
+
+		if (wordWrap && handle.text != "") {
+			lines = [];
+			var line = "";
+			var words = StringTools.replace(handle.text, "\n", " ").split(" ");
+			for (w in words) {
+				if (ui.ops.font.width(ui.fontSize, line + " " + w) > ui._w - 20) {
+					lines.push(line);
+					line = "";
+				}
+				line = line == "" ? w : line + " " + w;
+			}
+			lines.push(line);
+			if (selected) {
+				handle.position = lines.length - 1;
+				handle.text = line;
+				ui.startTextEdit(handle);
+				ui.cursorX = ui.highlightAnchor = line.length;
+			}
+		}
 
 		for (i in 0...lines.length) { // Draw lines
 			if ((!selected && ui.getHover()) || (selected && i == handle.position)) {
@@ -336,7 +356,7 @@ class Ext {
 				handle.position--;
 			}
 			// New line
-			if (editable && ui.key == KeyCode.Return) {
+			if (editable && ui.key == KeyCode.Return && !wordWrap) {
 				handle.position++;
 				lines.insert(handle.position, lines[handle.position - 1].substr(ui.cursorX));
 				lines[handle.position - 1] = lines[handle.position - 1].substr(0, ui.cursorX);
