@@ -295,7 +295,6 @@ class Ext {
 		var selected = ui.textSelectedHandle == handle; // Text being edited
 		var lines = handle.text.split("\n");
 		var showLabel = (lines.length == 1 && lines[0] == "");
-		var cursorStartX = ui.cursorX;
 		var keyPressed = selected && ui.isKeyPressed;
 		ui.highlightOnSelect = false;
 		ui.tabSwitchEnabled = false;
@@ -303,24 +302,35 @@ class Ext {
 		ui.drawRect(ui.g, true, ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, lines.length * ui.ELEMENT_H() - ui.buttonOffsetY * 2);
 
 		if (wordWrap && handle.text != "") {
+			var cursorSet = false;
+			var cursorPos = ui.cursorX;
+			for (i in 0...handle.position) cursorPos += lines[i].length + 1; // + \n
+			var words = lines.join(" ").split(" ");
 			lines = [];
 			var line = "";
-			var words = StringTools.replace(handle.text, "\n", " ").split(" ");
 			for (w in words) {
-				if (ui.ops.font.width(ui.fontSize, line + " " + w) > ui._w - 20) {
+				var linew = ui.ops.font.width(ui.fontSize, line + " " + w);
+				var wordw = ui.ops.font.width(ui.fontSize, " " + w);
+				if (linew > ui._w - 10 && linew > wordw) {
 					lines.push(line);
 					line = "";
 				}
 				line = line == "" ? w : line + " " + w;
+
+				var linesLen = lines.length;
+				for (l in lines) linesLen += l.length;
+				if (!cursorSet && cursorPos <= linesLen + line.length) {
+					cursorSet = true;
+					handle.position = lines.length;
+					ui.cursorX = ui.highlightAnchor = cursorPos - linesLen;
+				}
 			}
 			lines.push(line);
 			if (selected) {
-				handle.position = lines.length - 1;
-				handle.text = line;
-				ui.startTextEdit(handle);
-				ui.cursorX = ui.highlightAnchor = line.length;
+				ui.textSelected = handle.text = lines[handle.position];
 			}
 		}
+		var cursorStartX = ui.cursorX;
 
 		for (i in 0...lines.length) { // Draw lines
 			if ((!selected && ui.getHover()) || (selected && i == handle.position)) {
