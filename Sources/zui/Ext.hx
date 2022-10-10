@@ -319,7 +319,7 @@ class Ext {
 
 				var linesLen = lines.length;
 				for (l in lines) linesLen += l.length;
-				if (!cursorSet && cursorPos <= linesLen + line.length) {
+				if (selected && !cursorSet && cursorPos <= linesLen + line.length) {
 					cursorSet = true;
 					handle.position = lines.length;
 					ui.cursorX = ui.highlightAnchor = cursorPos - linesLen;
