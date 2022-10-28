@@ -234,7 +234,7 @@ class Zui {
 		if (checkSelectImage != null) {
 			checkSelectImage.unload();
 		}
-		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_SIZE()), Std.int(CHECK_SELECT_SIZE()), null, NoDepthAndStencil, 1, ops.khaWindowId);
+		checkSelectImage = kha.Image.createRenderTarget(Std.int(CHECK_SELECT_SIZE()), Std.int(CHECK_SELECT_SIZE()), null, NoDepthAndStencil, 1);
 		var g = checkSelectImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = t.ACCENT_SELECT_COL;
@@ -366,7 +366,7 @@ class Zui {
 	// Returns true if redraw is needed
 	public function window(handle: Handle, x: Int, y: Int, w: Int, h: Int, drag = false): Bool {
 		if (handle.texture == null || w != handle.texture.width || h != handle.texture.height) {
-			resize(handle, w, h, ops.khaWindowId);
+			resize(handle, w, h);
 		}
 
 		if (!windowEnded) endWindow(); // End previous window if necessary
@@ -1889,12 +1889,12 @@ class Zui {
 		return 1.0;
 	}
 
-	public function resize(handle: Handle, w: Int, h: Int, khaWindowId = 0) {
+	public function resize(handle: Handle, w: Int, h: Int) {
 		handle.redraws = 2;
 		if (handle.texture != null) handle.texture.unload();
 		if (w < 1) w = 1;
 		if (h < 1) h = 1;
-		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1, khaWindowId);
+		handle.texture = kha.Image.createRenderTarget(w, h, kha.graphics4.TextureFormat.RGBA32, kha.graphics4.DepthStencilFormat.NoDepthAndStencil, 1);
 		handle.texture.g2.imageScaleQuality = kha.graphics2.ImageScaleQuality.High;
 	}
 }
