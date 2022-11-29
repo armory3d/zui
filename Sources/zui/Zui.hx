@@ -4,6 +4,7 @@ package zui;
 // https://github.com/armory3d/zui
 
 import kha.input.Mouse;
+import kha.input.Pen;
 import kha.input.Surface;
 import kha.input.Keyboard;
 import kha.input.KeyCode;
@@ -72,6 +73,7 @@ class Zui {
 	public var inputReleasedR: Bool;
 	public var inputDown: Bool;
 	public var inputDownR: Bool;
+	public var penInUse: Bool;
 	public var isKeyPressed = false; // Keys
 	public var isKeyDown = false;
 	public var isShiftDown = false;
@@ -249,7 +251,9 @@ class Zui {
 	}
 
 	public function registerInput() {
+		if (inputRegistered) return;
 		Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		Pen.get().notify(onPenDown, onPenUp, onPenMove);
 		Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
 		#if (kha_android || kha_ios)
 		if (Surface.get() != null) Surface.get().notify(onTouchDown, onTouchUp, onTouchMove);
@@ -260,7 +264,9 @@ class Zui {
 	}
 
 	public function unregisterInput() {
+		if (!inputRegistered) return;
 		Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
+		Pen.get().remove(onPenDown, onPenUp, onPenMove);
 		Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
 		#if (kha_android || kha_ios)
 		if (Surface.get() != null) Surface.get().remove(onTouchDown, onTouchUp, onTouchMove);
@@ -340,6 +346,7 @@ class Zui {
 		inputDX = 0;
 		inputDY = 0;
 		inputWheelDelta = 0;
+		penInUse = false;
 		if (keyRepeat && isKeyDown && kha.Scheduler.time() - keyRepeatTime > 0.05) {
 			if (key == KeyCode.Backspace || key == KeyCode.Delete || key == KeyCode.Left || key == KeyCode.Right || key == KeyCode.Up || key == KeyCode.Down) {
 				keyRepeatTime = kha.Scheduler.time();
@@ -1673,6 +1680,7 @@ class Zui {
 	}
 
 	public function onMouseDown(button: Int, x: Int, y: Int) { // Input events
+		if (penInUse) return;
 		button == 0 ? inputStarted = true : inputStartedR = true;
 		button == 0 ? inputDown = true : inputDownR = true;
 		inputStartedTime = kha.Scheduler.time();
@@ -1684,6 +1692,8 @@ class Zui {
 	}
 
 	public function onMouseUp(button: Int, x: Int, y: Int) {
+		if (penInUse) return;
+
 		if (isScrolling) { // Prevent action when scrolling is active
 			isScrolling = false;
 			scrollHandle = null;
@@ -1722,6 +1732,21 @@ class Zui {
 		inputDY += y - inputY;
 		inputX = x;
 		inputY = y;
+	}
+
+	public function onPenDown(x: Int, y: Int, pressure: Float) {
+		onMouseDown(0, x, y);
+	}
+
+	public function onPenUp(x: Int, y: Int, pressure: Float) {
+		if (inputStarted) { inputStarted = false; penInUse = true; return; }
+
+		onMouseUp(0, x, y);
+		penInUse = true; // On pen release, additional mouse down & up events are fired at once - filter those out
+	}
+
+	public function onPenMove(x: Int, y: Int, pressure: Float) {
+		onMouseMove(x, y, 0, 0);
 	}
 
 	public function onKeyDown(code: KeyCode) {
