@@ -253,7 +253,7 @@ class Zui {
 	public function registerInput() {
 		if (inputRegistered) return;
 		Mouse.get().notifyWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		Pen.get().notify(onPenDown, onPenUp, onPenMove);
+		if (Pen.get() != null) Pen.get().notify(onPenDown, onPenUp, onPenMove);
 		Keyboard.get().notify(onKeyDown, onKeyUp, onKeyPress);
 		#if (kha_android || kha_ios)
 		if (Surface.get() != null) Surface.get().notify(onTouchDown, onTouchUp, onTouchMove);
@@ -266,7 +266,7 @@ class Zui {
 	public function unregisterInput() {
 		if (!inputRegistered) return;
 		Mouse.get().removeWindowed(ops.khaWindowId, onMouseDown, onMouseUp, onMouseMove, onMouseWheel);
-		Pen.get().remove(onPenDown, onPenUp, onPenMove);
+		if (Pen.get() != null) Pen.get().remove(onPenDown, onPenUp, onPenMove);
 		Keyboard.get().remove(onKeyDown, onKeyUp, onKeyPress);
 		#if (kha_android || kha_ios)
 		if (Surface.get() != null) Surface.get().remove(onTouchDown, onTouchUp, onTouchMove);
