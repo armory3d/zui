@@ -1744,7 +1744,10 @@ class Zui {
 	public function onPenUp(x: Int, y: Int, pressure: Float) {
 		if (inputStarted) { inputStarted = false; penInUse = true; return; }
 
+		#if (!kha_android && !kha_ios)
 		onMouseUp(0, x, y);
+		#end
+
 		penInUse = true; // On pen release, additional mouse down & up events are fired at once - filter those out
 	}
 
