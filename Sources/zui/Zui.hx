@@ -1377,8 +1377,11 @@ class Zui {
 			if (comboFirst) comboSearchHandle.text = "";
 			fill(0, 0, _w / SCALE(), ELEMENT_H() / SCALE(), t.SEPARATOR_COL);
 			search = textInput(comboSearchHandle, "", Align.Left, true, true).toLowerCase();
+			if (isReleased) comboFirst = true; // Keep combo open
 			if (comboFirst) {
+				#if (!kha_android && !kha_ios)
 				startTextEdit(comboSearchHandle); // Focus search bar
+				#end
 			}
 			resetPosition = comboSearchHandle.changed;
 		}
