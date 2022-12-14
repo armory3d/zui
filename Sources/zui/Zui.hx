@@ -46,12 +46,10 @@ class Zui {
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 	public static var keyRepeat = true; // Emulate key repeat for non-character keys
 	public static var dynamicGlyphLoad = true; // Allow text input fields to push new glyphs into the font atlas
-	#if (kha_android || kha_ios || zui_touchui)
-	public static var touchControls = true; // Pan with finger to scroll, hold finger for right click
-	#else
-	public static var touchControls = false;
-	#end
-	var touchHold = false;
+	public static var touchScroll = false; // Pan with finger to scroll
+	public static var touchHold = false; // Touch and hold finger for right click
+	public static var touchTooltip = false; // Show extra tooltips above finger / on-screen keyboard
+	var touchHoldActivated = false;
 	var sliderTooltip = false;
 	var sliderTooltipX = 0.0;
 	var sliderTooltipY = 0.0;
@@ -353,8 +351,9 @@ class Zui {
 				isKeyPressed = true;
 			}
 		}
-		if (touchControls && inputDown && inputX == inputStartedX && inputY == inputStartedY && inputStartedTime > 0 && kha.Scheduler.time() - inputStartedTime > 0.5) {
-			touchHold = true;
+		if (touchHold && inputDown && inputX == inputStartedX && inputY == inputStartedY && inputStartedTime > 0 && kha.Scheduler.time() - inputStartedTime > 0.7) {
+			touchHoldActivated = true;
+			inputReleasedR = true;
 			inputStartedTime = 0;
 		}
 	}
@@ -495,7 +494,7 @@ class Zui {
 				}
 
 				var scrollDelta: Float = inputWheelDelta;
-				if (touchControls && inputDown && inputDY != 0) {
+				if (touchScroll && inputDown && inputDY != 0) {
 					isScrolling = true;
 					scrollDelta = -inputDY / 20;
 				}
@@ -1151,7 +1150,7 @@ class Zui {
 			scrollHandle = handle;
 			isScrolling = true;
 			changed = handle.changed = true;
-			if (touchControls) {
+			if (touchTooltip) {
 				sliderTooltip = true;
 				sliderTooltipX = _x + _windowX;
 				sliderTooltipY = _y + _windowY;
@@ -1455,6 +1454,20 @@ class Zui {
 			globalG.drawString(text, x - xoff, sliderTooltipY - yoff);
 			if (bindGlobalG) globalG.end();
 		}
+		if (touchTooltip && textSelectedHandle != null) {
+			if (bindGlobalG) globalG.begin(false);
+			globalG.font = ops.font;
+			globalG.fontSize = fontSize * 2;
+			var xoff = ops.font.width(globalG.fontSize, textSelected) / 2;
+			var yoff = ops.font.height(globalG.fontSize) / 2;
+			var x = kha.System.windowWidth() / 2;
+			var y = kha.System.windowHeight() / 3;
+			globalG.color = t.ACCENT_COL;
+			globalG.fillRect(x - xoff, y - yoff, xoff * 2, yoff * 2);
+			globalG.color = t.TEXT_COL;
+			globalG.drawString(textSelected, x - xoff, y - yoff);
+			if (bindGlobalG) globalG.end();
+		}
 
 		if (tooltipText != "" || tooltipImg != null) {
 			if (inputChanged()) {
@@ -1697,6 +1710,11 @@ class Zui {
 	public function onMouseUp(button: Int, x: Int, y: Int) {
 		if (penInUse) return;
 
+		if (touchHoldActivated) {
+			touchHoldActivated = false;
+			return;
+		}
+
 		if (isScrolling) { // Prevent action when scrolling is active
 			isScrolling = false;
 			scrollHandle = null;
@@ -1713,11 +1731,6 @@ class Zui {
 		setInputPosition(x, y);
 		#end
 		deselectText();
-		if (touchHold) {
-			touchHold = false;
-			inputReleased = false;
-			inputReleasedR = true;
-		}
 	}
 
 	public function onMouseMove(x: Int, y: Int, movementX: Int, movementY: Int) {
