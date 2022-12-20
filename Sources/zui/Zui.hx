@@ -43,6 +43,7 @@ class Zui {
 	public static var current: Zui = null;
 	public static var onBorderHover: Handle->Int->Void = null; // Mouse over window border, use for resizing
 	public static var onTextHover: Void->Void = null; // Mouse over text input, use to set I-cursor
+	public static var onDeselectText: Void->Void = null; // Text editing finished
 	public static var alwaysRedrawWindow = true; // Redraw cached window texture each frame or on changes only
 	public static var keyRepeat = true; // Emulate key repeat for non-character keys
 	public static var dynamicGlyphLoad = true; // Allow text input fields to push new glyphs into the font atlas
@@ -984,6 +985,7 @@ class Zui {
 		if (currentWindow != null) currentWindow.redraws = 2;
 		if (Keyboard.get() != null) Keyboard.get().hide();
 		highlightAnchor = cursorX;
+		if (onDeselectText != null) onDeselectText();
 	}
 
 	public function button(text: String, align = Align.Center, label = ""): Bool {
