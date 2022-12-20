@@ -1753,20 +1753,28 @@ class Zui {
 	}
 
 	public function onPenDown(x: Int, y: Int, pressure: Float) {
+		#if (kha_android || kha_ios)
+		return;
+		#end
+
 		onMouseDown(0, x, y);
 	}
 
 	public function onPenUp(x: Int, y: Int, pressure: Float) {
-		if (inputStarted) { inputStarted = false; penInUse = true; return; }
-
-		#if (!kha_android && !kha_ios)
-		onMouseUp(0, x, y);
+		#if (kha_android || kha_ios)
+		return;
 		#end
 
+		if (inputStarted) { inputStarted = false; penInUse = true; return; }
+		onMouseUp(0, x, y);
 		penInUse = true; // On pen release, additional mouse down & up events are fired at once - filter those out
 	}
 
 	public function onPenMove(x: Int, y: Int, pressure: Float) {
+		#if (kha_android || kha_ios)
+		return;
+		#end
+
 		onMouseMove(x, y, 0, 0);
 	}
 
