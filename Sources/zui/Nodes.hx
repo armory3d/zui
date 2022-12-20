@@ -72,7 +72,7 @@ class Nodes {
 	function BUTTONS_H(node: TNode): Int {
 		var h = 0.0;
 		for (but in node.buttons) {
-			if (but.type == "RGBA") h += 235 * SCALE();
+			if (but.type == "RGBA") h += 102 * SCALE() + LINE_H() * 5; // Color wheel + controls
 			else if (but.type == "VECTOR") h += LINE_H() * 4;
 			else if (but.type == "CUSTOM") h += LINE_H() * but.height;
 			else h += LINE_H();
