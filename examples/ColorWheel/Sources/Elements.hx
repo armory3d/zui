@@ -11,7 +11,7 @@ class Elements {
 	}
 
 	function loadingFinished() {
-		ui = new Zui({font: Assets.fonts.DroidSans, color_wheel: Assets.images.color_wheel});
+		ui = new Zui({font: Assets.fonts.DroidSans, color_wheel: Assets.images.color_wheel, black_white_gradient: Assets.images.black_white_gradient});
 		kha.System.notifyOnFrames(render);
 	}
 
