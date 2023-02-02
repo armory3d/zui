@@ -290,6 +290,10 @@ class Ext {
 		return handle.color;
 	}
 
+	public static var textAreaLineNumbers = false;
+	public static var textAreaScrollPastEnd = false;
+	public static var textAreaColoring: TTextColoring = null;
+
 	public static function textArea(ui: Zui, handle: Handle, align = Align.Left, editable = true, label = "", wordWrap = false): String {
 		handle.text = StringTools.replace(handle.text, "\t", "    ");
 		var selected = ui.textSelectedHandle == handle; // Text being edited
@@ -332,6 +336,22 @@ class Ext {
 		}
 		var cursorStartX = ui.cursorX;
 
+		if (textAreaLineNumbers) {
+			var _y = ui._y;
+			var _TEXT_COL = ui.t.TEXT_COL;
+			ui.t.TEXT_COL = ui.t.ACCENT_COL;
+			for (i in 0...lines.length) {
+				ui.text((i + 1) + "");
+				ui._y -= ui.ELEMENT_OFFSET();
+			}
+			ui.t.TEXT_COL = _TEXT_COL;
+			ui._y = _y;
+			ui._x += (lines.length + "").length * 16 + 4;
+		}
+
+		var _textColoring = ui.textColoring;
+		ui.textColoring = textAreaColoring;
+
 		for (i in 0...lines.length) { // Draw lines
 			if ((!selected && ui.getHover()) || (selected && i == handle.position)) {
 				handle.position = i; // Set active line
@@ -356,14 +376,21 @@ class Ext {
 			ui._y -= ui.ELEMENT_OFFSET();
 		}
 		ui._y += ui.ELEMENT_OFFSET();
+		ui.textColoring = _textColoring;
+
+		if (textAreaScrollPastEnd) {
+			ui._y += ui._h - ui.windowHeaderH - ui.ELEMENT_H() - ui.ELEMENT_OFFSET();
+		}
 
 		if (keyPressed) {
 			// Move cursor vertically
 			if (ui.key == KeyCode.Down && handle.position < lines.length - 1) {
 				handle.position++;
+				scrollAlign(ui, handle);
 			}
 			if (ui.key == KeyCode.Up && handle.position > 0) {
 				handle.position--;
+				scrollAlign(ui, handle);
 			}
 			// New line
 			if (editable && ui.key == KeyCode.Return && !wordWrap) {
@@ -372,6 +399,7 @@ class Ext {
 				lines[handle.position - 1] = lines[handle.position - 1].substr(0, ui.cursorX);
 				ui.startTextEdit(handle);
 				ui.cursorX = ui.highlightAnchor = 0;
+				scrollAlign(ui, handle);
 			}
 			// Delete line
 			if (editable && ui.key == KeyCode.Backspace && cursorStartX == 0 && handle.position > 0) {
@@ -379,6 +407,7 @@ class Ext {
 				ui.cursorX = ui.highlightAnchor = lines[handle.position].length;
 				lines[handle.position] += lines[handle.position + 1];
 				lines.splice(handle.position + 1, 1);
+				scrollAlign(ui, handle);
 			}
 			ui.textSelected = lines[handle.position];
 		}
@@ -387,6 +416,17 @@ class Ext {
 		ui.tabSwitchEnabled = true;
 		handle.text = lines.join("\n");
 		return handle.text;
+	}
+
+	static function scrollAlign(ui: Zui, handle: Handle) {
+		// Scroll down
+		if ((handle.position + 1) * ui.ELEMENT_H() + ui.currentWindow.scrollOffset > ui._h - ui.windowHeaderH) {
+			ui.currentWindow.scrollOffset -= ui.ELEMENT_H();
+		}
+		// Scroll up
+		else if ((handle.position + 1) * ui.ELEMENT_H() + ui.currentWindow.scrollOffset < ui.windowHeaderH) {
+			ui.currentWindow.scrollOffset += ui.ELEMENT_H();
+		}
 	}
 
 	static var _ELEMENT_OFFSET = 0;

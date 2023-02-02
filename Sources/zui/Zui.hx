@@ -35,6 +35,7 @@ class Zui {
 	public var alwaysRedraw = false; // Hurts performance
 	public var highlightOnSelect = true; // Highlight text edit contents on selection
 	public var tabSwitchEnabled = true; // Allow switching focus to the next element by pressing tab
+	public var textColoring: TTextColoring = null; // Set coloring scheme for drawString() calls
 	public var windowBorderTop = 0;
 	public var windowBorderBottom = 0;
 	public var windowBorderLeft = 0;
@@ -1566,8 +1567,30 @@ class Zui {
 
 		if (!enabled) fadeColor();
 		g.pipeline = rtTextPipeline;
-		g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
+
+		if (textColoring == null) {
+			g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
+		}
+		else {
+			var colorings = textColoring.colorings;
+			var result = null;
+			for (coloring in colorings) {
+				result = extract(text, coloring.start, coloring.end, coloring.offset == 1);
+				if (result.colored != "") {
+					g.color = untyped coloring.color;
+					g.drawString(result.colored, _x + xOffset, _y + fontOffsetY + yOffset);
+				}
+				text = result.uncolored;
+			}
+			g.color = textColoring.default_color;
+			g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
+		}
+
 		g.pipeline = null;
+	}
+
+	static function extract(text: String, start: String, end: String, skipFirst = false) {
+		return { colored: "", uncolored: text };
 	}
 
 	function endElement(elementSize: Null<Float> = null) {
@@ -2028,4 +2051,16 @@ class Handle {
 	var Down = 2;
 	var Released = 3;
 	var Hovered = 4;
+}
+
+typedef TColoring = {
+	var color: Int;
+	var start: String;
+	var end: String;
+	var offset: Int;
+}
+
+typedef TTextColoring = {
+	var colorings: Array<TColoring>;
+	var default_color: Int;
 }
