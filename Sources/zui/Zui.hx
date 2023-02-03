@@ -1571,7 +1571,7 @@ class Zui {
 		else {
 			// Monospace fonts only for now
 			for (coloring in textColoring.colorings) {
-				var result = extract(text, coloring.start, coloring.end, coloring.offset == 1);
+				var result = extractColoring(text, coloring);
 				if (result.colored != "") {
 					g.color = coloring.color;
 					g.drawString(result.colored, _x + xOffset, _y + fontOffsetY + yOffset);
@@ -1585,8 +1585,48 @@ class Zui {
 		g.pipeline = null;
 	}
 
-	static function extract(text: String, start: String, end: String, skipFirst = false) {
-		return { colored: "", uncolored: text };
+	static function extractColoring(text: String, col: TColoring) {
+		var res = { colored: "", uncolored: "" };
+		var coloring = false;
+		var startFrom = 0;
+		var startLength = 0;
+		for (i in 0...text.length) {
+			var skipFirst = false;
+			// Check if upcoming text should be colored
+			var length = checkStart(i, text, col.start);
+			// Not touching another character
+			var separatedLeft = i == 0 || !isChar(text.charCodeAt(i - 1));
+			var separatedRight = i + length >= text.length || !isChar(text.charCodeAt(i + length));
+			var isSeparated = separatedLeft && separatedRight;
+			// Start coloring
+			if (length > 0 && (!coloring || col.end == "") && (!col.separated || isSeparated)) {
+				coloring = true;
+				startFrom = i;
+				startLength = length;
+				if (col.end != "" && col.end != "\n") skipFirst = true;
+			}
+			// End coloring
+			else if (col.end == "") {
+				if (i == startFrom + startLength) coloring = false;
+			}
+			else if (text.substr(i, col.end.length) == col.end) {
+				coloring = false;
+			}
+			// If true, add current character to colored string
+			var b = coloring && !skipFirst;
+			res.colored += b ? text.charAt(i) : " ";
+			res.uncolored += b ? " " : text.charAt(i);
+		}
+		return res;
+	}
+
+	static inline function isChar(code: Int): Bool {
+		return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+	}
+
+	static function checkStart(i:Int, text: String, start: Array<String>): Int {
+		for (s in start) if (text.substr(i, s.length) == s) return s.length;
+		return 0;
 	}
 
 	function endElement(elementSize: Null<Float> = null) {
@@ -2048,9 +2088,9 @@ class Handle {
 
 typedef TColoring = {
 	var color: Int;
-	var start: String;
+	var start: Array<String>;
 	var end: String;
-	var offset: Int;
+	@:optional var separated: Null<Bool>;
 }
 
 typedef TTextColoring = {
