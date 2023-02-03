@@ -368,7 +368,7 @@ class Zui {
 		var wx = x + handle.dragX;
 		var wy = y + handle.dragY;
 		var inputChanged = getInputInRect(wx, wy, w, h) && inputChanged();
-		return alwaysRedraw || isScrolling || isTyping || inputChanged;
+		return alwaysRedraw || isScrolling || inputChanged;
 	}
 
 	// Returns true if redraw is needed
@@ -453,7 +453,7 @@ class Zui {
 	public function endWindow(bindGlobalG = true) {
 		var handle = currentWindow;
 		if (handle == null) return;
-		if (handle.redraws > 0 || isScrolling || isTyping) {
+		if (handle.redraws > 0 || isScrolling) {
 			if (scissor) {
 				scissor = false;
 				g.disableScissor();
@@ -912,15 +912,12 @@ class Zui {
 			g.fillRect(hlStart, _y + buttonOffsetY * 1.5, hlstrw, cursorHeight);
 		}
 
-		// Flash cursor
-		var time = kha.Scheduler.time();
-		if (isKeyDown || time % (FLASH_SPEED() * 2.0) < FLASH_SPEED()) {
-			var str = align == Align.Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
-			var strw = ops.font.width(fontSize, str);
-			var cursorX = align == Align.Left ? _x + strw + off : _x + _w - strw - off;
-			g.color = t.TEXT_COL; // Cursor
-			g.fillRect(cursorX, _y + buttonOffsetY * 1.5, 1 * SCALE(), cursorHeight);
-		}
+		// Draw cursor
+		var str = align == Align.Left ? text.substr(0, cursorX) : text.substring(cursorX, text.length);
+		var strw = ops.font.width(fontSize, str);
+		var cursorX = align == Align.Left ? _x + strw + off : _x + _w - strw - off;
+		g.color = t.TEXT_COL; // Cursor
+		g.fillRect(cursorX, _y + buttonOffsetY * 1.5, 2 * SCALE(), cursorHeight);
 
 		textSelected = text;
 		if (liveUpdate && textSelectedHandle != null) {
@@ -1572,12 +1569,11 @@ class Zui {
 			g.drawString(text, _x + xOffset, _y + fontOffsetY + yOffset);
 		}
 		else {
-			var colorings = textColoring.colorings;
-			var result = null;
-			for (coloring in colorings) {
-				result = extract(text, coloring.start, coloring.end, coloring.offset == 1);
+			// Monospace fonts only for now
+			for (coloring in textColoring.colorings) {
+				var result = extract(text, coloring.start, coloring.end, coloring.offset == 1);
 				if (result.colored != "") {
-					g.color = untyped coloring.color;
+					g.color = coloring.color;
 					g.drawString(result.colored, _x + xOffset, _y + fontOffsetY + yOffset);
 				}
 				text = result.uncolored;
@@ -1958,9 +1954,6 @@ class Zui {
 	}
 	public inline function SCALE(): Float {
 		return ops.scaleFactor;
-	}
-	inline function FLASH_SPEED(): Float {
-		return 0.5;
 	}
 	inline function TOOLTIP_DELAY(): Float {
 		return 1.0;
