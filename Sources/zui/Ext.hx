@@ -290,11 +290,10 @@ class Ext {
 		return handle.color;
 	}
 
-	private static function rightAlignNumber(number: Int, length: Int) {
+	static function rightAlignNumber(number: Int, length: Int): String {
 		var s = number + "";
 		while (s.length < length)
 			s = " " + s;
-
 		return s;
 	}
 
@@ -348,9 +347,9 @@ class Ext {
 			var _y = ui._y;
 			var _TEXT_COL = ui.t.TEXT_COL;
 			ui.t.TEXT_COL = ui.t.ACCENT_COL;
-			var maxLength = Math.ceil(Math.log(lines.length+0.5) / Math.log(10)); // Express log_10 with natural log.
+			var maxLength = Math.ceil(Math.log(lines.length + 0.5) / Math.log(10)); // Express log_10 with natural log
 			for (i in 0...lines.length) {
-				ui.text(rightAlignNumber(i+1, maxLength));
+				ui.text(rightAlignNumber(i + 1, maxLength));
 				ui._y -= ui.ELEMENT_OFFSET();
 			}
 			ui.t.TEXT_COL = _TEXT_COL;
