@@ -309,8 +309,6 @@ class Ext {
 		var keyPressed = selected && ui.isKeyPressed;
 		ui.highlightOnSelect = false;
 		ui.tabSwitchEnabled = false;
-		ui.g.color = ui.t.SEPARATOR_COL;
-		ui.drawRect(ui.g, true, ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, lines.length * ui.ELEMENT_H() - ui.buttonOffsetY * 2);
 
 		if (wordWrap && handle.text != "") {
 			var cursorSet = false;
@@ -356,6 +354,9 @@ class Ext {
 			ui._y = _y;
 			ui._x += (lines.length + "").length * 16 + 4;
 		}
+
+		ui.g.color = ui.t.SEPARATOR_COL; // Background
+		ui.drawRect(ui.g, true, ui._x + ui.buttonOffsetY, ui._y + ui.buttonOffsetY, ui._w - ui.buttonOffsetY * 2, lines.length * ui.ELEMENT_H() - ui.buttonOffsetY * 2);
 
 		var _textColoring = ui.textColoring;
 		ui.textColoring = textAreaColoring;
