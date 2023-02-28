@@ -672,7 +672,6 @@ class Zui {
 		isTree ? drawTree(handle.selected) : drawArrow(handle.selected);
 
 		g.color = t.LABEL_COL; // Title
-		g.opacity = 1.0;
 		drawString(g, text, titleOffsetX, 0);
 
 		endElement();
