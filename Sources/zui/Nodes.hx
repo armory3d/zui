@@ -1,6 +1,6 @@
 package zui;
 
-using kha.graphics2.GraphicsExtension;
+using zui.GraphicsExtension;
 
 @:access(zui.Zui)
 class Nodes {
@@ -154,9 +154,9 @@ class Nodes {
 		var g = socketImage.g2;
 		g.begin(true, 0x00000000);
 		g.color = 0xff000000;
-		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 12);
+		zui.GraphicsExtension.fillCircle(g, 12, 12, 12);
 		g.color = 0xffffffff;
-		kha.graphics2.GraphicsExtension.fillCircle(g, 12, 12, 9);
+		zui.GraphicsExtension.fillCircle(g, 12, 12, 9);
 		g.end();
 		ui.g.begin(false);
 	}
